@@ -1,0 +1,318 @@
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php init_head(); ?>
+
+<div id="wrapper">
+	<div class="content">
+		<div class="row">
+			<div class="col-md-12" id="small-table">
+				<div class="panel_s">
+					<?php echo form_open_multipart(admin_url('purchase/pur_order'), array('id'=>'add_pur_order')); ?>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12">
+								<h4 class="no-margin font-bold"><i class="fa fa-clone menu-icon menu-icon" aria-hidden="true"></i> <?php echo _l($title); ?></h4>
+								<hr>
+							</div>
+						</div>
+
+						<?php 
+						$id = '';
+						if(isset($goods_receipt)){
+							$id = $goods_receipt->id;
+							echo form_hidden('isedit');
+						}
+						?>
+
+						<input type="hidden" name="id" value="<?php echo html_entity_decode($id); ?>">
+						<input type="hidden" name="save_and_send_request" value="false">
+
+						<!-- start-->
+
+						<?php $prefix = get_purchase_option('pur_order_prefix');
+                                $next_number = max_number_pur_order()+1;
+                          $pur_order_number = (isset($pur_order) ? str_pad($pur_order->number,5,'0',STR_PAD_LEFT) : str_pad($next_number,5,'0',STR_PAD_LEFT));
+                          
+                          $number = (isset($pur_order) ? $pur_order->number : $next_number);
+                          echo form_hidden('number',$number); ?> 
+
+
+						<div class="row">
+							<div class="col-md-6">
+								<?php echo render_input('goods_receipt_code', 'stock_received_docket_number',$pur_order_number,'',array('disabled' => 'true')) ?>
+							</div>
+							<div class="col-md-3">
+								 <?php $order_date = (isset($pur_order) ? _d($pur_order->order_date) : '') ?>
+								<?php echo render_date_input('order_date','order_date', $order_date) ?>
+							</div>
+							<div class="col-md-3">
+								<?php $delivery_date = (isset($pur_order) ? _d($pur_order->delivery_date) : '');
+                         echo render_date_input('delivery_date','delivery_date',$delivery_date); ?>
+							</div>
+
+							<div class="col-md-6 <?php if($pr_orders_status == false){ echo 'hide';} ;?>" >
+								<div class="form-group">
+									<label for="pr_order_id"><?php echo _l('reference_purchase_order'); ?></label>
+									<select name="pr_order_id" id="pr_order_id" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+										<option value=""></option>
+										<?php foreach($pr_orders as $pr_order) { ?>
+											<option value="<?php echo html_entity_decode($pr_order['id']); ?>" <?php if(isset($goods_receipt) && ($goods_receipt->pr_order_id == $pr_order['id'])){ echo 'selected' ;} ?>><?php echo html_entity_decode($pr_order['pur_order_number'].' - '.$pr_order['pur_order_name']); ?></option>
+										<?php } ?>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-md-6" >
+								<div class="form-group">
+									<label for="supplier_code"><?php echo _l('supplier_name'); ?></label>
+									<select  name="supplier_code" id="supplier_code" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+										<option value=""></option>
+
+										 <?php foreach($vendors as $s) { ?>
+                              <option value="<?php echo html_entity_decode($s['userid']); ?>" <?php if(isset($pur_order) && $pur_order->vendor == $s['userid']){ echo 'selected'; }else{ if(isset($ven) && $ven == $s['userid']){ echo 'selected';} } ?>><?php echo html_entity_decode($s['company']); ?></option>
+                                <?php } ?>
+
+									</select>
+								</div>
+							</div>
+
+							
+							<div class=" col-md-3">
+								<div class="form-group">
+									<label for="buyer_id" class="control-label">Currency</label>
+									<select name="currency" class="selectpicker" id="currency" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>"> 
+										<?php
+										
+										foreach(get_currencies_all() as $s){
+										?>
+											<option value="<?php echo html_entity_decode($s['symbol']); ?>"> <?php echo html_entity_decode($s['name']); ?></option>                  
+										<?php }?>
+									</select>
+								</div>
+							</div>
+							
+							<div class=" col-md-3">
+								<div class="form-group">
+									<label for="buyer_id" class="control-label">Conversion</label>
+									<input type="text" name="rconversion" class="form-control">
+								</div>
+							</div>
+							
+							
+
+							<div class=" col-md-3" style="display: none !important">
+								<div class="form-group">
+									<label for="buyer_id" class="control-label"><?php echo _l('Buyer'); ?></label>
+									<select name="buyer_id" class="selectpicker" id="buyer_id" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>"> 
+										<option value=""></option> 
+										<?php foreach($staff as $s){ ?>
+											<option value="<?php echo html_entity_decode($s['staffid']); ?>" <?php if(isset($goods_receipt) && ($goods_receipt->buyer_id == $s['staffid'])){ echo 'selected' ;} ?>> <?php echo html_entity_decode($s['firstname'].''.$s['lastname']); ?></option>                  
+										<?php }?>
+									</select>
+								</div>
+							</div>
+
+							<?php if(ACTIVE_PROPOSAL == true){ ?>
+								<div class="col-md-3 form-group <?php if($pr_orders_status == false){ echo 'hide';} ;?>" style="display: none !important">
+									<label for="project"><?php echo _l('project'); ?></label>
+									<select name="project" id="project" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+										<option value=""></option>
+
+										<?php if(isset($projects)){ ?>
+											<?php foreach($projects as $s) { ?>
+												<option value="<?php echo html_entity_decode($s['id']); ?>" <?php if(isset($goods_receipt) && $s['id'] == $goods_receipt->project){ echo 'selected'; } ?>><?php echo html_entity_decode($s['name']); ?></option>
+											<?php } ?>
+										<?php } ?>
+									</select>
+								</div>
+
+								<div class="col-md-3 form-group <?php if($pr_orders_status == false){ echo 'hide';} ;?>" >
+									<label for="type"><?php echo _l('type_label'); ?></label>
+									<select name="type" id="type" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+										<option value=""></option>
+										<option value="GST" <?php if(isset($goods_receipt) && $goods_receipt->type == 'GST'){ echo 'selected';} ?>>GST</option>
+										<option value="NON GST" <?php if(isset($goods_receipt) && $goods_receipt->type == 'NON GST'){ echo 'selected';} ?>>NON GST</option>
+									</select>
+								</div>
+
+								<div class="col-md-3 form-group <?php if($pr_orders_status == false){ echo 'hide';} ;?>" >
+									<label for="department"><?php echo _l('department'); ?></label>
+									<select name="department" id="department" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+										<option value=""></option>
+										<?php if(isset($departments)){ ?>
+											<?php foreach($departments as $s) { ?>
+												<option value="<?php echo html_entity_decode($s['departmentid']); ?>" <?php if(isset($goods_receipt) && $s['departmentid'] == $goods_receipt->department){ echo 'selected'; } ?>><?php echo html_entity_decode($s['name']); ?></option>
+											<?php } ?>
+
+										<?php } ?>
+
+									</select>
+								</div>
+
+								<div class="col-md-3 form-group <?php if($pr_orders_status == false){ echo 'hide';} ;?>" >
+									<label for="requester"><?php echo _l('requester'); ?></label>
+									<select name="requester" id="requester" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+										<option value=""></option>
+										<?php if(isset($staffs)){ ?>
+											<?php foreach($staffs as $s) { ?>
+												<option value="<?php echo html_entity_decode($s['staffid']); ?>" <?php if(isset($goods_receipt) && $s['staffid'] == $goods_receipt->requester){ echo 'selected'; } ?>><?php echo html_entity_decode($s['lastname'] . ' '. $s['firstname']); ?></option>
+											<?php } ?>
+										<?php }?>
+									</select>
+								</div>
+
+							<?php } ?>
+
+							<div class=" col-md-3" style="display: none !important">
+								   <?php $pur_order_name = (isset($pur_order) ? $pur_order->pur_order_name : '');
+                          echo render_input('pur_order_name','pur_order_name',$pur_order_name); ?>
+                
+							</div>
+
+							<div class="col-md-3 " style="display: none !important">
+								<?php $warehouse_id_value = (isset($goods_receipt) ? $goods_receipt->warehouse_id : '');?>
+								<a href="#" class="pull-right display-block input_method"><i class="fa fa-question-circle skucode-tooltip"  data-toggle="tooltip" title="" data-original-title="<?php echo _l('goods_receipt_warehouse_tooltip'); ?>"></i></a>
+								<select id="warehouse_id_m" name="warehouse_id_m" class="selectpicker" data-width="100%" data-none-selected-text="Non selected" data-live-search="true" tabindex="-98"><option value="18" selected>Store</option><option value="17">Sampling</option><option value="16">Industronic Warehouse 1</option><option value="15">Industronic Warehouse</option><option value="19">EWC WAREHOUSE NO 1</option></select>
+							</div>
+
+							<?php if(ACTIVE_PROPOSAL == true){ ?>
+								<div class="col-md-3 <?php if($pr_orders_status == false){ echo 'hide';} ;?>" style="display: none !important">
+									<?php $expiry_date =  isset($goods_receipt) ? $goods_receipt->expiry_date : $current_day?>
+									<?php echo render_date_input('expiry_date_m','expiry_date', _d($expiry_date)) ?>
+								</div>
+							<?php } ?>
+							<div class="col-md-3 form-group" style="display: none !important">
+								 <?php $days_owed = (isset($pur_order) ? $pur_order->days_owed : '');
+                         echo render_input('days_owed','days_owed',$days_owed,'number'); ?>
+							</div>
+						</div>
+					</div>
+					<div class="panel-body mtop10 invoice-item">
+						<div class="row">
+							<div class="col-md-4">
+								<?php $this->load->view('warehouse/item_include/main_item_select'); ?>
+							</div>
+						</div>
+
+						<div class="table-responsive s_table ">
+							<table class="table invoice-items-table items table-main-invoice-edit has-calculations no-mtop">
+								<thead>
+									<tr>
+										<th></th>
+										<th width="20%" align="left"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-title="<?php echo _l('item_description_new_lines_notice'); ?>"></i> <?php echo _l('invoice_table_item_heading'); ?></th>
+										<th width="15%" align="left">Feet</th>
+										<th width="15%" align="left">Meter</th>
+										<th width="15%" align="left">SKU</th>
+										<th width="15%" align="left">Description</th>
+										<th width="10%" align="right" class="qty"><?php echo _l('quantity'); ?></th>
+										<th width="10%" align="right"><?php echo _l('unit_price'); ?></th>
+										<th width="12%" align="right"><?php echo _l('invoice_table_tax_heading'); ?></th>
+										<th width="10%" align="right"><?php echo _l('invoice_table_amount_heading'); ?></th>
+                                        
+										<th align="center"><i class="fa fa-cog"></i></th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php echo $goods_receipt_row_template; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="col-md-8 col-md-offset-4">
+							<table class="table text-right">
+								<tbody>
+									<tr id="subtotal">
+										<td><span class="bold"><?php echo _l('total_goods_money'); ?> :</span>
+										</td>
+										<td class="wh-subtotal">
+										</td>
+									</tr>
+									
+									<tr id="subtotals">
+										<td><span class="bold">Value After Convertion :</span>
+										</td>
+										<td class="wh-subtotals">
+										</td>
+									</tr>
+									
+									<tr id="totalmoney">
+										<td><span class="bold"><?php echo _l('total_money'); ?> :</span>
+										</td>
+										<td class="wh-total">
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div id="removed-items"></div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12 mtop15">
+							<div class="panel-body ">
+								<?php $description = (isset($goods_receipt) ? $goods_receipt->description : ''); ?>
+								<?php echo render_textarea('description','note',$description,array(),array(),'mtop15'); ?>
+
+								<div class="btn-bottom-toolbar text-right">
+									<a href="<?php echo admin_url('warehouse/manage_purchase'); ?>"class="btn btn-default text-right mright5"><?php echo _l('close'); ?></a>
+
+									<!--<?php if(wh_check_approval_setting('1') != false) { ?>-->
+									<!--	<?php if(isset($goods_receipt) && $goods_receipt->approval != 1){ ?>-->
+									<!--		<a href="javascript:void(0)"class="btn btn-info pull-right mright5 add_goods_receipt_send" ><?php echo _l('save_send_request'); ?></a>-->
+									<!--	<?php }elseif(!isset($goods_receipt)){ ?>-->
+									<!--		<a href="javascript:void(0)"class="btn btn-info pull-right mright5 add_goods_receipt_send" ><?php echo _l('save_send_request'); ?></a>-->
+									<!--	<?php } ?>-->
+									<!--<?php } ?>-->
+
+									<!--<?php if (is_admin() || has_permission('warehouse', '', 'edit') || has_permission('warehouse', '', 'create')) { ?>-->
+									<!--	<?php if(isset($goods_receipt) && $goods_receipt->approval == 0){ ?>-->
+									<!--		<a href="javascript:void(0)"class="btn btn-info pull-right mright5 add_goods_receipt" ><?php echo _l('submit'); ?></a>-->
+									<!--	<?php }elseif(!isset($goods_receipt)){ ?>-->
+									<!--		<a href="javascript:void(0)"class="btn btn-info pull-right mright5 add_goods_receipt" ><?php echo _l('submit'); ?></a>-->
+									<!--	<?php } ?>-->
+									<!--<?php } ?>-->
+									
+										<input type="submit" class="btn btn-info pull-right mright5 add_goods_receipt" value="<?php echo _l('submit'); ?>">
+								</div>
+							</div>
+							<div class="btn-bottom-pusher"></div>
+						</div>
+					</div>
+
+ 				<!-- <div>
+ 					<div>
+ 						<div class="col-md-12 ">
+ 							<div class="row <?php if(isset($goods_receipt)){ echo " hide" ;} ?>">
+ 								<div class="col-md-12">
+ 									<div class="col-md-1">
+ 										<div class="onoffswitch">
+ 											<input type="checkbox"  name="onoffswitch" class="onoffswitch-checkbox" id="switch_barcode_scanners">
+ 											<label class="onoffswitch-label" for="switch_barcode_scanners"></label>
+ 										</div>
+ 									</div>
+ 									<div class="col-md-11">
+ 										<span>
+ 											<?php echo _l('get_item_via_barcode_scanners'); ?>
+ 										</span>
+ 									</div>
+ 								</div>
+ 							</div>
+ 						</div>
+ 					</div>
+ 				</div> -->
+
+ 			</div>
+
+ 			<?php echo form_close(); ?>
+
+ 		</div>
+ 	</div>
+ </div>
+</div>
+</div>
+</div>
+
+
+<?php init_tail(); ?>
+<?php require 'modules/warehouse/assets/js/purchase_js.php';?>
+</body>
+</html>
+
