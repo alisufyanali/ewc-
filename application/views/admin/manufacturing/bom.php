@@ -18,7 +18,7 @@
 		                 Traveling/Transport Gate Pass
 		            </div>
 		            <?php 
-		            	echo form_open_multipart('http://localhost/ewc/admin/Misc/insert_gatepass',array('id'=>'insert_gatepass','class'=>'_transaction_form insert_gatepass'));
+		            	echo form_open_multipart('http://localhost/ewc-/admin/Misc/insert_gatepass',array('id'=>'insert_gatepass','class'=>'_transaction_form insert_gatepass'));
 		            ?>
 		            <div class="panel-body">
 		                <div class="col-sm-6">

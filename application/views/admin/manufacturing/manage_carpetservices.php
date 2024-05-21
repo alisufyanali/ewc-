@@ -30,7 +30,7 @@
 		        
 		        <div class="panel_s mbot10">
          <div class="panel-body _buttons">
-                        <a href="http://localhost/ewc/admin/misc/carpetservices" class="btn btn-info pull-left display-block">NEW CARPET SERVICES</a>
+                        <a href="http://localhost/ewc-/admin/misc/carpetservices" class="btn btn-info pull-left display-block">NEW CARPET SERVICES</a>
                         
       </div>
    </div>
@@ -38,7 +38,7 @@
 		<div class="panel_s mbot10">
         <div class="panel-body _buttons">
         <?php 
-		 	echo form_open_multipart('http://localhost/ewc/admin/Misc/manage_carpetservices',array('id'=>'manage_carpetservices','class'=>'manage_carpetservices'));
+		 	echo form_open_multipart('http://localhost/ewc-/admin/Misc/manage_carpetservices',array('id'=>'manage_carpetservices','class'=>'manage_carpetservices'));
 		?> 
         <div class="col-sm-4">
            <label>Client From Date</label>
@@ -106,9 +106,9 @@
     		                        <td><?php echo $totalcarpetservices['Type'] ?></td>
     		                              <td><?php echo $totalcarpetservices['handovertovendor'] ?></td>
     		                        <td>
-    		                            <a href="http://localhost/ewc/admin/misc/delete_carpetsevices/<?php echo $totalcarpetservices['carpetid'] ?>" class="btn btn-info">DELETE</a>
-    		                            <a href="http://localhost/ewc/admin/misc/carpetservices/<?php echo $totalcarpetservices['carpetid'] ?>" class="btn btn-info">EDIT</a>
-    		                            <a href="http://localhost/ewc/admin/misc/print_carpetservices/<?php echo $totalcarpetservices['carpetid'] ?>" class="btn btn-warning">PRINT</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/delete_carpetsevices/<?php echo $totalcarpetservices['carpetid'] ?>" class="btn btn-info">DELETE</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/carpetservices/<?php echo $totalcarpetservices['carpetid'] ?>" class="btn btn-info">EDIT</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/print_carpetservices/<?php echo $totalcarpetservices['carpetid'] ?>" class="btn btn-warning">PRINT</a>
     		                        </td>
 		                        </tr>
 		                         <?php } ?>

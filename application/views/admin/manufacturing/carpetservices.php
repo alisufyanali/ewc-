@@ -18,7 +18,7 @@
 		                 Carpet Services
 		            </div>
 		            <?php 
-		            	echo form_open_multipart('http://localhost/ewc/admin/Misc/insert_carpetservices',array('id'=>'insert_carpetservices','class'=>'_transaction_form insert_carpetservices'));
+		            	echo form_open_multipart('http://localhost/ewc-/admin/Misc/insert_carpetservices',array('id'=>'insert_carpetservices','class'=>'_transaction_form insert_carpetservices'));
 		            ?>
 		            <div class="panel-body">
 		                <div class="col-sm-6">

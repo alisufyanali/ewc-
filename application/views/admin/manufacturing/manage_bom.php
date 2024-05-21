@@ -30,7 +30,7 @@
 		        
 		        <div class="panel_s mbot10">
          <div class="panel-body _buttons">
-                        <a href="http://localhost/ewc/admin/misc/bom" class="btn btn-info pull-left display-block">
+                        <a href="http://localhost/ewc-/admin/misc/bom" class="btn btn-info pull-left display-block">
                New Gatepass            </a>
                         
       </div>
@@ -40,7 +40,7 @@
         <div class="panel_s mbot10">
             <div class="panel-body _buttons">
             <?php 
-		    	echo form_open_multipart('http://localhost/ewc/admin/Misc/manage_bom',array('id'=>'manage_bom','class'=>'manage_bom'));
+		    	echo form_open_multipart('http://localhost/ewc-/admin/Misc/manage_bom',array('id'=>'manage_bom','class'=>'manage_bom'));
 		    ?> 
             <div class="col-sm-4">
                <label>From Date</label>
@@ -99,9 +99,9 @@
     		                        <td><?php echo $totalbom['RecDriver'] ?></td>
     		                  
     		                        <td>
-    		                            <a href="http://localhost/ewc/admin/misc/delete_bom/<?php echo $totalbom['gatepassid'] ?>" class="btn btn-danger">DELETE</a>
-    		                            <a href="http://localhost/ewc/admin/misc/bom/<?php echo $totalbom['gatepassid'] ?>" class="btn btn-info">EDIT</a>
-    		                             <a href="http://localhost/ewc/admin/misc/print_gatepass/<?php echo $totalbom['gatepassid'] ?>" class="btn btn-Warning">Print</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/delete_bom/<?php echo $totalbom['gatepassid'] ?>" class="btn btn-danger">DELETE</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/bom/<?php echo $totalbom['gatepassid'] ?>" class="btn btn-info">EDIT</a>
+    		                             <a href="http://localhost/ewc-/admin/misc/print_gatepass/<?php echo $totalbom['gatepassid'] ?>" class="btn btn-Warning">Print</a>
     		                        </td>
 		                        </tr>
 		                         <?php } ?>

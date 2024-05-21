@@ -434,20 +434,20 @@ class Misc extends AdminController
     public function delete_bom($id){
             $this->db->where('id', $id);
             $this->db->delete(db_prefix() . 'gatepass');
-            redirect('http://localhost/ewc/admin/misc/manage_bom');
+            redirect('http://localhost/ewc-/admin/misc/manage_bom');
     }
     
     public function delete_approvalproduct($id){
             $this->db->where('uniqueid', $id);
             $this->db->delete(db_prefix() . 'approved_products');
-            redirect('http://localhost/ewc/admin/misc/manage_approved_products');
+            redirect('http://localhost/ewc-/admin/misc/manage_approved_products');
     }
     
     
     public function delete_carpetsevices($id){
             $this->db->where('carpetid', $id);
             $this->db->delete(db_prefix() . 'carpetservices');
-            redirect('http://localhost/ewc/admin/misc/manage_carpetservices');
+            redirect('http://localhost/ewc-/admin/misc/manage_carpetservices');
     }
 
     public function upload_sales_file()

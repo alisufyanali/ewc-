@@ -388,7 +388,7 @@
                            <td><?php echo get_payment_mode_by_id($pay['paymentmode']); ?></td>
                            <td><?php echo html_entity_decode($pay['transactionid']); ?></td>
                            <td><?php echo _d($pay['date']); ?></td>
-                           <td><a href="http://localhost/ewc/uploads/<?php echo _d($pay['attachmentsid']); ?>"><?php echo _d($pay['attachmentsid']); ?></a></td>
+                           <td><a href="http://localhost/ewc-/uploads/<?php echo _d($pay['attachmentsid']); ?>"><?php echo _d($pay['attachmentsid']); ?></a></td>
                            <td> <a href="<?php echo admin_url('purchase/delete_payment/'.$pay['id'].'/'.$estimate->id); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove"></i></a></td>
                         </tr>
                      <?php } ?>

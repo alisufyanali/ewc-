@@ -16,7 +16,7 @@
 		        <div class="panel_s">
 		            <div class="panel-heading" style="text-align: center;font-size: 18.4px;">Approval Product</div>
 		            <?php 
-		            	echo form_open_multipart('http://localhost/ewc/admin/Misc/insert_approvalproduct/'.$details['uniqueid'],array('id'=>'insert_approvalproduct','class'=>'_transaction_form insert_approvalproduct'));
+		            	echo form_open_multipart('http://localhost/ewc-/admin/Misc/insert_approvalproduct/'.$details['uniqueid'],array('id'=>'insert_approvalproduct','class'=>'_transaction_form insert_approvalproduct'));
 		            ?>
 		      <div class="panel-body">
 		                <div class="col-sm-6">

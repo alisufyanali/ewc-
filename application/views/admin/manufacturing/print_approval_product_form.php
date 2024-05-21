@@ -21,7 +21,7 @@
 		           <div class="slip">
             
             <div class="col-md-4" style="width: 40%;text-align: left;float:left">
-			    <img src="http://localhost/ewc/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" alt="EWC INTERIORS" style="width: 22%;text-align: left;">
+			    <img src="http://localhost/ewc-/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" alt="EWC INTERIORS" style="width: 22%;text-align: left;">
 			</div>
 			
 			<div class="col-md-8 text-right" style="width: 60%;text-align: right;float:right">

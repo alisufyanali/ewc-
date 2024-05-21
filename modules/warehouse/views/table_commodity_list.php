@@ -256,7 +256,7 @@ $item_have_variation = $this->ci->warehouse_model->arr_item_have_variation();
 				if (has_permission('warehouse', '', 'edit') || has_permission('warehouse', '', 'create')) {
 					$code .= ' | <a href="#" onclick="add_opening_stock_modal('. $aRow['id'].'); return false;">' . _l('add_opening_stock') . '</a>';
 					if($aRow['holdreason'] != ""){
-					    $code .= ' | <a href="http://localhost/ewc/admin/warehouse/insert_realease_stock/'. $aRow['id'].'" class="text-success">Realease Product</a>';
+					    $code .= ' | <a href="http://localhost/ewc-/admin/warehouse/insert_realease_stock/'. $aRow['id'].'" class="text-success">Realease Product</a>';
 					}
 					else{
 					    $code .= ' | <a href="#" onclick="holdtheproduct('. $aRow['id'].'); return false;"  class="text-warning">Hold Product</a>';

@@ -719,6 +719,7 @@ var_dump($data['group'] ); die;
         }
     }
 
+
     /**
      * manage chart of accounts
      */

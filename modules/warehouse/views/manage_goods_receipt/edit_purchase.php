@@ -24,7 +24,7 @@
                                         <table>
                                             <tr>
                                                 <td width="50%"><img
-                                                src="http://localhost/ewc/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png"
+                                                src="http://localhost/ewc-/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png"
                                                 alt="EWC INTERIORS"
                                                 style="width: 21%;text-align: left;margin: auto;"><br>
                                                 <strong>EWC INTERIORS</strong><br>

@@ -30,7 +30,7 @@
 		        
 		        <div class="panel_s mbot10">
          <div class="panel-body _buttons">
-                        <a href="http://localhost/ewc/admin/misc/approval_product_form" class="btn btn-info pull-left display-block">NEW APPROVAL PRODUCTS</a>
+                        <a href="http://localhost/ewc-/admin/misc/approval_product_form" class="btn btn-info pull-left display-block">NEW APPROVAL PRODUCTS</a>
                         
       </div>
    </div>
@@ -38,7 +38,7 @@
              <div class="panel_s mbot10">
          <div class="panel-body _buttons">
               <?php 
-		            	echo form_open_multipart('http://localhost/ewc/admin/Misc/manage_approved_products',array('id'=>'insert_approvalproduct','class'=>'_transaction_form insert_approvalproduct'));
+		            	echo form_open_multipart('http://localhost/ewc-/admin/Misc/manage_approved_products',array('id'=>'insert_approvalproduct','class'=>'_transaction_form insert_approvalproduct'));
 		            ?>
                     <div class="col-sm-2">
                           <label>From Date</label>
@@ -106,9 +106,9 @@
 		                            <td><?php echo $totalcarpetservices['uniqueid'] ?></td>
 		                            <td><?php echo $totalcarpetservices['client_name'] ?></td>
     		                        <td>
-    		                            <a href="http://localhost/ewc/admin/misc/delete_approvalproduct/<?php echo $totalcarpetservices['uniqueid'] ?>" class="btn btn-info">DELETE</a>
-    		                            <a href="http://localhost/ewc/admin/misc/approval_product_form/<?php echo $totalcarpetservices['uniqueid'] ?>" class="btn btn-info">EDIT</a>
-    		                            <a href="http://localhost/ewc/admin/misc/print_approval_product_form/<?php echo $totalcarpetservices['uniqueid'] ?>" class="btn btn-warning">PRINT</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/delete_approvalproduct/<?php echo $totalcarpetservices['uniqueid'] ?>" class="btn btn-info">DELETE</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/approval_product_form/<?php echo $totalcarpetservices['uniqueid'] ?>" class="btn btn-info">EDIT</a>
+    		                            <a href="http://localhost/ewc-/admin/misc/print_approval_product_form/<?php echo $totalcarpetservices['uniqueid'] ?>" class="btn btn-warning">PRINT</a>
     		                        </td>
 		                        </tr>
 		                         <?php } ?>

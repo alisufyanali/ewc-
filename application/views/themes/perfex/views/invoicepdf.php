@@ -207,7 +207,7 @@ if (get_option('total_to_words_enabled') == 1) {
 }
 
 if ($invoice->fbrinvoiceno != "") {
-$fbrimage = '<div style="text-align:center"><img src="http://localhost/ewc/assets/pos%20(1).png" style="widht:25%;text-align:center" width="100" height="100">
+$fbrimage = '<div style="text-align:center"><img src="http://localhost/ewc-/assets/pos%20(1).png" style="widht:25%;text-align:center" width="100" height="100">
 <img src="https://barcode.tec-it.com/barcode.ashx?data='.$invoice->fbrinvoiceno.'&code=Code128&translate-esc=true" style="widht:25%;text-align:center" width="300" height="100"></div>';
 }
 // 

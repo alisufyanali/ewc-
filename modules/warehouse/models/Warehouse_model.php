@@ -2961,7 +2961,7 @@ class Warehouse_model extends App_Model {
 		<tr>
 		<td rowspan="2" width="50%" class="text-left">
 		<img
-            src="http://localhost/ewc/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" height="100"
+            src="http://localhost/ewc-/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" height="100"
             alt="EWC INTERIORS">
         </td>
 		<td class="text_right_weight "><h3>' . mb_strtoupper(_l('PURCHASE SLIP')) . '</h3></td>

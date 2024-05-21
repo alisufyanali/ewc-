@@ -10,7 +10,7 @@
         </li>
         <?php $i++; } ?>
         <li>
-        <a href="http://localhost/ewc/admin/purchase/vendor/<?php echo $client->userid; ?>?group=statement" data-group="attachments">
+        <a href="http://localhost/ewc-/admin/purchase/vendor/<?php echo $client->userid; ?>?group=statement" data-group="attachments">
          <i class="fa fa-area-chart menu-icon"></i> Statement</a>
         </li>
 </ul>
