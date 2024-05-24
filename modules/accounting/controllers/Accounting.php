@@ -732,9 +732,14 @@ var_dump($data['group'] ); die;
         $data['account_types'] = $this->accounting_model->get_account_types();
          //var_dump($data['account_types']);
         $data['detail_types'] = $this->accounting_model->get_account_type_details();
+      
+
         $data['accounts'] = $this->accounting_model->get_accounts();
         
         $data['accounts_level'] = $this->accounting_model->get_third_accounts();
+        // echo '<pre>';
+        // print_r($data['accounts_level']);
+        // exit;
         //var_dump($data['accounts']);
         $this->load->view('chart_of_accounts/manage', $data);
     }
@@ -830,112 +835,26 @@ var_dump($data['group'] ); die;
     public function accounts_table()
     {
         if ($this->input->is_ajax_request()) {
-            $acc_enable_account_numbers = get_option('acc_enable_account_numbers');
-            $acc_show_account_numbers = get_option('acc_show_account_numbers');
 
-            $accounts = $this->accounting_model->get_accounts();
-            $account_types = $this->accounting_model->get_account_types();
-            $detail_types = $this->accounting_model->get_account_type_details();
-            $third_level = $this->accounting_model->get_account_type_details_type();
-
-            $account_name = [];
-            $account_type_name = [];
-            $detail_type_name = [];
-            $third_level_name = [];
-
-            foreach ($accounts as $key => $value) {
-                $account_name[$value['id']] = $value['name'];
-            }
-
-            foreach ($account_types as $key => $value) {
-                $account_type_name[$value['id']] = $value['name'];
-            }
-
-            foreach ($detail_types as $key => $value) {
-                $detail_type_name[$value['id']] = $value['name'];
-            } 
-            foreach ($third_level as $key => $value) {
-                $third_level_name[$value['id']] = $value['name'];
-            }
-
-            $array_history = [2,3,4,5,7,8,9,10];
-            
             $this->load->model('currencies_model');
-
             $currency = $this->currencies_model->get_base_currency();
-
-            if($acc_enable_account_numbers == 1 && $acc_show_account_numbers == 1){
-                $select = [
-                    '1', // bulk actions
-                    'id',
-                    'number',
-                    'name',
-                    'parent_account',
-                    'account_type_id',
-                    'account_detail_type_id',
-                    'balance',
-                    'key_name',
-                    'currency',
-                    'active',
-                    
-                ];
-            }else {
-                $select = [
-                    '1', // bulk actions
-                    'id',
-                    'name',
-                    'parent_account',
-                    'account_type_id',
-                    'account_detail_type_id',
-                    'balance',
-                    'key_name',
-                    'currency',
-                    'active',
-                    
-                ];
-            }
-
-            $where = [];
-            if ($this->input->post('ft_active')) {
-                $ft_active = $this->input->post('ft_active');
-                if($ft_active == 'yes'){
-                    array_push($where, 'AND active = 1');
-                }elseif($ft_active == 'no'){
-                    array_push($where, 'AND active = 0');
-                }
-            }
+            $where = []; 
             if ($this->input->post('ft_account')) {
                 $ft_account = $this->input->post('ft_account');
                 array_push($where, 'AND id IN (' . implode(', ', $ft_account) . ')');
             }
-            if ($this->input->post('ft_parent_account')) {
-                $ft_parent_account = $this->input->post('ft_parent_account');
-                array_push($where, 'AND parent_account IN (' . implode(', ', $ft_parent_account) . ')');
+            
+            if ($this->input->post('ft_search')) {
+                $ft_search = $this->input->post('ft_search');
+                array_push($where, 'OR name like "%' . $ft_search . '%" OR PHeadName like "%' . $ft_search . '%" ') ;
             }
-            if ($this->input->post('ft_type')) {
-                $ft_type = $this->input->post('ft_type');
-                array_push($where, 'AND account_type_id IN (' . implode(', ', $ft_type) . ')');
-            }
-            if ($this->input->post('ft_detail_type')) {
-                $ft_detail_type = $this->input->post('ft_detail_type');
-                array_push($where, 'AND account_detail_type_id IN (' . implode(', ', $ft_detail_type) . ')');
-            }
-
-            $accounting_method = get_option('acc_accounting_method');
-
-            if($accounting_method == 'cash'){
-                $debit = '(SELECT sum(debit) as debit FROM '.db_prefix().'acc_account_history where (account = '.db_prefix().'acc_accounts.id or parent_account = '.db_prefix().'acc_accounts.id) AND (('.db_prefix().'acc_account_history.rel_type = "invoice" AND '.db_prefix().'acc_account_history.paid = 1) or rel_type != "invoice")) as debit';
-                $credit = '(SELECT sum(credit) as credit FROM '.db_prefix().'acc_account_history where (account = '.db_prefix().'acc_accounts.id or parent_account = '.db_prefix().'acc_accounts.id) AND (('.db_prefix().'acc_account_history.rel_type = "invoice" AND '.db_prefix().'acc_account_history.paid = 1) or rel_type != "invoice")) as credit';
-            }else{
-                $debit = '(SELECT sum(debit) as debit FROM '.db_prefix().'acc_account_history where (account = '.db_prefix().'acc_accounts.id or parent_account = '.db_prefix().'acc_accounts.id)) as debit';
-                $credit = '(SELECT sum(credit) as credit FROM '.db_prefix().'acc_account_history where (account = '.db_prefix().'acc_accounts.id or parent_account = '.db_prefix().'acc_accounts.id)) as credit';
-            }
-
+ 
             $aColumns     = $select;
             $sIndexColumn = 'id';
             $sTable       = db_prefix() . 'acc_accounts';
             $join         = [];
-            $result       = $this->accounting_model->get_account_data_tables($aColumns, $sIndexColumn, $sTable, $join, $where, ['number', 'description','currency', 'balance_as_of', $debit, $credit, 'default_account']);
+            $result       = $this->accounting_model->get_account_data_tables_new($aColumns, $sIndexColumn, $sTable, $join, $where,  
+            ['number', 'description','currency', 'balance_as_of',  'default_account']);
             $output  = $result['output'];
             $rResult = $result['rResult'];
             $count=0;  
@@ -973,14 +892,10 @@ var_dump($data['group'] ); die;
 
                 $categoryOutput .= '</div>';
                 $row[] = $categoryOutput;
-                // if($aRow['parent_account'] != '' && $aRow['parent_account'] != 0){
-                //     $row[] = (isset($account_name[$aRow['parent_account']]) ? $account_name[$aRow['parent_account']] : '');
-                // }else{
-                //     $row[] = '';
-                // }
-                $row[] = isset($third_level_name[$aRow['account_third_level']]) ? $third_level_name[$aRow['account_third_level']] : $aRow['account_third_level'];
-                $row[] = isset($account_type_name[$aRow['account_type_id']]) ? $account_type_name[$aRow['account_type_id']] : '';
-                $row[] = isset($detail_type_name[$aRow['account_detail_type_id']]) ? $detail_type_name[$aRow['account_detail_type_id']] : '';
+
+                $row[] = $aRow['HeadCode'];
+                $row[] = $aRow['PHeadName'];
+                
                 
                 if($aRow['account_type_id'] == 11 || $aRow['account_type_id'] == 12 || $aRow['account_type_id'] == 8 || $aRow['account_type_id'] == 9 || $aRow['account_type_id'] == 10 || $aRow['account_type_id'] == 7 || $aRow['account_type_id'] == 16){ //$aRow['credit'] - $aRow['debit']
                     $row[] = app_format_money($aRow['balance'], $aRow['currency']);
@@ -988,11 +903,10 @@ var_dump($data['group'] ); die;
                     $row[] = app_format_money($aRow['debit'] - $aRow['credit'], $aRow['currency']);
                 }
                 if($aRow['account_type_id'] >=10 && $aRow['account_type_id'] != 16 ){
-                $row[] =  app_format_money($aRow['debit'] - $aRow['credit'], $aRow['currency']);}
+                  $row[] =  app_format_money($aRow['debit'] - $aRow['credit'], $aRow['currency']);}
                 else{
                     $row[] = '';
                 }
-                
 
                 $checked = '';
                 if ($aRow['active'] == 1) {
@@ -1007,14 +921,7 @@ var_dump($data['group'] ); die;
                 // For exporting
                 $_data .= '<span class="hide">' . ($checked == 'checked' ? _l('is_active_export') : _l('is_not_active_export')) . '</span>';
                 $row[] = $_data;
-                
-                $options = '';
-                if(in_array($aRow['account_type_id'], $array_history)){
-                    $options = icon_btn(admin_url('accounting/rp_account_history?account='.$aRow['id']), 'history', 'btn-default', [
-                        'title' => _l('account_history'),
-                    ]);
-                }
-                $row[] =  $options;
+                 
                 $count +=1;
                 $output['aaData'][] = $row;
             }
@@ -1069,6 +976,9 @@ var_dump($data['group'] ); die;
             die();
         }
     }
+
+
+    
 
     /**
      * get data convert

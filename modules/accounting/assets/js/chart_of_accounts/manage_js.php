@@ -9,30 +9,14 @@ var list_account_type_details, list_third_level, fnServerParams;
         name: 'required',
     }, account_form_handler);
 
-    fnServerParams = {
-        "ft_type": '[name="ft_type"]',
-        "ft_detail_type": '[name="ft_detail_type"]',
-        "ft_parent_account": '[name="ft_parent_account"]',
+    fnServerParams = { 
         "ft_account": '[name="ft_account"]',
-        "ft_active": '[name="ft_active"]',
+        "ft_search": '[name="ft_search"]',
     };
-    $('select[name="ft_type"]').on('change', function() {
+    $('#filter_submit').on('click', function() {
         init_account_table();
     });
-    $('select[name="ft_active"]').on('change', function() {
-        init_account_table();
-    });
-    $('select[name="ft_detail_type"]').on('change', function() {
-        init_account_table();
-    });
-
-    $('select[name="ft_parent_account"]').on('change', function() {
-        init_account_table();
-    });
-
-    $('select[name="ft_account"]').on('change', function() {
-        init_account_table();
-    });
+   
 
     list_account_type_details = <?php echo json_encode($detail_types); ?>;
     list_third_level = <?php echo json_encode($accounts_level); ?>;
@@ -263,6 +247,9 @@ function account_form_handler(form) {
         response = JSON.parse(response);
         if (response.success === true || response.success == 'true' || $.isNumeric(response.success)) {
             alert_float('success', response.message);
+            setTimeout(function() {
+                document.location.reload()
+            }, 2000);
 
             init_account_table();
         } else {
@@ -356,7 +343,7 @@ function init_account_table() {
     if ($.fn.DataTable.isDataTable('.table-accounts')) {
         $('.table-accounts').DataTable().destroy();
     }
-    initDataTable('.table-accounts', admin_url + 'accounting/accounts_table', [0], [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    initDataTable('.table-accounts', admin_url + 'accounting/accounts_table', [0], [0, 1, 2, 3, 4, 5, 6],
         fnServerParams, []);
     $('.dataTables_filter').addClass('hide');
 }

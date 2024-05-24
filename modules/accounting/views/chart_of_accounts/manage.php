@@ -17,22 +17,15 @@
                             <?php echo render_select('ft_account',$accounts,array('id','name', 'third_level'),'acc_account', '', array('multiple' => true, 'data-actions-box' => true), array(), '', '', false); ?>
                         </div>
                         <div class="col-md-3">
-                            <?php echo render_select('ft_parent_account',$accounts_level,array('id','name', 'detail_type_name'),'parent_account', '', array('multiple' => true, 'data-actions-box' => true), array(), '', '', false); ?>
+                            <?php echo render_input('ft_search','Search', null, 'text') ?>
                         </div>
                         <div class="col-md-3">
-                            <?php echo render_select('ft_type',$account_types,array('id','name'),'type', '', array('multiple' => true, 'data-actions-box' => true), array(), '', '', false); ?>
-                        </div>
-                        <div class="col-md-3">
-                            <?php echo render_select('ft_detail_type',$detail_types,array('id','name'),'detail_type', '', array('multiple' => true, 'data-actions-box' => true), array(), '', '', false); ?>
-                        </div>
-                        <div class="col-md-3">
-                            <?php $active = [ 
-                    1 => ['id' => 'all', 'name' => _l('all')],
-                    2 => ['id' => 'yes', 'name' => _l('is_active_export')],
-                    3 => ['id' => 'no', 'name' => _l('is_not_active_export')],
-                  ]; 
-                  ?>
-                            <?php echo render_select('ft_active',$active,array('id','name'),'staff_dt_active', 'yes', array(), array(), '', '', false); ?>
+                            <div class="">
+
+                                <p for="">&nbsp</p>
+                                <button class="btn btn-success" id="filter_submit">Filter</button>
+                            </div>
+
                         </div>
                     </div>
                     <hr>
@@ -43,16 +36,16 @@
                         <thead>
                             <th><span class="hide"> - </span>
                                 <div class="checkbox mass_select_all_wrap"><input type="checkbox" id="mass_select_all"
-                                        data-to-table="accounts"><label></label></div>
+                                        data-to-table="accounts">
+                                    <p></label>
+                                </div>
                             </th>
                             <th><?php echo _l('name'); ?></th>
+                            <th><?php echo _l('Code'); ?></th>
                             <th><?php echo _l('parent_account'); ?></th>
-                            <th><?php echo _l('type'); ?></th>
-                            <th><?php echo _l('detail_type'); ?></th>
                             <th><?php echo _l('primary_balance'); ?></th>
                             <th><?php echo _l('bank_balance'); ?></th>
                             <th><?php echo _l('staff_dt_active'); ?></th>
-                            <th><?php echo _l('options'); ?></th>
                         </thead>
                         <tbody>
                         </tbody>
@@ -70,22 +63,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title"><?php echo _l('acc_account')?></h4>
+                <h4 class="modal-title">Add Chart of Accounts</h4>
             </div>
             <?php echo form_open_multipart(admin_url('accounting/account'),array('id'=>'account-form'));?>
             <?php echo form_hidden('id'); ?>
             <?php echo form_hidden('update_balance'); ?>
             <div class="modal-body">
-                <?php echo render_select('account_type_id',$account_types,array('id','name'),'account_type','',array(),array(),'','',false); ?>
-                <?php echo render_select('account_detail_type_id',$detail_types,array('id','name'),'detail_type','',array(),array(),'','',false); ?>
-                <p><i class="detail_type_note"><?php echo html_entity_decode($detail_types[0]['note']); ?></i></p>
+
                 <?php echo render_input('name','name'); ?>
-                <?php if(get_option('acc_enable_account_numbers') == 1){
-           echo render_input('number','number'); 
-        } ?>
-                <?php echo render_select('account_third_level',$accounts_level,array('id','name', 'detail_type_name'),'parent_account'); ?>
-                <p><i class="parent_account_note"><?php echo html_entity_decode($accounts_level[0]['note']); ?></i></p>
-                <div class="row hide" id="div_balance">
+                <?php echo render_select('parent_account',$accounts,array('id','name' , 'HeadCode'),'parent_account'); ?>
+                <br>
+
+                <div class="row">
                     <div class="col-md-6">
                         <?php echo render_input('balance','balance','','text', $arrAtt); ?>
                     </div>
@@ -104,6 +93,7 @@
                         </select>
                     </div>
                 </div>
+                <br>
 
                 <div class="row">
                     <div class="col-md-12">

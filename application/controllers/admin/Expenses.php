@@ -58,6 +58,7 @@ class Expenses extends AdminController
                     ]);
                     die;
                 }
+                
                 $id = $this->expenses_model->add($this->input->post());
                 if ($id) {
                     set_alert('success', _l('added_successfully', _l('expense')));
@@ -89,6 +90,7 @@ class Expenses extends AdminController
                 ]);
             die;
         }
+
         if ($id == '') {
             $title = _l('add_new', _l('expense_lowercase'));
         } else {

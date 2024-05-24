@@ -114,6 +114,7 @@ class Expenses_model extends App_Model
         } else {
             $data['recurring'] = 0;
         }
+        
         unset($data['repeat_type_custom']);
         unset($data['repeat_every_custom']);
 
@@ -127,6 +128,7 @@ class Expenses_model extends App_Model
 
         $this->db->insert(db_prefix() . 'expenses', $data);
         $insert_id = $this->db->insert_id();
+
         if ($insert_id) {
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);
@@ -134,12 +136,12 @@ class Expenses_model extends App_Model
             if (isset($data['project_id']) && !empty($data['project_id'])) {
                 $this->load->model('projects_model');
                 $project_settings = $this->projects_model->get_project_settings($data['project_id']);
-                $visible_activity = 0;
+                $visible_activity = 0 ;
+                
                 foreach ($project_settings as $s) {
                     if ($s['name'] == 'view_finance_overview') {
                         if ($s['value'] == 1) {
                             $visible_activity = 1;
-
                             break;
                         }
                     }

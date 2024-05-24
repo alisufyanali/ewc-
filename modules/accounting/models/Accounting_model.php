@@ -1352,11 +1352,8 @@ class Accounting_model extends App_Model
         }
 
         foreach ($accounts as $key => $value) {
-
-            
                 $accounts[$key]['name'] = $value['name'] != '' ? $value['name'] : _l($value['key_name']);
-           
-            
+
             $_account_type_name = isset($account_type_name[$value['account_type_id']]) ? $account_type_name[$value['account_type_id']] : '';
             $_detail_type_name = isset($detail_type_name[$value['account_type_id_type']]) ? $detail_type_name[$value['account_type_id_type']] : '';
             $accounts[$key]['account_type_name'] = $_account_type_name;
@@ -2041,10 +2038,15 @@ class Accounting_model extends App_Model
         $this->db->order_by('account_type_id,account_detail_type_id', 'desc');
         $accounts = $this->db->get(db_prefix() . 'acc_accounts')->result_array();
 
+        
         $account_types = $this->accounting_model->get_account_types();
         $detail_types = $this->accounting_model->get_account_type_details();
         $third_level_types = $this->accounting_model->get_account_type_details_type();
 
+        
+        // echo '<pre>';
+        // print_r($accounts);
+        // exit;
         $account_type_name = [];
         $detail_type_name = [];
         $third_level_name = [];
@@ -2085,7 +2087,7 @@ class Accounting_model extends App_Model
      * @param array $data
      * @return integer
      */
-    public function add_account($data)
+    public function add_account_old($data)
     {
         if (isset($data['id'])) {
             unset($data['id']);
@@ -2098,7 +2100,7 @@ class Accounting_model extends App_Model
         if(isset($data['update_balance'])){
             unset($data['update_balance']);
         }
-//var_dump($data); die;
+        //var_dump($data); die;
         $data['balance'] = str_replace(',', '', $data['balance']);
         $this->db->insert(db_prefix() . 'acc_accounts', $data);
 
@@ -2280,6 +2282,204 @@ class Accounting_model extends App_Model
 
         return false;
     }
+
+    public function add_account($data)
+    {
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
+
+        if($data['balance_as_of'] != ''){
+            $data['balance_as_of'] = to_sql_date($data['balance_as_of']);
+        }
+
+        if(isset($data['update_balance'])){
+            unset($data['update_balance']);
+        }
+        //var_dump($data); die;
+        $data['balance'] = str_replace(',', '', $data['balance']);
+        $this->db->insert(db_prefix() . 'acc_accounts', $data);
+
+        $insert_id = $this->db->insert_id();
+
+        if ($insert_id) {
+            if($data['balance'] != 0 && $data['balance'] != ''){
+                $node = [];
+                $node['account'] = $insert_id;
+                $node['ending_balance'] = $data['balance'];
+                $node['beginning_balance'] = 0;
+                $node['opening_balance'] = 0;
+                $node['finish'] = 1;
+                if($data['balance_as_of'] != ''){
+                    $node['ending_date'] = $data['balance_as_of'];
+                }else{
+                    $node['ending_date'] = date('Y-m-d');
+                }
+            
+                $this->db->insert(db_prefix().'acc_reconciles', $node);
+                $reconcile_id = $this->db->insert_id();
+
+                $this->db->where('account_type_id', 10);
+                $this->db->where('account_detail_type_id', 71);
+                $account = $this->db->get(db_prefix().'acc_accounts')->row();
+
+                if($account){
+                    $node = [];
+
+                    if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                        if($data['balance'] > 0){
+                            $node['debit'] = $data['balance'];
+                            $node['credit'] = 0;
+                        }else{
+                            $node['debit'] = 0;
+                            $node['credit'] = abs($data['balance']);
+                        }
+                    }else{
+                        if($data['balance'] > 0){
+                            $node['debit'] = 0;
+                            $node['credit'] = $data['balance'];
+                        }else{
+                            $node['debit'] = abs($data['balance']);
+                            $node['credit'] = 0;
+                        }
+                    }
+
+                    $node['split'] = $insert_id;
+                    $node['account'] = $account->id;
+                    $node['rel_id'] = 0;
+                    $node['rel_type'] = 'deposit';
+                    if($data['balance_as_of'] != ''){
+                        $node['date'] = $data['balance_as_of'];
+                    }else{
+                        $node['date'] = date('Y-m-d');
+                    }
+                    $node['datecreated'] = date('Y-m-d H:i:s');
+                    $node['addedfrom'] = get_staff_user_id();
+
+                    $this->db->insert(db_prefix().'acc_account_history', $node);
+
+                    $node = [];
+                    if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                        if($data['balance'] > 0){
+                            $node['debit'] = 0;
+                            $node['credit'] = $data['balance'];
+                        }else{
+                            $node['debit'] = abs($data['balance']);
+                            $node['credit'] = 0;
+                        }
+                    }else{
+                        if($data['balance'] > 0){
+                            $node['debit'] = $data['balance'];
+                            $node['credit'] = 0;
+                        }else{
+                            $node['debit'] = 0;
+                            $node['credit'] = abs($data['balance']);
+                        }
+                    }
+
+                    $node['reconcile'] = $reconcile_id;
+                    $node['split'] = $account->id;
+                    $node['account'] = $insert_id;
+                    $node['rel_id'] = 0;
+                    $node['rel_type'] = 'deposit';
+                    if($data['balance_as_of'] != ''){
+                        $node['date'] = $data['balance_as_of'];
+                    }else{
+                        $node['date'] = date('Y-m-d');
+                    }
+                    $node['datecreated'] = date('Y-m-d H:i:s');
+                    $node['addedfrom'] = get_staff_user_id();
+
+                    $this->db->insert(db_prefix().'acc_account_history', $node);
+                }else{
+                    $this->db->insert(db_prefix().'acc_accounts', [
+                        'name' => '',
+                        'key_name' => 'acc_opening_balance_equity',
+                        'account_type_id' => 10,
+                        'account_detail_type_id' => 71,
+                    ]);
+
+                    $account_id = $this->db->insert_id();
+
+                    if ($account_id) {
+                        $node = [];
+                        if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                            if($data['balance'] > 0){
+                                $node['debit'] = $data['balance'];
+                                $node['credit'] = 0;
+                            }else{
+                                $node['debit'] = 0;
+                                $node['credit'] = abs($data['balance']);
+                            }
+                        }else{
+                            if($data['balance'] > 0){
+                                $node['debit'] = 0;
+                                $node['credit'] = $data['balance'];
+                            }else{
+                                $node['debit'] = abs($data['balance']);
+                                $node['credit'] = 0;
+                            }
+                        }
+                        
+                        $node['split'] = $insert_id;
+                        $node['account'] = $account_id;
+                        if($data['balance_as_of'] != ''){
+                            $node['date'] = $data['balance_as_of'];
+                        }else{
+                            $node['date'] = date('Y-m-d');
+                        }
+                        $node['rel_id'] = 0;
+                        $node['rel_type'] = 'deposit';
+                        $node['datecreated'] = date('Y-m-d H:i:s');
+                        $node['addedfrom'] = get_staff_user_id();
+
+                        $this->db->insert(db_prefix().'acc_account_history', $node);
+
+                        $node = [];
+                        if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                            if($data['balance'] > 0){
+                                $node['debit'] = 0;
+                                $node['credit'] = $data['balance'];
+                            }else{
+                                $node['debit'] = abs($data['balance']);
+                                $node['credit'] = 0;
+                            }
+                        }else{
+                            if($data['balance'] > 0){
+                                $node['debit'] = $data['balance'];
+                                $node['credit'] = 0;
+                            }else{
+                                $node['debit'] = 0;
+                                $node['credit'] = abs($data['balance']);
+                            }
+                        }
+                        
+                        $node['reconcile'] = $reconcile_id;
+                        $node['split'] = $account_id;
+                        $node['account'] = $insert_id;
+                        if($data['balance_as_of'] != ''){
+                            $node['date'] = $data['balance_as_of'];
+                        }else{
+                            $node['date'] = date('Y-m-d');
+                        }
+                        $node['rel_id'] = 0;
+                        $node['rel_type'] = 'deposit';
+                        $node['datecreated'] = date('Y-m-d H:i:s');
+                        $node['addedfrom'] = get_staff_user_id();
+
+                        $this->db->insert(db_prefix().'acc_account_history', $node);
+                    }
+                }
+            }
+
+           
+            return $insert_id;
+        }
+
+        return false;
+    }
+
+
 
     /**
      * update account
@@ -10174,6 +10374,7 @@ class Accounting_model extends App_Model
      * @param  string $sGroupBy group results
      * @return array
      */
+    
     function get_account_data_tables($aColumns, $sIndexColumn, $sTable, $join = [], $where = [], $additionalSelect = [], $sGroupBy = '', $searchAs = [])
     {
         $CI          = & get_instance();
@@ -10247,6 +10448,69 @@ class Accounting_model extends App_Model
             'output'  => $output,
             ];
     }
+
+
+
+    
+    function get_account_data_tables_new($aColumns, $sIndexColumn, $sTable, $join = [], $where = [], $additionalSelect = [], $sGroupBy = '', $searchAs = [])
+    {
+        $CI          = & get_instance();
+        $__post      = $CI->input->post();
+
+        $where = implode(' ', $where);
+        $where = trim($where);
+        if (startsWith($where, 'AND') || startsWith($where, 'OR')) {
+            if (startsWith($where, 'OR')) {
+                $where = substr($where, 2);
+            } else {
+                $where = substr($where, 3);
+            }
+
+            $this->db->where($where);
+        }
+        $this->db->select('*');
+        $this->db->limit(intval($CI->input->post('length')), intval($CI->input->post('start'))); 
+        $this->db->order_by('id', 'desc');
+
+        $accounts = $this->db->get($sTable)->result_array();
+        $rResult = [];
+        // echo "<pre>";
+        // print_r($accounts);
+        // exit;
+
+        foreach ($accounts as $key => $value) {
+            $rResult[] = $value;
+        }
+
+        /* Data set length after filtering */
+        $sQuery = '
+        SELECT FOUND_ROWS()
+        ';
+        $_query         = $CI->db->query($sQuery)->result_array();
+        $iFilteredTotal = $_query[0]['FOUND_ROWS()'];
+        
+        /* Total data set length */
+        $sQuery = '
+        SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') FROM '.$sTable.' where (parent_account IS NULL OR parent_account = 0)';
+        $_query = $CI->db->query($sQuery)->result_array();
+
+        $iTotal = $_query[0]['COUNT(' . $sTable . '.' . $sIndexColumn . ')'];
+        /*
+         * Output
+         */
+        $output = [
+            'draw'                 => $__post['draw'] ? intval($__post['draw']) : 0,
+            'iTotalRecords'        => 100,//$iTotal,
+            'iTotalDisplayRecords' => $iTotal,
+            'aaData'               => [],
+            ];
+
+        return [
+            'rResult' => $rResult,
+            'output'  => $output,
+            ];
+    }
+
 
     /**
      * get recursive account
@@ -11894,6 +12158,7 @@ class Accounting_model extends App_Model
         $total_credit = 0;
         $data_return['total_debit'] = 0;
         $data_return['total_credit'] = 0;
+        
         foreach ($child_account as $val) {
             $data_return['row_index']++;
             $total_debit = $val['debit'];
@@ -16574,6 +16839,7 @@ class Accounting_model extends App_Model
     public function get_html_custom_summary_report($child_account, $data_return, $parent_index, $currency){
         $total_amount = 0;
         $data_return['total_amount'] = 0;
+
         foreach ($child_account as $val) {
             $data_return['row_index']++;
             $data_return['html'] .= '<tr class="treegrid-'.$data_return['row_index'].' '.($parent_index != 0 ? 'treegrid-parent-'.$parent_index : '').' expanded">
@@ -16620,7 +16886,7 @@ class Accounting_model extends App_Model
 
             $data_return['total_amount'] += $total;
         }
-        return $data_return; 
+        return $data_return ; 
     }
 
     /**
