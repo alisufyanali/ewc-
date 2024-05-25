@@ -730,20 +730,26 @@ var_dump($data['group'] ); die;
 
         $data['title'] = _l('chart_of_accounts');
         $data['account_types'] = $this->accounting_model->get_account_types();
-         //var_dump($data['account_types']);
         $data['detail_types'] = $this->accounting_model->get_account_type_details();
       
+        $where =  ' HeadLevel = 1 ';
+        $data['accounts'] = $this->accounting_model->get_accounts(null , $where);
 
-        $data['accounts'] = $this->accounting_model->get_accounts();
+        $where =  ' HeadLevel = 2 ';
+        $data['child_accounts'] = $this->accounting_model->get_accounts(null , $where);
         
+        $where =  ' HeadLevel = 3 ';
+        $data['sub_child_accounts'] = $this->accounting_model->get_accounts(null , $where);
+
+
         $data['accounts_level'] = $this->accounting_model->get_third_accounts();
-        // echo '<pre>';
-        // print_r($data['accounts_level']);
-        // exit;
-        //var_dump($data['accounts']);
+     
         $this->load->view('chart_of_accounts/manage', $data);
     }
 
+
+
+    
     /**
      * setting
      * @return view
@@ -848,6 +854,7 @@ var_dump($data['group'] ); die;
                 $ft_search = $this->input->post('ft_search');
                 array_push($where, 'OR name like "%' . $ft_search . '%" OR PHeadName like "%' . $ft_search . '%" ') ;
             }
+            array_push($where, 'AND HeadLevel = 4 ');
  
             $aColumns     = $select;
             $sIndexColumn = 'id';
@@ -895,6 +902,11 @@ var_dump($data['group'] ); die;
 
                 $row[] = $aRow['HeadCode'];
                 $row[] = $aRow['PHeadName'];
+                
+                $level_2 =  $this->get_PHeadCode($aRow['PHeadCode']) ;
+                $row[] =   $this->get_HeadName($level_2) ;
+                $level_3 =  $this->get_PHeadCode($level_2) ;
+                $row[] = $this->get_HeadName($level_3);
                 
                 
                 if($aRow['account_type_id'] == 11 || $aRow['account_type_id'] == 12 || $aRow['account_type_id'] == 8 || $aRow['account_type_id'] == 9 || $aRow['account_type_id'] == 10 || $aRow['account_type_id'] == 7 || $aRow['account_type_id'] == 16){ //$aRow['credit'] - $aRow['debit']
@@ -945,9 +957,37 @@ var_dump($data['group'] ); die;
         }
 
         if ($this->input->post()) {
-            $data = $this->input->post();
+            $posts = $this->input->post();
             $data['description'] = $this->input->post('description', false);
             $message = '';
+
+            if(isset($posts['sub_child_accounts']) && $posts['sub_child_accounts'] != null ){
+                $data['HeadCode'] = $this->get_HeadCode($posts['sub_child_accounts']);
+                $data['PHeadName'] = $this->get_HeadName($posts['sub_child_accounts']);
+                $data['PHeadCode'] = $posts['sub_child_accounts'] ;
+                $data['HeadLevel'] = 4 ;
+                
+
+            }elseif(isset($posts['child_accounts']) && $posts['child_accounts'] != null ){
+                $data['HeadCode'] = $this->get_HeadCode($posts['child_accounts']);
+                $data['PHeadName'] = $this->get_HeadName($posts['child_accounts']);
+                $data['PHeadCode'] = $posts['child_accounts'] ;
+                $data['HeadLevel'] = 3 ;
+
+            }else{
+                $data['HeadCode'] = $this->get_HeadCode($posts['parent_account']);
+                $data['PHeadName'] = $this->get_HeadName($posts['parent_account']);
+                $data['PHeadCode'] = $posts['parent_account'] ;
+                $data['HeadLevel'] =  2;
+            }
+            $data['name'] = $posts['name'] ;
+            $data['balance'] = $posts['balance'] ;
+            $data['balance_as_of'] = $posts['balance_as_of'] ;
+            $data['currency'] = $posts['currency'] ;
+            $data['update_balance'] = $posts['update_balance'] ;
+            $data['id'] = $posts['id'] ;
+
+
             if ($data['id'] == '') {
                 if (!has_permission('accounting_chart_of_accounts', '', 'create')) {
                     access_denied('accounting');
@@ -979,6 +1019,67 @@ var_dump($data['group'] ); die;
 
 
     
+    public function dd($data) {
+        echo '<pre>';
+        print_r($data);
+        exit;
+    }
+
+    public function get_HeadCode($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        $newidsinfo = $this->db->select('count(HeadCode) as hc')
+                ->from('tblacc_accounts')
+                ->where('PHeadName',$newdata->name)
+                ->get()
+                ->row();
+
+        $nid  = $newidsinfo->hc;
+        $n = $nid + 1;
+        if ($n / 10 < 1){
+            $newHeadCode = $HeadCode . "0" . $n;
+        }
+        else{
+            $newHeadCode = $HeadCode . $n;
+        }
+
+        return $newHeadCode;
+    }
+
+
+
+    public function get_HeadName($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        return $newdata->name;
+    }
+
+    
+
+    
+    public function get_PHeadCode($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        return $newdata->PHeadCode;
+    }
+
+    
+
 
     /**
      * get data convert
@@ -3138,6 +3239,13 @@ var_dump($data['group'] ); die;
         $account = $this->accounting_model->get_accounts($id);
         $account->balance_as_of = _d($account->balance_as_of);
         $account->name = $account->name != '' ? $account->name : _l($account->key_name);
+
+        
+        $level_2 =  $this->get_PHeadCode($account->PHeadCode) ;
+        $account->PHeadCode2 =   $level_2 ;
+        
+        $level_3 =  $this->get_PHeadCode($level_2) ;
+        $account->PHeadCode3 = $level_3;
 
         // if($account->balance == 0){
         //     if(($account->account_type_id != 16 && $account->account_type_id > 10) || $account->account_type_id == 1 || $account->account_type_id == 6){

@@ -2282,12 +2282,12 @@ class Accounting_model extends App_Model
 
         return false;
     }
-
     public function add_account($data)
     {
         if (isset($data['id'])) {
             unset($data['id']);
         }
+
 
         if($data['balance_as_of'] != ''){
             $data['balance_as_of'] = to_sql_date($data['balance_as_of']);
@@ -2302,10 +2302,12 @@ class Accounting_model extends App_Model
 
         $insert_id = $this->db->insert_id();
 
+
         if ($insert_id) {
             if($data['balance'] != 0 && $data['balance'] != ''){
                 $node = [];
                 $node['account'] = $insert_id;
+                $node['acc_coa'] = $data['HeadCode'];
                 $node['ending_balance'] = $data['balance'];
                 $node['beginning_balance'] = 0;
                 $node['opening_balance'] = 0;
@@ -2319,163 +2321,12 @@ class Accounting_model extends App_Model
                 $this->db->insert(db_prefix().'acc_reconciles', $node);
                 $reconcile_id = $this->db->insert_id();
 
-                $this->db->where('account_type_id', 10);
-                $this->db->where('account_detail_type_id', 71);
-                $account = $this->db->get(db_prefix().'acc_accounts')->row();
-
-                if($account){
-                    $node = [];
-
-                    if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                        if($data['balance'] > 0){
-                            $node['debit'] = $data['balance'];
-                            $node['credit'] = 0;
-                        }else{
-                            $node['debit'] = 0;
-                            $node['credit'] = abs($data['balance']);
-                        }
-                    }else{
-                        if($data['balance'] > 0){
-                            $node['debit'] = 0;
-                            $node['credit'] = $data['balance'];
-                        }else{
-                            $node['debit'] = abs($data['balance']);
-                            $node['credit'] = 0;
-                        }
-                    }
-
-                    $node['split'] = $insert_id;
-                    $node['account'] = $account->id;
-                    $node['rel_id'] = 0;
-                    $node['rel_type'] = 'deposit';
-                    if($data['balance_as_of'] != ''){
-                        $node['date'] = $data['balance_as_of'];
-                    }else{
-                        $node['date'] = date('Y-m-d');
-                    }
-                    $node['datecreated'] = date('Y-m-d H:i:s');
-                    $node['addedfrom'] = get_staff_user_id();
-
-                    $this->db->insert(db_prefix().'acc_account_history', $node);
-
-                    $node = [];
-                    if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                        if($data['balance'] > 0){
-                            $node['debit'] = 0;
-                            $node['credit'] = $data['balance'];
-                        }else{
-                            $node['debit'] = abs($data['balance']);
-                            $node['credit'] = 0;
-                        }
-                    }else{
-                        if($data['balance'] > 0){
-                            $node['debit'] = $data['balance'];
-                            $node['credit'] = 0;
-                        }else{
-                            $node['debit'] = 0;
-                            $node['credit'] = abs($data['balance']);
-                        }
-                    }
-
-                    $node['reconcile'] = $reconcile_id;
-                    $node['split'] = $account->id;
-                    $node['account'] = $insert_id;
-                    $node['rel_id'] = 0;
-                    $node['rel_type'] = 'deposit';
-                    if($data['balance_as_of'] != ''){
-                        $node['date'] = $data['balance_as_of'];
-                    }else{
-                        $node['date'] = date('Y-m-d');
-                    }
-                    $node['datecreated'] = date('Y-m-d H:i:s');
-                    $node['addedfrom'] = get_staff_user_id();
-
-                    $this->db->insert(db_prefix().'acc_account_history', $node);
-                }else{
-                    $this->db->insert(db_prefix().'acc_accounts', [
-                        'name' => '',
-                        'key_name' => 'acc_opening_balance_equity',
-                        'account_type_id' => 10,
-                        'account_detail_type_id' => 71,
-                    ]);
-
-                    $account_id = $this->db->insert_id();
-
-                    if ($account_id) {
-                        $node = [];
-                        if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                            if($data['balance'] > 0){
-                                $node['debit'] = $data['balance'];
-                                $node['credit'] = 0;
-                            }else{
-                                $node['debit'] = 0;
-                                $node['credit'] = abs($data['balance']);
-                            }
-                        }else{
-                            if($data['balance'] > 0){
-                                $node['debit'] = 0;
-                                $node['credit'] = $data['balance'];
-                            }else{
-                                $node['debit'] = abs($data['balance']);
-                                $node['credit'] = 0;
-                            }
-                        }
-                        
-                        $node['split'] = $insert_id;
-                        $node['account'] = $account_id;
-                        if($data['balance_as_of'] != ''){
-                            $node['date'] = $data['balance_as_of'];
-                        }else{
-                            $node['date'] = date('Y-m-d');
-                        }
-                        $node['rel_id'] = 0;
-                        $node['rel_type'] = 'deposit';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
-
-                        $this->db->insert(db_prefix().'acc_account_history', $node);
-
-                        $node = [];
-                        if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                            if($data['balance'] > 0){
-                                $node['debit'] = 0;
-                                $node['credit'] = $data['balance'];
-                            }else{
-                                $node['debit'] = abs($data['balance']);
-                                $node['credit'] = 0;
-                            }
-                        }else{
-                            if($data['balance'] > 0){
-                                $node['debit'] = $data['balance'];
-                                $node['credit'] = 0;
-                            }else{
-                                $node['debit'] = 0;
-                                $node['credit'] = abs($data['balance']);
-                            }
-                        }
-                        
-                        $node['reconcile'] = $reconcile_id;
-                        $node['split'] = $account_id;
-                        $node['account'] = $insert_id;
-                        if($data['balance_as_of'] != ''){
-                            $node['date'] = $data['balance_as_of'];
-                        }else{
-                            $node['date'] = date('Y-m-d');
-                        }
-                        $node['rel_id'] = 0;
-                        $node['rel_type'] = 'deposit';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
-
-                        $this->db->insert(db_prefix().'acc_account_history', $node);
-                    }
-                }
             }
 
            
             return $insert_id;
         }
-
+        
         return false;
     }
 
@@ -2522,120 +2373,120 @@ class Accounting_model extends App_Model
                 $this->db->insert(db_prefix().'acc_reconciles', $node);
                 $reconcile_id = $this->db->insert_id();
 
-                $this->db->where('account_type_id', 10);
-                $this->db->where('account_detail_type_id', 71);
-                $account = $this->db->get(db_prefix().'acc_accounts')->row();
+                // $this->db->where('account_type_id', 10);
+                // $this->db->where('account_detail_type_id', 71);
+                // $account = $this->db->get(db_prefix().'acc_accounts')->row();
 
-                if($account){
-                    $node = [];
+                // if($account){
+                //     $node = [];
 
-                    if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                        $node['debit'] = $data['balance'];
-                        $node['credit'] = 0;
+                //     if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                //         $node['debit'] = $data['balance'];
+                //         $node['credit'] = 0;
 
-                    }else{
-                        $node['debit'] = 0;
-                        $node['credit'] = $data['balance'];
-                    }
+                //     }else{
+                //         $node['debit'] = 0;
+                //         $node['credit'] = $data['balance'];
+                //     }
 
-                    $node['split'] = $id;
-                    $node['account'] = $account->id;
+                //     $node['split'] = $id;
+                //     $node['account'] = $account->id;
 
-                    if($data['balance_as_of'] != ''){
-                        $node['date'] = $data['balance_as_of'];
-                    }else{
-                        $node['date'] = date('Y-m-d');
-                    }
+                //     if($data['balance_as_of'] != ''){
+                //         $node['date'] = $data['balance_as_of'];
+                //     }else{
+                //         $node['date'] = date('Y-m-d');
+                //     }
 
-                    $node['rel_id'] = 0;
-                    $node['rel_type'] = 'deposit';
-                    $node['datecreated'] = date('Y-m-d H:i:s');
-                    $node['addedfrom'] = get_staff_user_id();
-                    $this->db->insert(db_prefix().'acc_account_history', $node);
+                //     $node['rel_id'] = 0;
+                //     $node['rel_type'] = 'deposit';
+                //     $node['datecreated'] = date('Y-m-d H:i:s');
+                //     $node['addedfrom'] = get_staff_user_id();
+                //     $this->db->insert(db_prefix().'acc_account_history', $node);
 
-                    $node = [];
-                    if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                        $node['debit'] = 0;
-                        $node['credit'] = $data['balance'];
-                    }else{
-                        $node['debit'] = $data['balance'];
-                        $node['credit'] = 0;
-                    }
+                //     $node = [];
+                //     if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                //         $node['debit'] = 0;
+                //         $node['credit'] = $data['balance'];
+                //     }else{
+                //         $node['debit'] = $data['balance'];
+                //         $node['credit'] = 0;
+                //     }
 
-                    $node['reconcile'] = $reconcile_id;
-                    $node['split'] = $account->id;
-                    $node['account'] = $id;
-                    $node['rel_id'] = 0;
+                //     $node['reconcile'] = $reconcile_id;
+                //     $node['split'] = $account->id;
+                //     $node['account'] = $id;
+                //     $node['rel_id'] = 0;
 
-                    if($data['balance_as_of'] != ''){
-                        $node['date'] = $data['balance_as_of'];
-                    }else{
-                        $node['date'] = date('Y-m-d');
-                    }
-                    $node['rel_type'] = 'deposit';
-                    $node['datecreated'] = date('Y-m-d H:i:s');
-                    $node['addedfrom'] = get_staff_user_id();
+                //     if($data['balance_as_of'] != ''){
+                //         $node['date'] = $data['balance_as_of'];
+                //     }else{
+                //         $node['date'] = date('Y-m-d');
+                //     }
+                //     $node['rel_type'] = 'deposit';
+                //     $node['datecreated'] = date('Y-m-d H:i:s');
+                //     $node['addedfrom'] = get_staff_user_id();
 
-                    $this->db->insert(db_prefix().'acc_account_history', $node);
-                }else{
-                    $this->db->insert(db_prefix().'acc_accounts', [
-                        'name' => '',
-                        'key_name' => 'acc_opening_balance_equity',
-                        'account_type_id' => 10,
-                        'account_detail_type_id' => 71,
-                    ]);
+                //     $this->db->insert(db_prefix().'acc_account_history', $node);
+                // }else{
+                //     $this->db->insert(db_prefix().'acc_accounts', [
+                //         'name' => '',
+                //         'key_name' => 'acc_opening_balance_equity',
+                //         'account_type_id' => 10,
+                //         'account_detail_type_id' => 71,
+                //     ]);
 
-                    $account_id = $this->db->insert_id();
+                //     $account_id = $this->db->insert_id();
 
-                    if ($account_id) {
-                        $node = [];
-                        if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                            $node['debit'] = $data['balance'];
-                            $node['credit'] = 0;
-                        }else{
-                            $node['debit'] = 0;
-                            $node['credit'] = $data['balance'];
-                        }
+                //     if ($account_id) {
+                //         $node = [];
+                //         if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                //             $node['debit'] = $data['balance'];
+                //             $node['credit'] = 0;
+                //         }else{
+                //             $node['debit'] = 0;
+                //             $node['credit'] = $data['balance'];
+                //         }
                         
-                        $node['split'] = $id;
-                        $node['account'] = $account_id;
-                        $node['rel_id'] = 0;
-                        if($data['balance_as_of'] != ''){
-                            $node['date'] = $data['balance_as_of'];
-                        }else{
-                            $node['date'] = date('Y-m-d');
-                        }
-                        $node['rel_type'] = 'deposit';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
+                //         $node['split'] = $id;
+                //         $node['account'] = $account_id;
+                //         $node['rel_id'] = 0;
+                //         if($data['balance_as_of'] != ''){
+                //             $node['date'] = $data['balance_as_of'];
+                //         }else{
+                //             $node['date'] = date('Y-m-d');
+                //         }
+                //         $node['rel_type'] = 'deposit';
+                //         $node['datecreated'] = date('Y-m-d H:i:s');
+                //         $node['addedfrom'] = get_staff_user_id();
 
-                        $this->db->insert(db_prefix().'acc_account_history', $node);
+                //         $this->db->insert(db_prefix().'acc_account_history', $node);
 
-                        $node = [];
-                        if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
-                            $node['debit'] = 0;
-                            $node['credit'] = $data['balance'];
-                        }else{
-                            $node['debit'] = $data['balance'];
-                            $node['credit'] = 0;
-                        }
+                //         $node = [];
+                //         if($data['account_type_id'] == 7 || $data['account_type_id'] == 15 || $data['account_type_id'] == 8 || $data['account_type_id'] == 9){
+                //             $node['debit'] = 0;
+                //             $node['credit'] = $data['balance'];
+                //         }else{
+                //             $node['debit'] = $data['balance'];
+                //             $node['credit'] = 0;
+                //         }
                         
-                        $node['reconcile'] = $reconcile_id;
-                        $node['split'] = $account_id;
-                        $node['account'] = $id;
-                        $node['rel_id'] = 0;
-                        if($data['balance_as_of'] != ''){
-                            $node['date'] = $data['balance_as_of'];
-                        }else{
-                            $node['date'] = date('Y-m-d');
-                        }
-                        $node['rel_type'] = 'deposit';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
+                //         $node['reconcile'] = $reconcile_id;
+                //         $node['split'] = $account_id;
+                //         $node['account'] = $id;
+                //         $node['rel_id'] = 0;
+                //         if($data['balance_as_of'] != ''){
+                //             $node['date'] = $data['balance_as_of'];
+                //         }else{
+                //             $node['date'] = date('Y-m-d');
+                //         }
+                //         $node['rel_type'] = 'deposit';
+                //         $node['datecreated'] = date('Y-m-d H:i:s');
+                //         $node['addedfrom'] = get_staff_user_id();
 
-                        $this->db->insert(db_prefix().'acc_account_history', $node);
-                    }
-                }
+                //         $this->db->insert(db_prefix().'acc_account_history', $node);
+                //     }
+                // }
             }
 
             return true;

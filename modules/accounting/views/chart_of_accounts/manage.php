@@ -42,7 +42,11 @@
                             </th>
                             <th><?php echo _l('name'); ?></th>
                             <th><?php echo _l('Code'); ?></th>
-                            <th><?php echo _l('parent_account'); ?></th>
+
+                            <th> 3rd Level</th>
+                            <th> 2rd Level</th>
+                            <th> 1rd Level</th>
+
                             <th><?php echo _l('primary_balance'); ?></th>
                             <th><?php echo _l('bank_balance'); ?></th>
                             <th><?php echo _l('staff_dt_active'); ?></th>
@@ -58,6 +62,10 @@
 <?php $arrAtt = array();
       $arrAtt['data-type']='currency';
 ?>
+
+
+
+
 <div class="modal fade" id="account-modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -66,12 +74,64 @@
                 <h4 class="modal-title">Add Chart of Accounts</h4>
             </div>
             <?php echo form_open_multipart(admin_url('accounting/account'),array('id'=>'account-form'));?>
-            <?php echo form_hidden('id'); ?>
-            <?php echo form_hidden('update_balance'); ?>
             <div class="modal-body">
 
                 <?php echo render_input('name','name'); ?>
-                <?php echo render_select('parent_account',$accounts,array('id','name' , 'HeadCode'),'parent_account'); ?>
+
+                <div class="form-group">
+                    <label class="bold" for="parent_account"><small class="req text-danger">* </small> Parent
+                        Account</label>
+                    <select class="selectpicker" name="parent_account" required id="parent_account" data-width="100%">
+                        <option value=""></option>
+                        <?php 
+                            if (isset($accounts)) {
+                                foreach ($accounts as $key => $value) {
+                                    $HeadCode = $value['HeadCode'] ; 
+                                    $name = $value['name'] ; 
+                                    echo '<option value="'.$HeadCode.'" >'.$name.' </option>' ; 
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group hide child_account_div">
+                    <label class="bold" for="child_accounts"><small class="req text-danger">* </small> Child
+                        Account</label>
+                    <select class="selectpicker" name="child_accounts" required id="child_accounts" data-width="100%">
+                        <option value=""></option>
+                        <?php 
+                            if (isset($child_accounts)) {
+                                foreach ($child_accounts as $key => $value) {
+                                    $HeadCode = $value['HeadCode'] ; 
+                                    $PHeadCode = $value['PHeadCode'] ; 
+                                    $name = $value['name'] ; 
+                                    echo '<option value="'.$HeadCode.'" data-value="'.$PHeadCode.'" >'.$name.' </option>' ; 
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group hide sub_child_account_div">
+                    <label class="bold" for="sub_child_accounts">Sub Child Account</label>
+                    <select class="selectpicker" name="sub_child_accounts" id="sub_child_accounts" data-width="100%">
+                        <option value=""></option>
+                        <?php 
+                            if (isset($sub_child_accounts)) {
+                                foreach ($sub_child_accounts as $key => $value) {
+                                    $HeadCode = $value['HeadCode'] ; 
+                                    $PHeadCode = $value['PHeadCode'] ; 
+                                    $name = $value['name'] ; 
+                                    echo '<option value="'.$HeadCode.'" data-value="'.$PHeadCode.'" >'.$name.' </option>' ; 
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
+
+
+
                 <br>
 
                 <div class="row">
@@ -112,6 +172,122 @@
 </div>
 
 
+
+
+
+<div class="modal fade" id="edit-account-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Edit Chart of Accounts</h4>
+            </div>
+            <?php echo form_open_multipart(admin_url('accounting/account'),array('id'=>'account-form'));?>
+            <?php echo form_hidden('id'); ?>
+            <?php echo form_hidden('update_balance'); ?>
+            <div class="modal-body">
+
+                <?php echo render_input('edit_name','name'); ?>
+
+                <div class="form-group">
+                    <label class="bold" for="edit_parent_account"><small class="req text-danger">* </small> Parent
+                        Account</label>
+                    <select class="selectpicker" disabled name="edit_parent_account" required id="edit_parent_account"
+                        data-width="100%">
+                        <option value=""></option>
+                        <?php 
+                            if (isset($accounts)) {
+                                foreach ($accounts as $key => $value) {
+                                    $HeadCode = $value['HeadCode'] ; 
+                                    $name = $value['name'] ; 
+                                    echo '<option value="'.$HeadCode.'" >'.$name.' </option>' ; 
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group edit_child_account_div">
+                    <label class="bold" for="edit_child_accounts"><small class="req text-danger">* </small> Child
+                        Account</label>
+                    <select class="selectpicker" disabled name="edit_child_accounts" required id="edit_child_accounts"
+                        data-width="100%">
+                        <option value=""></option>
+                        <?php 
+                            if (isset($child_accounts)) {
+                                foreach ($child_accounts as $key => $value) {
+                                    $HeadCode = $value['HeadCode'] ; 
+                                    $PHeadCode = $value['PHeadCode'] ; 
+                                    $name = $value['name'] ; 
+                                    echo '<option value="'.$HeadCode.'" data-value="'.$PHeadCode.'" >'.$name.' </option>' ; 
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group hide edit_sub_child_account_div">
+                    <label class="bold" for="edit_sub_child_accounts">Sub Child Account</label>
+                    <select class="selectpicker" name="edit_sub_child_accounts" id="edit_sub_child_accounts"
+                        data-width="100%">
+                        <option value=""></option>
+                        <?php 
+                            if (isset($sub_child_accounts)) {
+                                foreach ($sub_child_accounts as $key => $value) {
+                                    $HeadCode = $value['HeadCode'] ; 
+                                    $PHeadCode = $value['PHeadCode'] ; 
+                                    $name = $value['name'] ; 
+                                    echo '<option value="'.$HeadCode.'" data-value="'.$PHeadCode.'" >'.$name.' </option>' ; 
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo render_input('edit_balance','balance','','text', $arrAtt); ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php echo render_date_input('edit_balance_as_of','as_of'); ?>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="bold">Currency</p>
+                        <select class="selectpicker edit_currency" name="edit_currency" data-width="100%">
+                            <option value="PKR">PKR</option>
+                            <option value="$">$</option>
+                            <option value="€">€</option>
+                        </select>
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="bold"><?php echo _l('dt_expense_description'); ?></p>
+                        <?php echo render_textarea('edit_description','','',array(),array(),'','tinymce'); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-info btn-submit"><?php echo _l('submit'); ?></button>
+            </div>
+            <?php echo form_close(); ?>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
 <div class="modal fade bulk_actions" id="accounts_bulk_actions" tabindex="-1" role="dialog"
     data-table=".table-accounts">
     <div class="modal-dialog" role="document">
@@ -149,6 +325,9 @@
         </div>
     </div>
 </div>
+
+
+
 <?php init_tail(); ?>
 </body>
 
