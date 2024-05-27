@@ -44,8 +44,8 @@
                             <th><?php echo _l('Code'); ?></th>
 
                             <th> 3rd Level</th>
-                            <th> 2rd Level</th>
-                            <th> 1rd Level</th>
+                            <th> 2nd Level</th>
+                            <th> 1st Level</th>
 
                             <th><?php echo _l('primary_balance'); ?></th>
                             <th><?php echo _l('bank_balance'); ?></th>
@@ -182,7 +182,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Edit Chart of Accounts</h4>
             </div>
-            <?php echo form_open_multipart(admin_url('accounting/account'),array('id'=>'account-form'));?>
+            <?php echo form_open_multipart(admin_url('accounting/account'),array('id'=>'update-account-form'));?>
             <?php echo form_hidden('id'); ?>
             <?php echo form_hidden('update_balance'); ?>
             <div class="modal-body">
@@ -192,7 +192,7 @@
                 <div class="form-group">
                     <label class="bold" for="edit_parent_account"><small class="req text-danger">* </small> Parent
                         Account</label>
-                    <select class="selectpicker" disabled name="edit_parent_account" required id="edit_parent_account"
+                    <select class="selectpicker"  name="edit_parent_account" required id="edit_parent_account"
                         data-width="100%">
                         <option value=""></option>
                         <?php 
@@ -210,7 +210,7 @@
                 <div class="form-group edit_child_account_div">
                     <label class="bold" for="edit_child_accounts"><small class="req text-danger">* </small> Child
                         Account</label>
-                    <select class="selectpicker" disabled name="edit_child_accounts" required id="edit_child_accounts"
+                    <select class="selectpicker"  name="edit_child_accounts" required id="edit_child_accounts"
                         data-width="100%">
                         <option value=""></option>
                         <?php 

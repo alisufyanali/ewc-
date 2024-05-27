@@ -1,5 +1,6 @@
 <script type="text/javascript">
 var list_account_type_details, list_third_level, fnServerParams;
+
 (function($) {
     "use strict";
 
@@ -8,6 +9,13 @@ var list_account_type_details, list_third_level, fnServerParams;
         account_detail_type_id: 'required',
         name: 'required',
     }, account_form_handler);
+    
+    appValidateForm($('#update-account-form'), {
+        account_type_id: 'required',
+        account_detail_type_id: 'required',
+        name: 'required',
+    }, account_update_form_handler);
+
 
     fnServerParams = {
         "ft_account": '[name="ft_account"]',
@@ -51,6 +59,54 @@ var list_account_type_details, list_third_level, fnServerParams;
 
         }
     });
+
+
+
+
+
+
+    
+    $(document).on('change', 'select[name="edit_parent_account"]', function() {
+        $('.edit_child_account_div').removeClass('hide');
+        $('.edit_sub_child_account_div').addClass('hide');
+        let val = $(this).val();
+
+        $('select[name="edit_child_accounts"] option').each(function() {
+            if ($(this).attr('data-value') === val) {
+                $(this).show();
+            } else if ($(this).attr('data-value') != undefined) {
+                $(this).hide();
+            }
+        });
+        $('select[name="edit_child_accounts"]').selectpicker('refresh');
+        $('select[name="edit_child_accounts"]').change();
+    });
+
+
+
+
+    $(document).on('change', 'select[name="edit_child_accounts"]', function() {
+
+        let val = $(this).val();
+        if (val != "") {
+            $('.edit_sub_child_account_div').removeClass('hide');
+            let val = $(this).val();
+            $('select[name="edit_sub_child_accounts"] option').each(function() {
+                if ($(this).attr('data-value') === val) {
+                    $(this).show();
+                } else if ($(this).attr('data-value') != undefined) {
+                    $(this).hide();
+                }
+            });
+            $('select[name="edit_sub_child_accounts"]').selectpicker('refresh');
+            $('select[name="edit_sub_child_accounts"]').change();
+
+        }
+    });
+
+
+
+
 
 
 
@@ -252,7 +308,7 @@ function edit_account(id) {
 
         $('input[name="number"]').val(response.number);
         $('input[name="edit_name"]').val(response.name);
-        $('input[name="edit_id"]').val(id);
+        $('input[name="id"]').val(id);
         $('input[name="edit_balance"]').val(response.balance);
         $('input[name="edit_balance_as_of"]').val(response.balance_as_of);
 
@@ -310,6 +366,46 @@ function account_form_handler(form) {
 
     return false;
 }
+
+
+function account_update_form_handler(form) {
+    "use strict";
+    $('#update-account-modal').find('button[type="submit"]').prop('disabled', true);
+    tinyMCE.triggerSave();
+
+    var formURL = form.action;
+    var formData = new FormData($(form)[0]);
+
+    $.ajax({
+        type: $(form).attr('method'),
+        data: formData,
+        mimeType: $(form).attr('enctype'),
+        contentType: false,
+        cache: false,
+        processData: false,
+        url: formURL
+    }).done(function(response) {
+        response = JSON.parse(response);
+        if (response.success === true || response.success == 'true' || $.isNumeric(response.success)) {
+            alert_float('success', response.message);
+            setTimeout(function() {
+                document.location.reload()
+            }, 2000);
+
+            init_account_table();
+        } else {
+            alert_float('danger', response.message);
+        }
+        $('#update-account-modal').modal('hide');
+    }).fail(function(error) {
+        alert_float('danger', JSON.parse(error.mesage));
+    });
+
+    return false;
+}
+
+
+
 
 function formatNumber(n) {
     "use strict";

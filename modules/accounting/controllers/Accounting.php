@@ -840,21 +840,23 @@ var_dump($data['group'] ); die;
      */
     public function accounts_table()
     {
-        if ($this->input->is_ajax_request()) {
+        // if ($this->input->is_ajax_request()) {
 
             $this->load->model('currencies_model');
             $currency = $this->currencies_model->get_base_currency();
             $where = []; 
             if ($this->input->post('ft_account')) {
                 $ft_account = $this->input->post('ft_account');
-                array_push($where, 'AND id IN (' . implode(', ', $ft_account) . ')');
+                foreach ($ft_account as $key => $value) {
+                    array_push($where , ' AND  HeadCode Like "'. $value . '%" ' );
+                }
             }
-            
+                
             if ($this->input->post('ft_search')) {
                 $ft_search = $this->input->post('ft_search');
-                array_push($where, 'OR name like "%' . $ft_search . '%" OR PHeadName like "%' . $ft_search . '%" ') ;
+                array_push($where, 'AND ( name like "%' . $ft_search . '%" OR PHeadName like "%' . $ft_search . '%"  )') ;
             }
-            array_push($where, 'AND HeadLevel = 4 ');
+            array_push($where, ' AND HeadLevel = 4 ');
  
             $aColumns     = $select;
             $sIndexColumn = 'id';
@@ -901,19 +903,30 @@ var_dump($data['group'] ); die;
                 $row[] = $categoryOutput;
 
                 $row[] = $aRow['HeadCode'];
-                $row[] = $aRow['PHeadName'];
-                
-                $level_2 =  $this->get_PHeadCode($aRow['PHeadCode']) ;
-                $row[] =   $this->get_HeadName($level_2) ;
-                $level_3 =  $this->get_PHeadCode($level_2) ;
-                $row[] = $this->get_HeadName($level_3);
+
+                if($aRow['HeadLevel'] == 4 ){
+                    $row[] = $aRow['PHeadName'];
+                    $level_2 =  $this->get_PHeadCode($aRow['PHeadCode']) ;
+                    $row[] =   $this->get_HeadName($level_2) ;
+                    $level_3 =  $this->get_PHeadCode($level_2) ;
+                    $row[] = $this->get_HeadName($level_3);
+                }else{
+                    $row[] = null;
+                    $row[] = $aRow['PHeadName'];
+                    $level_3 =  $this->get_PHeadCode($aRow['PHeadCode']) ;
+                    $row[] =   $this->get_HeadName($level_3) ; 
+                }
                 
                 
                 if($aRow['account_type_id'] == 11 || $aRow['account_type_id'] == 12 || $aRow['account_type_id'] == 8 || $aRow['account_type_id'] == 9 || $aRow['account_type_id'] == 10 || $aRow['account_type_id'] == 7 || $aRow['account_type_id'] == 16){ //$aRow['credit'] - $aRow['debit']
                     $row[] = app_format_money($aRow['balance'], $aRow['currency']);
                 }else{
-                    $row[] = app_format_money($aRow['debit'] - $aRow['credit'], $aRow['currency']);
+                    // $row[] = app_format_money($aRow['debit'] - $aRow['credit'], $aRow['currency']);
+                    $row[] = app_format_money( ' '. $aRow['balance'] , $aRow['currency']);
                 }
+
+
+
                 if($aRow['account_type_id'] >=10 && $aRow['account_type_id'] != 16 ){
                   $row[] =  app_format_money($aRow['debit'] - $aRow['credit'], $aRow['currency']);}
                 else{
@@ -941,7 +954,7 @@ var_dump($data['group'] ); die;
             $output['iTotalDisplayRecords'] = $count;
             echo json_encode($output);
             die();
-        }
+        // }
     }
 
     /**
@@ -961,31 +974,37 @@ var_dump($data['group'] ); die;
             $data['description'] = $this->input->post('description', false);
             $message = '';
 
-            if(isset($posts['sub_child_accounts']) && $posts['sub_child_accounts'] != null ){
-                $data['HeadCode'] = $this->get_HeadCode($posts['sub_child_accounts']);
-                $data['PHeadName'] = $this->get_HeadName($posts['sub_child_accounts']);
-                $data['PHeadCode'] = $posts['sub_child_accounts'] ;
+            $edit = '';
+            if ($posts['id'] != '') {
+                $edit = 'edit_';
+            }
+            if(isset($posts[$edit. 'sub_child_accounts']) && $posts[$edit. 'sub_child_accounts'] != null ){
+                $data['HeadCode'] = $this->get_HeadCode($posts[$edit. 'sub_child_accounts']);
+                $data['PHeadName'] = $this->get_HeadName($posts[$edit. 'sub_child_accounts']);
+                $data['PHeadCode'] = $posts[$edit. 'sub_child_accounts'] ;
                 $data['HeadLevel'] = 4 ;
                 
 
-            }elseif(isset($posts['child_accounts']) && $posts['child_accounts'] != null ){
-                $data['HeadCode'] = $this->get_HeadCode($posts['child_accounts']);
-                $data['PHeadName'] = $this->get_HeadName($posts['child_accounts']);
-                $data['PHeadCode'] = $posts['child_accounts'] ;
+            }elseif(isset($posts[$edit. 'child_accounts']) && $posts[$edit. 'child_accounts'] != null ){
+                $data['HeadCode'] = $this->get_HeadCode($posts[$edit. 'child_accounts']);
+                $data['PHeadName'] = $this->get_HeadName($posts[$edit. 'child_accounts']);
+                $data['PHeadCode'] = $posts[$edit. 'child_accounts'] ;
                 $data['HeadLevel'] = 3 ;
 
             }else{
-                $data['HeadCode'] = $this->get_HeadCode($posts['parent_account']);
-                $data['PHeadName'] = $this->get_HeadName($posts['parent_account']);
-                $data['PHeadCode'] = $posts['parent_account'] ;
+                $data['HeadCode'] = $this->get_HeadCode($posts[$edit. 'parent_account']);
+                $data['PHeadName'] = $this->get_HeadName($posts[$edit. 'parent_account']);
+                $data['PHeadCode'] = $posts[$edit. 'parent_account'] ;
                 $data['HeadLevel'] =  2;
             }
-            $data['name'] = $posts['name'] ;
-            $data['balance'] = $posts['balance'] ;
-            $data['balance_as_of'] = $posts['balance_as_of'] ;
-            $data['currency'] = $posts['currency'] ;
-            $data['update_balance'] = $posts['update_balance'] ;
-            $data['id'] = $posts['id'] ;
+            
+            $data['name'] = $posts[$edit. 'name'] ;
+            $data['balance'] = $posts[$edit. 'balance'] ;
+            $data['balance_as_of'] = $posts[$edit. 'balance_as_of'] ;
+            $data['currency'] = $posts[$edit. 'currency'] ;
+            $data['update_balance'] = $posts[$edit. 'update_balance'] ;
+            $data['id'] = $posts[ 'id'] ;
+            unset($data['update_balance']);
 
 
             if ($data['id'] == '') {
@@ -1003,8 +1022,16 @@ var_dump($data['group'] ); die;
                     access_denied('accounting');
                 }
                 $id = $data['id'];
-                unset($data['id']);
-                $success = $this->accounting_model->update_account($data, $id);
+                // echo '<pre>';
+                // print_r($data);
+                // exit;
+
+                // unset($data['id']);
+                // unset($data['HeadCode']);
+                // unset($data['PHeadName']);
+                // unset($data['PHeadCode']);
+                // unset($data['HeadLevel']);
+               $success = $this->accounting_model->update_account($data, $id);
                 if ($success) {
                     $message = _l('updated_successfully', _l('acc_account'));
                 }else {
@@ -3240,13 +3267,17 @@ var_dump($data['group'] ); die;
         $account->balance_as_of = _d($account->balance_as_of);
         $account->name = $account->name != '' ? $account->name : _l($account->key_name);
 
-        
-        $level_2 =  $this->get_PHeadCode($account->PHeadCode) ;
-        $account->PHeadCode2 =   $level_2 ;
-        
-        $level_3 =  $this->get_PHeadCode($level_2) ;
-        $account->PHeadCode3 = $level_3;
-
+        if($account->HeadLevel == 4 ){
+            $level_2 =  $this->get_PHeadCode($account->PHeadCode) ;
+            $account->PHeadCode2 =   $level_2 ;
+            $level_3 =  $this->get_PHeadCode($level_2) ;
+            $account->PHeadCode3 = $level_3;
+        }else{
+            $level_2 =  $this->get_PHeadCode($account->PHeadCode) ;
+            $account->PHeadCode2 =   $account->PHeadCode ;
+            $level_3 =  $this->get_PHeadCode($account->PHeadCode) ;
+            $account->PHeadCode3 = $level_3; 
+        }
         // if($account->balance == 0){
         //     if(($account->account_type_id != 16 && $account->account_type_id > 10) || $account->account_type_id == 1 || $account->account_type_id == 6){
         //         $account->balance = 1;
