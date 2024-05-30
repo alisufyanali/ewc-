@@ -906,15 +906,15 @@ var_dump($data['group'] ); die;
 
                 if($aRow['HeadLevel'] == 4 ){
                     $row[] = $aRow['PHeadName'];
-                    $level_2 =  $this->get_PHeadCode($aRow['PHeadCode']) ;
-                    $row[] =   $this->get_HeadName($level_2) ;
-                    $level_3 =  $this->get_PHeadCode($level_2) ;
-                    $row[] = $this->get_HeadName($level_3);
+                    $level_2 =  $this->accounting_model->get_PHeadCode($aRow['PHeadCode']) ;
+                    $row[] =   $this->accounting_model->get_HeadName($level_2) ;
+                    $level_3 =  $this->accounting_model->get_PHeadCode($level_2) ;
+                    $row[] = $this->accounting_model->get_HeadName($level_3);
                 }else{
                     $row[] = null;
                     $row[] = $aRow['PHeadName'];
-                    $level_3 =  $this->get_PHeadCode($aRow['PHeadCode']) ;
-                    $row[] =   $this->get_HeadName($level_3) ; 
+                    $level_3 =  $this->accounting_model->get_PHeadCode($aRow['PHeadCode']) ;
+                    $row[] =   $this->accounting_model->get_HeadName($level_3) ; 
                 }
                 
                 
@@ -979,21 +979,21 @@ var_dump($data['group'] ); die;
                 $edit = 'edit_';
             }
             if(isset($posts[$edit. 'sub_child_accounts']) && $posts[$edit. 'sub_child_accounts'] != null ){
-                $data['HeadCode'] = $this->get_HeadCode($posts[$edit. 'sub_child_accounts']);
-                $data['PHeadName'] = $this->get_HeadName($posts[$edit. 'sub_child_accounts']);
+                $data['HeadCode'] = $this->accounting_model->get_HeadCode($posts[$edit. 'sub_child_accounts']);
+                $data['PHeadName'] = $this->accounting_model->get_HeadName($posts[$edit. 'sub_child_accounts']);
                 $data['PHeadCode'] = $posts[$edit. 'sub_child_accounts'] ;
                 $data['HeadLevel'] = 4 ;
                 
 
             }elseif(isset($posts[$edit. 'child_accounts']) && $posts[$edit. 'child_accounts'] != null ){
-                $data['HeadCode'] = $this->get_HeadCode($posts[$edit. 'child_accounts']);
-                $data['PHeadName'] = $this->get_HeadName($posts[$edit. 'child_accounts']);
+                $data['HeadCode'] = $this->accounting_model->get_HeadCode($posts[$edit. 'child_accounts']);
+                $data['PHeadName'] = $this->accounting_model->get_HeadName($posts[$edit. 'child_accounts']);
                 $data['PHeadCode'] = $posts[$edit. 'child_accounts'] ;
                 $data['HeadLevel'] = 3 ;
 
             }else{
-                $data['HeadCode'] = $this->get_HeadCode($posts[$edit. 'parent_account']);
-                $data['PHeadName'] = $this->get_HeadName($posts[$edit. 'parent_account']);
+                $data['HeadCode'] = $this->accounting_model->get_HeadCode($posts[$edit. 'parent_account']);
+                $data['PHeadName'] = $this->accounting_model->get_HeadName($posts[$edit. 'parent_account']);
                 $data['PHeadCode'] = $posts[$edit. 'parent_account'] ;
                 $data['HeadLevel'] =  2;
             }
@@ -1051,60 +1051,6 @@ var_dump($data['group'] ); die;
         print_r($data);
         exit;
     }
-
-    public function get_HeadCode($HeadCode) {
-
-        $newdata = $this->db->select('*')
-                ->from('tblacc_accounts')
-                ->where('HeadCode',$HeadCode)
-                ->get()
-                ->row();
-
-        $newidsinfo = $this->db->select('count(HeadCode) as hc')
-                ->from('tblacc_accounts')
-                ->where('PHeadName',$newdata->name)
-                ->get()
-                ->row();
-
-        $nid  = $newidsinfo->hc;
-        $n = $nid + 1;
-        if ($n / 10 < 1){
-            $newHeadCode = $HeadCode . "0" . $n;
-        }
-        else{
-            $newHeadCode = $HeadCode . $n;
-        }
-
-        return $newHeadCode;
-    }
-
-
-
-    public function get_HeadName($HeadCode) {
-
-        $newdata = $this->db->select('*')
-                ->from('tblacc_accounts')
-                ->where('HeadCode',$HeadCode)
-                ->get()
-                ->row();
-
-        return $newdata->name;
-    }
-
-    
-
-    
-    public function get_PHeadCode($HeadCode) {
-
-        $newdata = $this->db->select('*')
-                ->from('tblacc_accounts')
-                ->where('HeadCode',$HeadCode)
-                ->get()
-                ->row();
-
-        return $newdata->PHeadCode;
-    }
-
     
 
 
@@ -2481,6 +2427,7 @@ var_dump($data['group'] ); die;
         }
         $data['title']         = _l('journal_entry');
         $data['accounts'] = $this->accounting_model->get_accounts();
+        
         $data['accounts_to_select'] = $this->accounting_model->get_data_account_to_select();
         $this->load->view('journal_entry/manage', $data);
     }
@@ -2498,6 +2445,7 @@ var_dump($data['group'] ); die;
             $select = [
                 '1', // bulk actions
                 'id',
+                'VNo',
                 'number',
                 'journal_date',
             ];
@@ -2556,10 +2504,11 @@ var_dump($data['group'] ); die;
 
                 $categoryOutput .= '</div>';
                 $row[] = $categoryOutput;
+                $row[] = $aRow['VNo'];
                 if(strlen($aRow['number'].' - '.html_entity_decode($aRow['description'])) > 150){
                     $row[] = '<div data-toggle="tooltip" data-title="'. $aRow['number'].' - '.html_entity_decode(strip_tags($aRow['description'])).'">'.substr($aRow['number'].' - '.html_entity_decode($aRow['description']), 0, 150).'...</div>';
                 }else{
-                    $row[] = $aRow['number'].' - '.html_entity_decode($aRow['description']);
+                    $row[] = html_entity_decode($aRow['description']);
                 }
                 $row[] = app_format_money($aRow['amount'], $currency->name);
 
@@ -2610,10 +2559,11 @@ var_dump($data['group'] ); die;
         }
         $this->load->model('currencies_model');
         $data['currency'] = $this->currencies_model->get_base_currency();
-        $data['next_number'] = $this->accounting_model->get_journal_entry_next_number();
+        $data['voucher_no'] = $this->accounting_model->get_max_jv_no();
+        
+
         $data['title'] = _l('journal_entry');
         $data['account_to_select'] = $this->accounting_model->get_data_account_to_select();
-
         $this->load->view('journal_entry/journal_entry', $data);
     }
 
@@ -3268,14 +3218,14 @@ var_dump($data['group'] ); die;
         $account->name = $account->name != '' ? $account->name : _l($account->key_name);
 
         if($account->HeadLevel == 4 ){
-            $level_2 =  $this->get_PHeadCode($account->PHeadCode) ;
+            $level_2 =  $this->accounting_model->get_PHeadCode($account->PHeadCode) ;
             $account->PHeadCode2 =   $level_2 ;
-            $level_3 =  $this->get_PHeadCode($level_2) ;
+            $level_3 =  $this->accounting_model->get_PHeadCode($level_2) ;
             $account->PHeadCode3 = $level_3;
         }else{
-            $level_2 =  $this->get_PHeadCode($account->PHeadCode) ;
+            $level_2 =  $this->accounting_model->get_PHeadCode($account->PHeadCode) ;
             $account->PHeadCode2 =   $account->PHeadCode ;
-            $level_3 =  $this->get_PHeadCode($account->PHeadCode) ;
+            $level_3 =  $this->accounting_model->get_PHeadCode($account->PHeadCode) ;
             $account->PHeadCode3 = $level_3; 
         }
         // if($account->balance == 0){
@@ -9195,4 +9145,192 @@ var_dump($data['group'] ); die;
             die();
         }
     }
+
+
+
+
+
+
+
+
+ /**
+     * payment entry
+     * @return view
+     */
+    public function payment_entry(){
+        $data['title']         = _l('payment_entry');
+        $data['accounts'] = $this->accounting_model->get_accounts();
+        $data['accounts_to_select'] = $this->accounting_model->get_data_account_to_select();
+        $this->load->view('payment_entry/manage', $data);
+    }
+
+    /**
+     * payment entry table
+     * @return json
+     */
+    public function payment_entry_table(){
+        if ($this->input->is_ajax_request()) {
+           
+            $this->load->model('currencies_model');
+
+            $currency = $this->currencies_model->get_base_currency();
+            $select = [
+                '1', // bulk actions
+                'id',
+                'VNo',
+                'payment_date',
+            ];
+
+            $where = [];
+            $from_date = '';
+            $to_date   = '';
+            if ($this->input->post('from_date')) {
+                $from_date = $this->input->post('from_date');
+                if (!$this->accounting_model->check_format_date($from_date)) {
+                    $from_date = to_sql_date($from_date);
+                }
+            }
+
+            if ($this->input->post('to_date')) {
+                $to_date = $this->input->post('to_date');
+                if (!$this->accounting_model->check_format_date($to_date)) {
+                    $to_date = to_sql_date($to_date);
+                }
+            }
+            if ($from_date != '' && $to_date != '') {
+                array_push($where, 'AND (payment_date >= "' . $from_date . '" and payment_date <= "' . $to_date . '")');
+            } elseif ($from_date != '') {
+                array_push($where, 'AND (payment_date >= "' . $from_date . '")');
+            } elseif ($to_date != '') {
+                array_push($where, 'AND (payment_date <= "' . $to_date . '")');
+            }
+
+            $aColumns     = $select;
+            $sIndexColumn = 'id';
+            $sTable       = db_prefix() . 'acc_payment_entries';
+            $join         = [];
+            $result       = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, ['amount', 'description']);
+
+            $output  = $result['output'];
+            $rResult = $result['rResult'];
+
+            foreach ($rResult as $aRow) {
+                $row   = [];
+                $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
+                $categoryOutput = _d($aRow['payment_date']);
+
+                $categoryOutput .= '<div class="row-options">';
+
+                if (has_permission('accounting_payment_entry', '', 'edit')) {
+                    $categoryOutput .= '<a href="' . admin_url('accounting/payment_entry_export/' . $aRow['id']) . '" class="text-success">' . _l('acc_export_excel') . '</a>';
+                }
+
+                if (has_permission('accounting_payment_entry', '', 'edit')) {
+                    $categoryOutput .= ' | <a href="' . admin_url('accounting/new_payment_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
+                }
+
+                if (has_permission('accounting_payment_entry', '', 'delete')) {
+                    $categoryOutput .= ' | <a href="' . admin_url('accounting/delete_payment_entry/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+                }
+
+                $categoryOutput .= '</div>';
+                $row[] = $categoryOutput;
+                $row[] = $aRow['VNo'];
+                $row[] = html_entity_decode($aRow['description']);
+                $row[] = app_format_money($aRow['amount'], $currency->name);
+
+                $output['aaData'][] = $row;
+            }
+
+            echo json_encode($output);
+            die();
+        }
+    }
+
+    /**
+     * add payment entry
+     * @return view
+     */
+    public function new_payment_entry($id = ''){
+        if ($this->input->post()) {
+            $data                = $this->input->post();
+            $data['description'] = $this->input->post('description', false);
+            if($id == ''){
+                $success = $this->accounting_model->add_payment_entry($data);
+                echo 1;
+                if ($success === 'close_the_book') {
+                    $message = _l('has_closed_the_book');
+                    set_alert('warning', _l('has_closed_the_book'));
+                }elseif ($success) {
+                    set_alert('success', _l('added_successfully', _l('payment_entry')));
+                }
+            }else{
+                if (!has_permission('accounting_payment_entry', '', 'edit')) {
+                    access_denied('accounting_payment_entry');
+                }
+                $success = $this->accounting_model->update_payment_entry($data, $id);
+                if ($success === 'close_the_book') {
+                    $message = _l('has_closed_the_book');
+                    set_alert('warning', _l('has_closed_the_book'));
+                }elseif ($success) {
+                    set_alert('success', _l('updated_successfully', _l('payment_entry')));
+                }
+            }
+             
+            redirect(admin_url('accounting/payment_entry'));
+        }
+
+        if($id != ''){
+            $data['payment_entry'] = $this->accounting_model->get_payment_entry($id);
+        }
+
+        $this->load->model('currencies_model');
+        $data['currency'] = $this->currencies_model->get_base_currency();
+        $data['voucher_no'] = $this->accounting_model->get_max_pv_no();
+        
+        $data['title'] = _l('payment_entry');
+        $data['account_to_select'] = $this->accounting_model->get_data_account_to_select();
+
+
+        $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode = 10101 ');
+        $this->load->view('payment_entry/payment_entry', $data);
+    }
+
+    /**
+     * delete payment entry
+     * @param  integer $id
+     * @return
+     */
+    public function delete_payment_entry($id)
+    {
+        $success = $this->accounting_model->delete_payment_entry($id);
+        $message = '';
+        if ($success) {
+            $message = _l('deleted', _l('payment_entry'));
+            set_alert('success', $message);
+        } else {
+            $message = _l('can_not_delete');
+            set_alert('warning', $message);
+        }
+        redirect(admin_url('accounting/payment_entry'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

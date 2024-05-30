@@ -202,6 +202,12 @@ function get_url_by_type_id($rel_type, $rel_id){
             $url = admin_url('accounting/new_journal_entry/'.$rel_id);
         break;
 
+		
+
+        case 'payment_entry':
+            $url = admin_url('accounting/new_payment_entry/'.$rel_id);
+        break;
+
         case 'user_register_transaction':
             $url = admin_url('accounting/user_register_view/'.$rel_id);
         break;

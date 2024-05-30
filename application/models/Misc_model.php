@@ -240,11 +240,11 @@ class Misc_model extends App_Model
     
     public function getallbom($fromdate = "",$todate = ""){
         if($fromdate != ""){
-            $this->db->where('date > ',$fromdate);
+            $this->db->where('Date(`date`) > ',$fromdate);
         }
         
         if($todate != ""){
-            $this->db->where('date < ',$todate);
+            $this->db->where('Date(`date`) < ',$todate);
         }
         return $this->db->get(db_prefix() . 'gatepass')->result_array();
     }

@@ -83,7 +83,7 @@ function accounting_add_head_component() {
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/handsontable.full.min.js') . '?v=' . ACCOUNTING_REVISION . '"></script>';
 
 	}
-	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false)) {
+	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false) || !(strpos($viewuri, 'admin/accounting/new_payment_entry') === false)) {
 
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/handsontable.full.min.css') . '"  rel="stylesheet" type="text/css" />';
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/chosen.css') . '"  rel="stylesheet" type="text/css" />';
@@ -127,7 +127,7 @@ function accounting_add_head_component() {
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/css/setting.css') . '?v=' . ACCOUNTING_REVISION . '"  rel="stylesheet" type="text/css" />';
 	}
 
-	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false)) {
+	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false) ||!(strpos($viewuri, 'admin/accounting/new_payment_entry') === false)   ) {
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/css/new_journal_entry.css') . '?v=' . ACCOUNTING_REVISION . '"  rel="stylesheet" type="text/css" />';
 	}
 
@@ -228,10 +228,21 @@ function accounting_load_js() {
 	if (!(strpos($viewuri, 'admin/accounting/journal_entry') === false)) {
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/js/journal_entry/manage.js') . '?v=' . ACCOUNTING_REVISION . '"></script>';
 	}
-	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false)) {
+	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false) || !(strpos($viewuri, 'admin/accounting/new_payment_entry') === false)) {
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/chosen.jquery.js') . '"></script>';
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/handsontable-chosen-editor.js') . '"></script>';
 	}
+
+	
+	if (!(strpos($viewuri, 'admin/accounting/payment_entry') === false)) {
+		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/js/payment_entry/manage.js') . '?v=' . ACCOUNTING_REVISION . '"></script>';
+	}
+	if (!(strpos($viewuri, 'admin/accounting/new_payment_entry') === false)) {
+		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/chosen.jquery.js') . '"></script>';
+		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/handsontable-chosen-editor.js') . '"></script>';
+	}
+
+
 
 	if (!(strpos($viewuri, 'admin/accounting/transaction') === false)) {
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/chosen.jquery.js') . '"></script>';

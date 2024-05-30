@@ -21,7 +21,7 @@
                 <tr>
                     <td colspan="3">
                         <p class="text-center no-margin-top-20 no-margin-left-24">
-                            <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?></p>
+                            <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?> s</p>
                     </td>
                     <td></td>
                     <td></td>

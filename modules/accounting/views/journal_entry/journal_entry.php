@@ -16,8 +16,8 @@
                             <?php echo render_date_input('journal_date','journal_date',$value); ?>
                         </div>
                         <div class="col-md-6">
-                            <?php $value = (isset($journal_entry) ? $journal_entry->number : $next_number); ?>
-                            <?php echo render_input('number','number',$value,'number'); ?>
+                            <?php $value = (isset($journal_entry) ? $journal_entry->VNo : $voucher_no); ?>
+                            <?php echo render_input('VNo','Voucher No',$value,'text' ,[ "readonly" =>"readonly" ]); ?>
                         </div>
                     </div>
                     <div id="journal_entry_container"></div>

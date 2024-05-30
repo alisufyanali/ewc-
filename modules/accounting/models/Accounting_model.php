@@ -2522,7 +2522,8 @@ class Accounting_model extends App_Model
 
             $_account_type_name = isset($account_type_name[$account['account_type_id']]) ? $account_type_name[$account['account_type_id']] : '';
            
-            $note['label'] = $account['name'].' - '.$_account_type_name;
+            // $note['label'] = $account['name'].' - '.$_account_type_name;
+            $note['label'] = $account['name'].' - '.$account['HeadCode'];
 
             $list_accounts[] = $note;
         }
@@ -3793,6 +3794,8 @@ class Accounting_model extends App_Model
                 if($value[0] != ''){
                     $node = [];
                     $node['account'] = $value[0];
+                    $node['acc_no'] = $this->get_HeadCodeById($value[0]) ;
+                    $node['VNo'] = $data['VNo'];
                     $node['date'] = $data['journal_date'];
                     $node['debit'] = $value[1];
                     $node['credit'] = $value[2];
@@ -5856,6 +5859,7 @@ class Accounting_model extends App_Model
      * get data general ledger 
      * @return array
      */
+    
     public function get_data_general_ledger($data_filter){
         $this->load->model('currencies_model');
         $currency = $this->currencies_model->get_base_currency();
@@ -5877,18 +5881,20 @@ class Accounting_model extends App_Model
         }
 
         $accounts = $this->accounting_model->get_accounts();
-
+       
         $account_name = [];
 
         foreach ($accounts as $key => $value) {
             $account_name[$value['id']] = $value['name'];
         }
+       
 
         $account_type_details = $this->get_account_type_details();
         $data_report = [];
         $data_total = [];
         $data_accounts = [];
-        
+
+     
         foreach ($account_type_details as $key => $value) {
             if($value['account_type_id'] == 1){
                 $data_accounts['accounts_receivable'][] = $value;
@@ -10086,6 +10092,19 @@ class Accounting_model extends App_Model
         }
         return 1;
     }
+
+    public function get_max_jv_no() {
+        
+        $this->db->select('max(VNO) as max_VNO');
+        $max = $this->db->get(db_prefix().'acc_journal_entries')->row();
+        if($max->max_VNO !== null){
+            $last_number = intval(substr($max->max_VNO, 3)); // Extract number part and convert to integer
+            $new_number = 'JV-' . sprintf('%02d', $last_number + 1); // Increment and format number
+            return $new_number;
+        }
+        return 'JV-01'; // If no existing number found, return the initial one
+    }
+
 
     /**
      * add payment mode mapping
@@ -21532,4 +21551,280 @@ class Accounting_model extends App_Model
         }
         return false;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    public function get_HeadCode($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        $newidsinfo = $this->db->select('count(HeadCode) as hc')
+                ->from('tblacc_accounts')
+                ->where('PHeadName',$newdata->name)
+                ->get()
+                ->row();
+
+        $nid  = $newidsinfo->hc;
+        $n = $nid + 1;
+        if ($n / 10 < 1){
+            $newHeadCode = $HeadCode . "0" . $n;
+        }
+        else{
+            $newHeadCode = $HeadCode . $n;
+        }
+
+        return $newHeadCode;
+    }
+
+
+
+    public function get_HeadName($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        return $newdata->name;
+    }
+
+    
+
+    
+    public function get_PHeadCode($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        return $newdata->PHeadCode;
+    }
+
+
+
+    public function get_HeadCodeById($id) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('id',$id)
+                ->get()
+                ->row();
+
+        return $newdata->HeadCode;
+    }
+
+
+
+    
+
+    /**
+     * add payment entry
+     * @param array $data 
+     * @return boolean
+     */
+    public function add_payment_entry($data){
+        $payment_entry = json_decode($data['payment_entry']);
+        unset($data['payment_entry']);
+
+        $data['payment_date'] = to_sql_date($data['payment_date']);
+
+        
+        $data['datecreated'] = date('Y-m-d H:i:s');
+        $data['addedfrom'] = get_staff_user_id();
+        
+        $this->db->insert(db_prefix().'acc_payment_entries', $data);
+          $this->db->last_query();
+
+        $insert_id = $this->db->insert_id();
+        
+        if($insert_id){
+            $data_insert = [];
+
+            foreach ($payment_entry as $key => $value) {
+                if($value[0] != ''){
+                    $node = [];
+                    $node['account'] = $value[0];
+                    $node['acc_no'] = $this->get_HeadCodeById($value[0]) ;
+                    $node['VNo'] = $data['VNo'];
+                    $node['date'] = $data['payment_date'];
+                    $node['debit'] = $value[1];
+                    $node['credit'] = 0;
+                    $node['description'] = $value[2];
+                    $node['rel_id'] = $insert_id;
+                    $node['rel_type'] = 'payment_entry';
+                    $node['datecreated'] = date('Y-m-d H:i:s');
+                    $node['addedfrom'] = get_staff_user_id();
+                    $this->db->insert(db_prefix().'acc_account_history', $node);
+
+                    $new = [];
+                    $new['account'] = $value[0];
+                    $new['acc_no'] = $data['modes_accounts'] ;
+                    $new['VNo'] = $data['VNo'];
+                    $new['date'] = $data['payment_date'];
+                    $new['debit'] = 0;
+                    $new['credit'] = $value[1];
+                    $new['description'] = $value[2] ;
+                    $new['rel_id'] = $insert_id ;
+                    $new['rel_type'] = 'payment_entry' ;
+                    $new['datecreated'] = date('Y-m-d H:i:s');
+                    $new['addedfrom'] = get_staff_user_id();
+                    $this->db->insert(db_prefix().'acc_account_history', $new);
+
+
+                }
+            }
+            
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+
+     /**
+     * get payment entry
+     * @param  integer $id 
+     * @return object     
+     */
+    public function get_payment_entry($id){
+        $this->db->where('id', $id);
+        $payment_entrie = $this->db->get(db_prefix() . 'acc_payment_entries')->row();
+
+        if($payment_entrie){
+            $this->db->where('rel_id', $id);
+            $this->db->where('rel_type', 'payment_entry');
+            $details = $this->db->get(db_prefix().'acc_account_history')->result_array();
+
+            $data_details =[];
+            foreach ($details as $key => $value) {
+                $data_details[] = [
+                    "account" => $value['account'],
+                    "debit" => floatval($value['debit']),
+                    "credit" => floatval($value['credit']),
+                    "description" => $value['description']];
+            }
+            if(count($data_details) < 10){
+
+            }
+            $payment_entrie->details = $data_details;
+        }
+
+        return $payment_entrie;
+    }
+
+    /**
+     * delete payment entry
+     * @param integer $id
+     * @return boolean
+     */
+
+    public function delete_payment_entry($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->delete(db_prefix() . 'acc_payment_entries');
+        if ($this->db->affected_rows() > 0) {
+            $this->db->where('rel_id', $id);
+            $this->db->where('rel_type', 'payment_entry');
+            $this->db->delete(db_prefix() . 'acc_account_history');
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * update payment entry
+     * @param  array $data 
+     * @param  integer $id 
+     * @return boolean       
+     */
+    public function update_payment_entry($data, $id){
+        $payment_entry = json_decode($data['payment_entry']);
+        unset($data['payment_entry']);
+
+        $data['payment_date'] = to_sql_date($data['payment_date']);
+        if(get_option('acc_close_the_books') == 1){
+            if(strtotime($data['payment_date']) <= strtotime(get_option('acc_closing_date')) && strtotime(date('Y-m-d')) > strtotime(get_option('acc_closing_date'))){
+                return 'close_the_book';
+            }
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix().'acc_payment_entries', $data);
+
+        $this->db->where('rel_id', $id);
+        $this->db->where('rel_type', 'payment_entry');
+        $this->db->delete(db_prefix() . 'acc_account_history');
+
+        $data_insert = [];
+
+        foreach ($payment_entry as $key => $value) {
+            if($value[0] != ''){
+                $node = [];
+                $node['account'] = $value[0];
+                $node['debit'] = $value[1];
+                $node['credit'] = $value[2];
+                $node['date'] = $data['payment_date'];
+                $node['description'] = $value[3];
+                $node['rel_id'] = $id;
+                $node['rel_type'] = 'payment_entry';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+
+                $data_insert[] = $node;
+            }
+        }
+        
+        $this->db->insert_batch(db_prefix().'acc_account_history', $data_insert);
+
+        return true;
+    }
+
+    
+    public function get_max_pv_no() {
+        
+        $this->db->select('max(VNO) as max_VNO');
+        $max = $this->db->get(db_prefix().'acc_payment_entries')->row();
+        if($max->max_VNO !== null){
+            $last_number = intval(substr($max->max_VNO, 3)); // Extract number part and convert to integer
+            $new_number = 'PV-' . sprintf('%02d', $last_number + 1); // Increment and format number
+            return $new_number;
+        }
+        return 'PV-01'; // If no existing number found, return the initial one
+    }
+
+
 }
