@@ -9153,7 +9153,7 @@ var_dump($data['group'] ); die;
 
 
 
- /**
+     /**
      * payment entry
      * @return view
      */
@@ -9220,18 +9220,14 @@ var_dump($data['group'] ); die;
                 $categoryOutput = _d($aRow['payment_date']);
 
                 $categoryOutput .= '<div class="row-options">';
-
-                if (has_permission('accounting_payment_entry', '', 'edit')) {
-                    $categoryOutput .= '<a href="' . admin_url('accounting/payment_entry_export/' . $aRow['id']) . '" class="text-success">' . _l('acc_export_excel') . '</a>';
-                }
-
-                if (has_permission('accounting_payment_entry', '', 'edit')) {
+ 
+                // if (has_permission('accounting_payment_entry', '', 'edit')) {
                     $categoryOutput .= ' | <a href="' . admin_url('accounting/new_payment_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
-                }
+                // }
 
-                if (has_permission('accounting_payment_entry', '', 'delete')) {
+                // if (has_permission('accounting_payment_entry', '', 'delete')) {
                     $categoryOutput .= ' | <a href="' . admin_url('accounting/delete_payment_entry/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
-                }
+                // }
 
                 $categoryOutput .= '</div>';
                 $row[] = $categoryOutput;
@@ -9255,6 +9251,7 @@ var_dump($data['group'] ); die;
         if ($this->input->post()) {
             $data                = $this->input->post();
             $data['description'] = $this->input->post('description', false);
+ 
             if($id == ''){
                 $success = $this->accounting_model->add_payment_entry($data);
                 echo 1;
@@ -9265,9 +9262,9 @@ var_dump($data['group'] ); die;
                     set_alert('success', _l('added_successfully', _l('payment_entry')));
                 }
             }else{
-                if (!has_permission('accounting_payment_entry', '', 'edit')) {
-                    access_denied('accounting_payment_entry');
-                }
+                // if (!has_permission('accounting_payment_entry', '', 'edit')) {
+                //     access_denied('accounting_payment_entry');
+                // }
                 $success = $this->accounting_model->update_payment_entry($data, $id);
                 if ($success === 'close_the_book') {
                     $message = _l('has_closed_the_book');
@@ -9290,9 +9287,12 @@ var_dump($data['group'] ); die;
         
         $data['title'] = _l('payment_entry');
         $data['account_to_select'] = $this->accounting_model->get_data_account_to_select();
+      
+        $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode in (10101 , 10102)  ');
+        // echo '<pre>';
+        // print_r($data['modes_accounts']);
+        // exit;
 
-
-        $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode = 10101 ');
         $this->load->view('payment_entry/payment_entry', $data);
     }
 
@@ -9313,6 +9313,180 @@ var_dump($data['group'] ); die;
             set_alert('warning', $message);
         }
         redirect(admin_url('accounting/payment_entry'));
+    }
+
+
+
+
+
+
+
+
+
+
+    
+
+
+     /**
+     * customer entry
+     * @return view
+     */
+    public function customer_entry(){
+        $data['title']         = _l('customer_entry');
+        $data['accounts'] = $this->accounting_model->get_accounts();
+        $data['accounts_to_select'] = $this->accounting_model->get_data_account_to_select();
+        $this->load->view('customer_entry/manage', $data);
+    }
+
+    /**
+     * customer entry table
+     * @return json
+     */
+    public function customer_entry_table(){
+        if ($this->input->is_ajax_request()) {
+           
+            $this->load->model('currencies_model');
+
+            $currency = $this->currencies_model->get_base_currency();
+            $select = [
+                '1', // bulk actions
+                'id',
+                'VNo',
+                'customer_date',
+            ];
+
+            $where = [];
+            $from_date = '';
+            $to_date   = '';
+            if ($this->input->post('from_date')) {
+                $from_date = $this->input->post('from_date');
+                if (!$this->accounting_model->check_format_date($from_date)) {
+                    $from_date = to_sql_date($from_date);
+                }
+            }
+
+            if ($this->input->post('to_date')) {
+                $to_date = $this->input->post('to_date');
+                if (!$this->accounting_model->check_format_date($to_date)) {
+                    $to_date = to_sql_date($to_date);
+                }
+            }
+            if ($from_date != '' && $to_date != '') {
+                array_push($where, 'AND (customer_date >= "' . $from_date . '" and customer_date <= "' . $to_date . '")');
+            } elseif ($from_date != '') {
+                array_push($where, 'AND (customer_date >= "' . $from_date . '")');
+            } elseif ($to_date != '') {
+                array_push($where, 'AND (customer_date <= "' . $to_date . '")');
+            }
+
+            $aColumns     = $select;
+            $sIndexColumn = 'id';
+            $sTable       = db_prefix() . 'acc_customer_entries';
+            $join         = [];
+            $result       = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, ['amount', 'description']);
+
+            $output  = $result['output'];
+            $rResult = $result['rResult'];
+
+            foreach ($rResult as $aRow) {
+                $row   = [];
+                $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
+                $categoryOutput = _d($aRow['customer_date']);
+
+                $categoryOutput .= '<div class="row-options">';
+ 
+                // if (has_permission('accounting_customer_entry', '', 'edit')) {
+                    $categoryOutput .= ' | <a href="' . admin_url('accounting/new_customer_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
+                // }
+
+                // if (has_permission('accounting_customer_entry', '', 'delete')) {
+                    $categoryOutput .= ' | <a href="' . admin_url('accounting/delete_customer_entry/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+                // }
+
+                $categoryOutput .= '</div>';
+                $row[] = $categoryOutput;
+                $row[] = $aRow['VNo'];
+                $row[] = html_entity_decode($aRow['description']);
+                $row[] = app_format_money($aRow['amount'], $currency->name);
+
+                $output['aaData'][] = $row;
+            }
+
+            echo json_encode($output);
+            die();
+        }
+    }
+
+    /**
+     * add customer entry
+     * @return view
+     */
+    public function new_customer_entry($id = ''){
+        if ($this->input->post()) {
+            $data                = $this->input->post();
+            $data['description'] = $this->input->post('description', false);
+ 
+            if($id == ''){
+                $success = $this->accounting_model->add_customer_entry($data);
+                echo 1;
+                if ($success === 'close_the_book') {
+                    $message = _l('has_closed_the_book');
+                    set_alert('warning', _l('has_closed_the_book'));
+                }elseif ($success) {
+                    set_alert('success', _l('added_successfully', _l('customer_entry')));
+                }
+            }else{
+                // if (!has_permission('accounting_customer_entry', '', 'edit')) {
+                //     access_denied('accounting_customer_entry');
+                // }
+                $success = $this->accounting_model->update_customer_entry($data, $id);
+                if ($success === 'close_the_book') {
+                    $message = _l('has_closed_the_book');
+                    set_alert('warning', _l('has_closed_the_book'));
+                }elseif ($success) {
+                    set_alert('success', _l('updated_successfully', _l('customer_entry')));
+                }
+            }
+             
+            redirect(admin_url('accounting/customer_entry'));
+        }
+
+        if($id != ''){
+            $data['customer_entry'] = $this->accounting_model->get_customer_entry($id);
+        }
+
+        $this->load->model('currencies_model');
+        $data['currency'] = $this->currencies_model->get_base_currency();
+        $data['voucher_no'] = $this->accounting_model->get_max_cr_no();
+        
+        $data['title'] = _l('customer_entry');
+        $data['account_to_select'] = $this->accounting_model->get_data_account_to_select();
+      
+        $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode in (10101 , 10102)  ');
+        // echo '<pre>';
+        // print_r($data['modes_accounts']);
+        // exit;
+
+        $this->load->view('customer_entry/customer_entry', $data);
+    }
+
+    /**
+     * delete customer entry
+     * @param  integer $id
+     * @return
+     */
+    public function delete_customer_entry($id)
+    {
+        $success = $this->accounting_model->delete_customer_entry($id);
+        $message = '';
+        if ($success) {
+            $message = _l('deleted', _l('customer_entry'));
+            set_alert('success', $message);
+        } else {
+            $message = _l('can_not_delete');
+            set_alert('warning', $message);
+        }
+        redirect(admin_url('accounting/customer_entry'));
     }
 
 
