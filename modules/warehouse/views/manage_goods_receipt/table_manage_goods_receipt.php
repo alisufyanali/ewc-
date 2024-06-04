@@ -10,9 +10,9 @@ $aColumns = [
     'pr_order_id',
     'date_add',
     'total_tax_money', 
+    'total_money',
     'total_goods_money',
     'value_of_inventory',
-    'total_money',
     'rconversion',
     'approval',
     'currency'
@@ -31,8 +31,7 @@ if (isset($day_vouchers)) {
     $where[] = 'AND tblgoods_receipt.date_add <= "' . $day_vouchers . '"';
     
 }
-
-
+  
 
 
 
@@ -48,6 +47,7 @@ foreach ($rResult as $aRow) {
     for ($i = 0; $i < count($aColumns); $i++) {
 
         $_data = $aRow[$aColumns[$i]];
+
         if($aColumns[$i] == 'supplier_name'){
 
             if (get_status_modules_wh('purchase') && ($aRow['supplier_code'] != '') && ($aRow['supplier_code'] != 0) ){
@@ -87,44 +87,50 @@ foreach ($rResult as $aRow) {
             }
             
 
-            
             $name .= '</div>';
 
             $_data = $name;
         }elseif ($aColumns[$i] == 'total_goods_money') {
-            $_data = app_format_money((float)$aRow['total_goods_money'],$aRow['currency']);
+            // $_data = app_format_money((float)$aRow['total_goods_money'],$aRow['currency']);
+            $_data = number_format(get_paid_amount($aRow['id']) ,2);
         }elseif ($aColumns[$i] == 'total_money') {
             $_data = app_format_money((float)$aRow['total_money'],$aRow['currency']);
         }elseif ($aColumns[$i] == 'rconversion') {
            $subtotals =  (float)$aRow['total_money'] * $aRow['rconversion'];
             $_data = "PKR ".number_format($subtotals,2);
         }elseif($aColumns[$i] == 'value_of_inventory') {
-            $_data = app_format_money((float)$aRow['value_of_inventory'],$aRow['currency']);
+            // $_data = app_format_money((float)$aRow['value_of_inventory'],$aRow['currency']);
+            $_data =  number_format(get_recived_amount($aRow['id'])   -  get_paid_amount($aRow['id']) );
         }elseif($aColumns[$i] == 'approval') {
-           
-           if($aRow['approval'] == 1){
-            $_data = '<span class="label label-tag tag-id-1 label-tab1"><span class="tag">'._l('approved').'</span><span class="hide">, </span></span>&nbsp';
-        }elseif($aRow['approval'] == 0){
-            $_data = '<span class="label label-tag tag-id-1 label-tab2"><span class="tag">'._l('not_yet_approve').'</span><span class="hide">, </span></span>&nbsp';
-        }elseif($aRow['approval'] == -1){
-            $_data = '<span class="label label-tag tag-id-1 label-tab3"><span class="tag">'._l('reject').'</span><span class="hide">, </span></span>&nbsp';
-        }
-    }elseif($aColumns[$i] == 'pr_order_id'){
-        $get_pur_order_name ='';
-        if (get_status_modules_wh('purchase')) {
-            if( ($aRow['pr_order_id'] != '') && ($aRow['pr_order_id'] != 0) ){
-                $get_pur_order_name .='<a href="'. admin_url('purchase/purchase_order/'.$aRow['pr_order_id']) .'" >'. get_pur_order_name($aRow['pr_order_id']) .'</a>';
+            if($aRow['approval'] == 1){
+                $_data = '<span class="label label-tag tag-id-1 label-tab1"><span class="tag">'._l('approved').'</span><span class="hide">, </span></span>&nbsp';
+            }elseif($aRow['approval'] == 0){
+                $_data = '<span class="label label-tag tag-id-1 label-tab2"><span class="tag">'._l('not_yet_approve').'</span><span class="hide">, </span></span>&nbsp';
+            }elseif($aRow['approval'] == -1){
+                $_data = '<span class="label label-tag tag-id-1 label-tab3"><span class="tag">'._l('reject').'</span><span class="hide">, </span></span>&nbsp';
             }
+        }elseif($aColumns[$i] == 'pr_order_id'){
+            $get_pur_order_name ='';
+            if (get_status_modules_wh('purchase')) {
+                if( ($aRow['pr_order_id'] != '') && ($aRow['pr_order_id'] != 0) ){
+                    $get_pur_order_name .='<a href="'. admin_url('purchase/purchase_order/'.$aRow['pr_order_id']) .'" >'. get_pur_order_name($aRow['pr_order_id']) .'</a>';
+                }
+            }
+            $_data = $get_pur_order_name;
         }
 
-        $_data = $get_pur_order_name;
 
+        else{
+            $_data = '<a target="_blank" href="' . admin_url('accounting/new_payment_entry/' . $aRow['id']) . '/pay"> Pay Now </a>';
+        }
+
+
+
+        $row[] = $_data;
     }
-    
 
 
-    $row[] = $_data;
-}
+
 $output['aaData'][] = $row;
 
 }

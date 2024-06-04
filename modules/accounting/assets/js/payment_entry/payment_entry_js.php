@@ -9,7 +9,7 @@ var commodity_type_value, data;
         number: 'required',
     });
 
-    <?php if(isset($payment_entry)){ ?>
+    <?php if(isset($payment_entry->details)){ ?>
     data = <?php echo json_encode($payment_entry->details); ?>
     <?php }else{ ?>
     data = [{

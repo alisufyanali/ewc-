@@ -170,7 +170,7 @@ function manage_invoice_items(form) {
             }
             alert_float('success', response.message);
         }
-        $('#sales_item_modal').modal('hide');
+        $('#customer_item_modal').modal('hide');
     }).fail(function (data) {
         alert_float('danger', data.responseText);
     });

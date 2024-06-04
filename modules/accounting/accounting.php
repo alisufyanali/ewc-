@@ -84,7 +84,7 @@ function accounting_add_head_component() {
 
 	}
 	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false) || !(strpos($viewuri, 'admin/accounting/new_payment_entry') === false)
-	|| !(strpos($viewuri, 'admin/accounting/new_customer_entry') === false)) {
+	|| !(strpos($viewuri, 'admin/accounting/new_received_entry') === false)) {
 
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/handsontable.full.min.css') . '"  rel="stylesheet" type="text/css" />';
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/chosen.css') . '"  rel="stylesheet" type="text/css" />';
@@ -129,7 +129,7 @@ function accounting_add_head_component() {
 	}
 
 	if (!(strpos($viewuri, 'admin/accounting/new_journal_entry') === false) || !(strpos($viewuri, 'admin/accounting/new_payment_entry') === false)
-	|| !(strpos($viewuri, 'admin/accounting/new_customer_entry') === false)   ) {
+	|| !(strpos($viewuri, 'admin/accounting/new_received_entry') === false)   ) {
 		echo '<link href="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/css/new_journal_entry.css') . '?v=' . ACCOUNTING_REVISION . '"  rel="stylesheet" type="text/css" />';
 	}
 
@@ -240,11 +240,11 @@ function accounting_load_js() {
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/js/payment_entry/manage.js') . '?v=' . ACCOUNTING_REVISION . '"></script>';
 	}
 	
-	if (!(strpos($viewuri, 'admin/accounting/customer_entry') === false)) {
-		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/js/customer_entry/manage.js') . '?v=' . ACCOUNTING_REVISION . '"></script>';
+	if (!(strpos($viewuri, 'admin/accounting/received_entry') === false)) {
+		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/js/received_entry/manage.js') . '?v=' . ACCOUNTING_REVISION . '"></script>';
 	}
 
-	if (!(strpos($viewuri, 'admin/accounting/new_payment_entry') === false) || !(strpos($viewuri, 'admin/accounting/new_customer_entry') === false)) {
+	if (!(strpos($viewuri, 'admin/accounting/new_payment_entry') === false) || !(strpos($viewuri, 'admin/accounting/new_received_entry') === false)) {
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/chosen.jquery.js') . '"></script>';
 		echo '<script src="' . module_dir_url(ACCOUNTING_MODULE_NAME, 'assets/plugins/handsontable/handsontable-chosen-editor.js') . '"></script>';
 	}
@@ -291,7 +291,9 @@ function accounting_load_js() {
 function accounting_module_init_menu_items() {
 	$CI = &get_instance();
 
-	if (has_permission('accounting_dashboard', '', 'view') || has_permission('accounting_transaction', '', 'view') || has_permission('accounting_journal_entry', '', 'view') || has_permission('accounting_transfer', '', 'view') || has_permission('accounting_chart_of_accounts', '', 'view') || has_permission('accounting_reconcile', '', 'view') || has_permission('accounting_report', '', 'view') || has_permission('accounting_setting', '', 'view')) {
+	if (has_permission('accounting_dashboard', '', 'view') || has_permission('accounting_transaction', '', 'view') || has_permission('accounting_journal_entry', '', 'view')
+	 || has_permission('accounting_transfer', '', 'view') || has_permission('accounting_chart_of_accounts', '', 'view') || has_permission('accounting_reconcile', '', 'view') 
+	|| has_permission('accounting_report', '', 'view') || has_permission('accounting_setting', '', 'view')) {
 		$CI->app_menu->add_sidebar_menu_item('accounting', [
 			'name' => _l('als_accounting'),
 			'icon' => 'fa fa-usd',
@@ -342,6 +344,14 @@ function accounting_module_init_menu_items() {
 				'name' => 'Payment Entry',
 				'icon' => 'fa fa-money',
 				'href' => admin_url('accounting/payment_entry'),
+				'position' => 3,
+			]);
+			
+			$CI->app_menu->add_sidebar_children_item('accounting', [
+				'slug' => 'accounting_received_entry',
+				'name' => 'Received Entry',
+				'icon' => 'fa fa-handshake-o',
+				'href' => admin_url('accounting/received_entry'),
 				'position' => 3,
 			]);
 			

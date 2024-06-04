@@ -1256,6 +1256,24 @@ class Warehouse_model extends App_Model {
 		$this->db->insert(db_prefix() . 'goods_receipt', $data);
 		$insert_id = $this->db->insert_id();
 
+
+		$node = [];
+		$acc_vendor = $this->get_account_by_vendor($data['supplier_code']) ;
+		$node['account'] = $acc_vendor->id;
+		$node['acc_no'] = $acc_vendor->HeadCode ;
+		$node['VNo'] = $data['goods_receipt_code'];
+		$node['date'] = $data['date_add'];
+		$node['debit'] = 0;
+		$node['credit'] = $data['total_money'];
+		$node['description'] = $data['LongDescription'];
+		$node['rel_id'] = $insert_id;
+		$node['rel_type'] = 'purchase_entry';
+		$node['vendor'] = $data['supplier_code'];
+		$node['datecreated'] = date('Y-m-d H:i:s');
+		$node['addedfrom'] = get_staff_user_id();
+		$this->db->insert(db_prefix().'acc_account_history', $node);
+
+
 		/*insert detail*/
 		if ($insert_id) {
 			foreach ($inventory_receipts as $inventory_receipt) {
@@ -16211,5 +16229,14 @@ class Warehouse_model extends App_Model {
 		}
 		return false;
 	}
+
+
+	public function get_account_by_vendor($id) {
+
+		$this->db->where('vendor_id', $id);
+		return $this->db->get(db_prefix() . 'acc_accounts')->row();
+
+	}
+
 
 }

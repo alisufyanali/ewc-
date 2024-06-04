@@ -7,13 +7,13 @@ var fnServerParams;
       "from_date": '[name="from_date"]',
       "to_date": '[name="to_date"]',
     };
-    init_customer_entry_table();
+    init_received_entry_table();
     $('input[name="from_date"]').on('change', function() {
-      init_customer_entry_table();
+      init_received_entry_table();
     });
 
     $('input[name="to_date"]').on('change', function() {
-      init_customer_entry_table();
+      init_received_entry_table();
     });
 
 	$("input[data-type='currency']").on({
@@ -26,17 +26,17 @@ var fnServerParams;
     });
 })(jQuery);
 
-function init_customer_entry_table() {
+function init_received_entry_table() {
   "use strict";
 
-  if ($.fn.DataTable.isDataTable('.table-customer-entry')) {
-    $('.table-customer-entry').DataTable().destroy();
+  if ($.fn.DataTable.isDataTable('.table-received-entry')) {
+    $('.table-received-entry').DataTable().destroy();
   }
-  initDataTable('.table-customer-entry', admin_url + 'accounting/customer_entry_table', [0], [0], fnServerParams, [1, 'desc']);
+  initDataTable('.table-received-entry', admin_url + 'accounting/received_entry_table', [0], [0], fnServerParams, [1, 'desc']);
 }
 
 
-// customer entry bulk actions action
+// received entry bulk actions action
 function bulk_action(event) {
   "use strict";
     if (confirm_delete()) {
@@ -44,7 +44,7 @@ function bulk_action(event) {
             data = {};
             data.mass_delete = $('#mass_delete').prop('checked');
 
-        var rows = $($('#customer_entry_bulk_actions').attr('data-table')).find('tbody tr');
+        var rows = $($('#received_entry_bulk_actions').attr('data-table')).find('tbody tr');
 
         $.each(rows, function() {
             var checkbox = $($(this).find('td').eq(0)).find('input');
@@ -55,7 +55,7 @@ function bulk_action(event) {
         data.ids = ids;
         $(event).addClass('disabled');
         setTimeout(function() {
-            $.post(admin_url + 'accounting/customer_entry_bulk_action', data).done(function() {
+            $.post(admin_url + 'accounting/received_entry_bulk_action', data).done(function() {
                 window.location.reload();
             });
         }, 200);

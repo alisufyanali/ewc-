@@ -1196,3 +1196,40 @@ if (!function_exists('collect')) {
         return new Illuminate\Support\Collection($items);
     }
 }
+
+
+
+
+
+
+function get_paid_amount($id)
+{
+    $CI = &get_instance();
+
+    $newdata = $CI->db->select('sum(debit) as total')
+                ->from('tblacc_account_history')
+                ->where('pur_id',$id)
+                ->where('rel_type' , 'payment_entry')
+                ->group_by('pur_id')
+                ->get()
+                ->row();
+
+        return $newdata->total;
+}
+
+
+
+
+function get_recived_amount($id)
+{
+    $CI = &get_instance();
+    $newdata = $CI->db->select('credit')
+    ->from('tblacc_account_history')
+    ->where('rel_id',$id)
+    ->where('rel_type' , 'purchase_entry')
+    ->get()
+    ->row();
+
+return $newdata->credit;
+
+}

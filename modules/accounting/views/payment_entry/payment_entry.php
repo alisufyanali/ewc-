@@ -12,34 +12,33 @@
                     <hr />
                     <div class="row">
                         <div class="col-md-6">
-                            <?php $value = (isset($payment_entry) ? _d($payment_entry->payment_date) : _d(date('Y-m-d'))); ?>
+                            <?php $value = (isset($payment_entry->payment_date) ? _d($payment_entry->payment_date) : _d(date('Y-m-d'))); ?>
                             <?php echo render_date_input('payment_date','payment_date',$value); ?>
                         </div>
                         <div class="col-md-6">
-                            <?php $value = (isset($payment_entry) ? $payment_entry->VNo : $voucher_no); ?>
+                            <?php $value = (isset($payment_entry->VNo) ? $payment_entry->VNo : $voucher_no); ?>
                             <?php echo render_input('VNo','Voucher No',$value,'text' ,[ "readonly" =>"readonly" ]); ?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <?php $value = (isset($payment_entry) ? $payment_entry->payee_name : null); ?>
+                            <?php $value = (isset($payment_entry->payee_name) ? $payment_entry->payee_name : null); ?>
                             <?php echo render_input('payee_name','Payee Name',$value,'text'); ?>
                         </div>
 
                         <div class="col-md-6">
-                            <?php $value = (isset($payment_entry) ? $payment_entry->reference_no : null); ?>
+                            <?php $value = (isset($payment_entry->reference_no) ? $payment_entry->reference_no : null); ?>
                             <?php echo render_input('reference_no','Reference No',$value,'text'); ?>
                         </div>
                     </div>
                     <div class="row">
-
                         <div class="col-md-6">
                             <div class="form-select">
                                 <label class="bold"> <small class="req text-danger">* </small>mode Of Payment</label>
                                 <select class="selectpicker mode_of_payment" required name="mode_of_payment" data-width="100%">
                                     <option value=""></option>
-                                    <option value="Cash" <?php echo ((isset($payment_entry) && $payment_entry->mode_of_payment == 'Cash' ) ? 'Selected' : null); ?> >Cash</option>
-                                    <option value="Bank" <?php echo ((isset($payment_entry) && $payment_entry->mode_of_payment == 'Bank' ) ? 'Selected' : null); ?> >Bank</option>
+                                    <option value="Cash" <?php echo ((isset($payment_entry->mode_of_payment) && $payment_entry->mode_of_payment == 'Cash' ) ? 'Selected' : null); ?> >Cash</option>
+                                    <option value="Bank" <?php echo ((isset($payment_entry->mode_of_payment) && $payment_entry->mode_of_payment == 'Bank' ) ? 'Selected' : null); ?> >Bank</option>
                                 </select>
 
                             </div>
@@ -54,7 +53,7 @@
                                             $HeadCode = $value['HeadCode'] ; 
                                             $PHeadCode = $value['PHeadCode'] ; 
                                             $name = $value['name'] ; 
-                                            $selected = ((isset($payment_entry) && $payment_entry->modes_accounts == $value['HeadCode'] ) ? 'Selected' : null); 
+                                            $selected = ((isset($payment_entry->modes_accounts) && $payment_entry->modes_accounts == $value['HeadCode'] ) ? 'Selected' : null); 
                                             echo '<option value="'.$HeadCode.'" data-value="'.$PHeadCode.'" '.$selected.' >'.$name .' - ' .$HeadCode .' </option>' ; 
                                         }
                                     }
@@ -62,7 +61,24 @@
                             </select>
                         </div>
                     </div>
-                    <br>
+                    <?php
+                    if(isset($purchase_id)){
+                    ?>
+                      <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php $value = (isset($purchase_total) ? $purchase_total : null); ?>
+                                <?php echo render_input('purchase_total','Purchase Total',$value,'text' , ['disabled' =>'disabled']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php $value = (isset($purchase_paid) ? $purchase_paid : null); ?>
+                                <?php echo render_input('purchase_paid','Purchase paid',$value,'text' , ['disabled' =>'disabled']); ?>
+                            </div>
+                            
+                        </div>
+                    <?php
+                    }
+                    ?>
                     <br>
                     <div id="payment_entry_container"></div>
                     <div class="col-md-8 col-md-offset-4">
@@ -76,7 +92,7 @@
                                     <td><span class="bold"><?php echo _l('invoice_total'); ?> :</span>
                                     </td>
                                     <td class="total_debit">
-                                        <?php $value = (isset($payment_entry) ? $payment_entry->amount : 0); ?>
+                                        <?php $value = (isset($payment_entry->amount) ? $payment_entry->amount : 0); ?>
                                         <?php echo app_format_money($value, $currency->name); ?>
                                     </td>
 

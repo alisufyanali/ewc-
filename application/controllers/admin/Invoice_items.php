@@ -99,6 +99,9 @@ class Invoice_items extends AdminController
                     $this->db->insert('clients',$data);
                     $id = $this->db->insert_id();
                     
+                    $this->load->model('Clients_model');
+                    $this->Clients_model->add_customer_account($id, $data['company'] ) ;
+
                     $success = true;
                     $message = 'Customer Added Successfully!';
                     

@@ -4,13 +4,13 @@ var commodity_type_value, data;
     "use strict";
 
     acc_init_currency();
-    appValidateForm($('#customer-entry-form'), {
-        customer_date: 'required',
+    appValidateForm($('#received-entry-form'), {
+        received_date: 'required',
         number: 'required',
     });
 
-    <?php if(isset($customer_entry)){ ?>
-    data = <?php echo json_encode($customer_entry->details); ?>
+    <?php if(isset($received_entry)){ ?>
+    data = <?php echo json_encode($received_entry->details); ?>
     <?php }else{ ?>
     data = [{
             "account": "",
@@ -115,7 +115,7 @@ var commodity_type_value, data;
     ];
     <?php } ?>
 
-    var hotElement1 = document.querySelector('#customer_entry_container');
+    var hotElement1 = document.querySelector('#received_entry_container');
 
     var commodity_type = new Handsontable(hotElement1, {
         contextMenu: true,
@@ -166,10 +166,10 @@ var commodity_type_value, data;
         data: data,
         afterChange: (changes) => {
             if (changes != null) {
-                var customer_entry = JSON.parse(JSON.stringify(commodity_type_value.getData()));
+                var received_entry = JSON.parse(JSON.stringify(commodity_type_value.getData()));
                 var total_debit = 0;
 
-                $.each(customer_entry, function(index, value) {
+                $.each(received_entry, function(index, value) {
                     if (value[0] != '') {
                         if (value[1] != '' && value[1] != null) {
                             total_debit += parseFloat(value[1]);
@@ -183,11 +183,11 @@ var commodity_type_value, data;
     });
     commodity_type_value = commodity_type;
 
-    $('.customer-entry-form-submiter').on('click', function() {
-        $('input[name="customer_entry"]').val(JSON.stringify(commodity_type_value.getData()));
-        var customer_entry = JSON.parse($('input[name="customer_entry"]').val());
+    $('.received-entry-form-submiter').on('click', function() {
+        $('input[name="received_entry"]').val(JSON.stringify(commodity_type_value.getData()));
+        var received_entry = JSON.parse($('input[name="received_entry"]').val());
         var total_debit = 0;
-        $.each(customer_entry, function(index, value) {
+        $.each(received_entry, function(index, value) {
             if (value[0] != '') {
                 if (value[1] != '' && value[1] != null) {
                     total_debit += parseFloat(value[1]);
@@ -198,7 +198,7 @@ var commodity_type_value, data;
         // if (total_debit.toFixed(2) == total_credit.toFixed(2)) {
             if (total_debit > 0) {
                 $('input[name="amount"]').val(total_debit.toFixed(2));
-                $('#customer-entry-form').submit();
+                $('#received-entry-form').submit();
             } else {
                 alert('<?php echo _l('you must fill out at least one detail lines'); ?>');
             }
@@ -236,10 +236,10 @@ function customDropdownRenderer(instance, td, row, col, prop, value, cellPropert
 
 function calculate_amount_total() {
     "use strict";
-    var customer_entry = JSON.parse(JSON.stringify(commodity_type_value.getData()));
+    var received_entry = JSON.parse(JSON.stringify(commodity_type_value.getData()));
     var total_debit = 0,
         total_credit = 0;
-    $.each(customer_entry, function(index, value) {
+    $.each(received_entry, function(index, value) {
         if (value[1] != '') {
             total_debit += parseFloat(value[1]);
         }

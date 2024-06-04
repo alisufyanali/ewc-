@@ -155,6 +155,7 @@ class Purchase_model extends App_Model
         } else {
             $this->db->insert(db_prefix() . 'pur_vendor', $data);
             $userid = $this->db->insert_id();    
+            $this->add_vendor_account($userid , $data['company']);
         }
         
         if ($userid) {
@@ -4296,5 +4297,23 @@ class Purchase_model extends App_Model
 
         return $deleted;
     }
+
+
+
+    
+
+    public function add_vendor_account($client_id, $company )  {
+        $this->load->model('Clients_model');
+        $client['HeadCode'] = $this->Clients_model->get_HeadCode(50101);
+        $client['PHeadName'] = 'Accounts Payable';
+        $client['PHeadCode'] =  '50101' ;
+        $client['HeadLevel'] = 4 ;
+        $client['name'] = $company ; 
+        $client['vendor_id'] = $client_id ; 
+        $this->db->insert(db_prefix() .'acc_accounts', $client);
+    }
+
+
+    
 
 }

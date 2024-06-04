@@ -9247,14 +9247,35 @@ var_dump($data['group'] ); die;
      * add payment entry
      * @return view
      */
-    public function new_payment_entry($id = ''){
+    public function new_payment_entry($id = '' , $pay = null){
+        $purchase_id = null ;
+        if(isset($pay)){
+            
+            $purchase_data = $this->accounting_model->get_paidAmountByPurchaseId($id);
+            $suplier_data = $this->accounting_model->get_SupplierByPurchaseId($id);
+            $suplier[0]['account'] = $this->accounting_model->get_HeadId($suplier_data->supplier_code , 'vendor');
+            $suplier[0]['debit'] = $suplier_data->total_money - $purchase_data->total ;
+            $suplier[0]['description'] = null ;
+            
+            $result['details'] = $suplier ;
+            $data['payment_entry'] = (object) $result;
+            
+            // echo '<pre>';
+            // print_r($purchase_data->total);
+            // exit;
+            $purchase_id = $id ;
+            $data['purchase_id'] = $id ;
+            $data['purchase_total'] = $suplier_data->total_money ;
+            $data['purchase_paid'] = $purchase_data->total ;
+            $id =null;
+        }
         if ($this->input->post()) {
+       
             $data                = $this->input->post();
             $data['description'] = $this->input->post('description', false);
  
             if($id == ''){
-                $success = $this->accounting_model->add_payment_entry($data);
-                echo 1;
+                $success = $this->accounting_model->add_payment_entry($data , $purchase_id );
                 if ($success === 'close_the_book') {
                     $message = _l('has_closed_the_book');
                     set_alert('warning', _l('has_closed_the_book'));
@@ -9279,6 +9300,16 @@ var_dump($data['group'] ); die;
 
         if($id != ''){
             $data['payment_entry'] = $this->accounting_model->get_payment_entry($id);
+            if(isset($data['payment_entry']->pur_id)){
+
+                $purchase_id = $data['payment_entry']->pur_id ;
+                $purchase_data = $this->accounting_model->get_paidAmountByPurchaseId($purchase_id);
+                $suplier_data = $this->accounting_model->get_remainAmountByPurchaseId($purchase_id);
+                
+                $data['purchase_id'] = $purchase_id ;
+                $data['purchase_total'] = $suplier_data->credit ;
+                $data['purchase_paid'] = $purchase_data->total ;
+            }
         }
 
         $this->load->model('currencies_model');
@@ -9289,8 +9320,9 @@ var_dump($data['group'] ); die;
         $data['account_to_select'] = $this->accounting_model->get_data_account_to_select();
       
         $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode in (10101 , 10102)  ');
+
         // echo '<pre>';
-        // print_r($data['modes_accounts']);
+        // print_r($data['payment_entry']);
         // exit;
 
         $this->load->view('payment_entry/payment_entry', $data);
@@ -9328,21 +9360,21 @@ var_dump($data['group'] ); die;
 
 
      /**
-     * customer entry
+     * received entry
      * @return view
      */
-    public function customer_entry(){
-        $data['title']         = _l('customer_entry');
+    public function received_entry(){
+        $data['title']         = _l('received_entry');
         $data['accounts'] = $this->accounting_model->get_accounts();
         $data['accounts_to_select'] = $this->accounting_model->get_data_account_to_select();
-        $this->load->view('customer_entry/manage', $data);
+        $this->load->view('received_entry/manage', $data);
     }
 
     /**
-     * customer entry table
+     * received entry table
      * @return json
      */
-    public function customer_entry_table(){
+    public function received_entry_table(){
         if ($this->input->is_ajax_request()) {
            
             $this->load->model('currencies_model');
@@ -9352,7 +9384,7 @@ var_dump($data['group'] ); die;
                 '1', // bulk actions
                 'id',
                 'VNo',
-                'customer_date',
+                'received_date',
             ];
 
             $where = [];
@@ -9372,16 +9404,16 @@ var_dump($data['group'] ); die;
                 }
             }
             if ($from_date != '' && $to_date != '') {
-                array_push($where, 'AND (customer_date >= "' . $from_date . '" and customer_date <= "' . $to_date . '")');
+                array_push($where, 'AND (received_date >= "' . $from_date . '" and received_date <= "' . $to_date . '")');
             } elseif ($from_date != '') {
-                array_push($where, 'AND (customer_date >= "' . $from_date . '")');
+                array_push($where, 'AND (received_date >= "' . $from_date . '")');
             } elseif ($to_date != '') {
-                array_push($where, 'AND (customer_date <= "' . $to_date . '")');
+                array_push($where, 'AND (received_date <= "' . $to_date . '")');
             }
 
             $aColumns     = $select;
             $sIndexColumn = 'id';
-            $sTable       = db_prefix() . 'acc_customer_entries';
+            $sTable       = db_prefix() . 'acc_received_entries';
             $join         = [];
             $result       = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, ['amount', 'description']);
 
@@ -9391,16 +9423,16 @@ var_dump($data['group'] ); die;
             foreach ($rResult as $aRow) {
                 $row   = [];
                 $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
-                $categoryOutput = _d($aRow['customer_date']);
+                $categoryOutput = _d($aRow['received_date']);
 
                 $categoryOutput .= '<div class="row-options">';
  
-                // if (has_permission('accounting_customer_entry', '', 'edit')) {
-                    $categoryOutput .= ' | <a href="' . admin_url('accounting/new_customer_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
+                // if (has_permission('accounting_received_entry', '', 'edit')) {
+                    $categoryOutput .= ' | <a href="' . admin_url('accounting/new_received_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
                 // }
 
-                // if (has_permission('accounting_customer_entry', '', 'delete')) {
-                    $categoryOutput .= ' | <a href="' . admin_url('accounting/delete_customer_entry/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+                // if (has_permission('accounting_received_entry', '', 'delete')) {
+                    $categoryOutput .= ' | <a href="' . admin_url('accounting/delete_received_entry/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
                 // }
 
                 $categoryOutput .= '</div>';
@@ -9418,48 +9450,48 @@ var_dump($data['group'] ); die;
     }
 
     /**
-     * add customer entry
+     * add received entry
      * @return view
      */
-    public function new_customer_entry($id = ''){
+    public function new_received_entry($id = ''){
         if ($this->input->post()) {
             $data                = $this->input->post();
             $data['description'] = $this->input->post('description', false);
  
             if($id == ''){
-                $success = $this->accounting_model->add_customer_entry($data);
+                $success = $this->accounting_model->add_received_entry($data);
                 echo 1;
                 if ($success === 'close_the_book') {
                     $message = _l('has_closed_the_book');
                     set_alert('warning', _l('has_closed_the_book'));
                 }elseif ($success) {
-                    set_alert('success', _l('added_successfully', _l('customer_entry')));
+                    set_alert('success', _l('added_successfully', _l('received_entry')));
                 }
             }else{
-                // if (!has_permission('accounting_customer_entry', '', 'edit')) {
-                //     access_denied('accounting_customer_entry');
+                // if (!has_permission('accounting_received_entry', '', 'edit')) {
+                //     access_denied('accounting_received_entry');
                 // }
-                $success = $this->accounting_model->update_customer_entry($data, $id);
+                $success = $this->accounting_model->update_received_entry($data, $id);
                 if ($success === 'close_the_book') {
                     $message = _l('has_closed_the_book');
                     set_alert('warning', _l('has_closed_the_book'));
                 }elseif ($success) {
-                    set_alert('success', _l('updated_successfully', _l('customer_entry')));
+                    set_alert('success', _l('updated_successfully', _l('received_entry')));
                 }
             }
              
-            redirect(admin_url('accounting/customer_entry'));
+            redirect(admin_url('accounting/received_entry'));
         }
 
         if($id != ''){
-            $data['customer_entry'] = $this->accounting_model->get_customer_entry($id);
+            $data['received_entry'] = $this->accounting_model->get_received_entry($id);
         }
 
         $this->load->model('currencies_model');
         $data['currency'] = $this->currencies_model->get_base_currency();
-        $data['voucher_no'] = $this->accounting_model->get_max_cr_no();
+        $data['voucher_no'] = $this->accounting_model->get_max_rv_no();
         
-        $data['title'] = _l('customer_entry');
+        $data['title'] = _l('received_entry');
         $data['account_to_select'] = $this->accounting_model->get_data_account_to_select();
       
         $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode in (10101 , 10102)  ');
@@ -9467,26 +9499,26 @@ var_dump($data['group'] ); die;
         // print_r($data['modes_accounts']);
         // exit;
 
-        $this->load->view('customer_entry/customer_entry', $data);
+        $this->load->view('received_entry/received_entry', $data);
     }
 
     /**
-     * delete customer entry
+     * delete received entry
      * @param  integer $id
      * @return
      */
-    public function delete_customer_entry($id)
+    public function delete_received_entry($id)
     {
-        $success = $this->accounting_model->delete_customer_entry($id);
+        $success = $this->accounting_model->delete_received_entry($id);
         $message = '';
         if ($success) {
-            $message = _l('deleted', _l('customer_entry'));
+            $message = _l('deleted', _l('received_entry'));
             set_alert('success', $message);
         } else {
             $message = _l('can_not_delete');
             set_alert('warning', $message);
         }
-        redirect(admin_url('accounting/customer_entry'));
+        redirect(admin_url('accounting/received_entry'));
     }
 
 

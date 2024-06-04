@@ -9,7 +9,7 @@
                          <?php echo form_hidden('purchase_id',$purchase_id); ?>
                         <div class="row">
                          <div class="col-md-12">
-                          <h4 class="no-margin font-bold"><i class="fa fa-shopping-basket" aria-hidden="true"></i> <?php echo _l($title); ?></h4>
+                          <h4 class="no-margin font-bold"><i class="fa fa-shopping-basket" aria-hidden="true"></i><?php echo _l($title); ?></h4>
                           <hr />
                          </div>
                         </div>
@@ -24,7 +24,6 @@
                              <div class="col-md-1 pull-right">
                                 <a href="#" class="btn btn-default pull-right btn-with-tooltip toggle-small-view hidden-xs" onclick="toggle_small_view_proposal('.purchase_sm','#purchase_sm_view'); return false;" data-toggle="tooltip" title="<?php echo _l('invoices_toggle_table_tooltip'); ?>"><i class="fa fa-angle-double-left"></i></a>
                             </div>
-
                         </div>
                         <br/>
                         <div class="row">
@@ -46,11 +45,12 @@
                         _l('reference_purchase_order'),
                         _l('day_vouchers'),
                         _l('total_tax_money'),
-                        _l('total_goods_money'),
-                        _l('value_of_inventory'),
-                        _l('total_money'),
+                        _l('Total Bill Amount'),
+                        _l('Payment To Supplier'),
+                        _l('Supplier Remaining'),
                         _l('Conversion Money'),
                         _l('status_label'),
+                        'Payable',
                         ),'table_manage_goods_receipt',['purchase_sm' => 'purchase_sm']); ?>
                         
                     </div>

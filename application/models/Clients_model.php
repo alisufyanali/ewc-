@@ -158,6 +158,8 @@ class Clients_model extends App_Model
 
         $client_id = $this->db->insert_id();
 
+        $this->add_customer_account($client_id , $data['company']);
+
         if ($client_id) {
             if (count($custom_fields) > 0) {
                 $_custom_fields = $custom_fields;
@@ -1725,4 +1727,54 @@ class Clients_model extends App_Model
 
         return $this->db->get(db_prefix() . 'contacts')->result_array();
     }
+
+
+
+
+
+    
+
+
+
+    public function add_customer_account($client_id, $company )  {
+        
+        $client['HeadCode'] = $this->get_HeadCode(10105);
+        $client['PHeadName'] = 'Accounts Receivable';
+        $client['PHeadCode'] =  '10105' ;
+        $client['HeadLevel'] = 4 ;
+        $client['name'] = $company ; 
+        $client['customer_id'] = $client_id ; 
+        $this->db->insert(db_prefix() .'acc_accounts', $client);
+
+    }
+
+    
+
+    public function get_HeadCode($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        $newidsinfo = $this->db->select('count(HeadCode) as hc')
+                ->from('tblacc_accounts')
+                ->where('PHeadName',$newdata->name)
+                ->get()
+                ->row();
+
+        $nid  = $newidsinfo->hc;
+        $n = $nid + 1;
+        if ($n / 10 < 1){
+            $newHeadCode = $HeadCode . "0" . $n;
+        }
+        else{
+            $newHeadCode = $HeadCode . $n;
+        }
+
+        return $newHeadCode;
+    }
+
+
 }
