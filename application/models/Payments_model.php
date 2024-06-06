@@ -82,7 +82,6 @@ class Payments_model extends App_Model
         if (is_numeric($data['paymentmode'])) {
             if (is_staff_logged_in()) {
                 $id = $this->add($data);
-
                 return $id;
             }
 
@@ -201,7 +200,6 @@ class Payments_model extends App_Model
 
         $data['daterecorded'] = date('Y-m-d H:i:s');
         $data                 = hooks()->apply_filters('before_payment_recorded', $data);
-
         $this->db->insert(db_prefix() . 'invoicepaymentrecords', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
@@ -360,7 +358,7 @@ class Payments_model extends App_Model
 
             pusher_trigger_notification($notifiedUsers);
 
-            hooks()->do_action('after_payment_added', $insert_id);
+            // hooks()->do_action('after_payment_added', $insert_id);
 
             return $insert_id;
         }
@@ -581,5 +579,15 @@ class Payments_model extends App_Model
         return $this->clients_model->get_contacts($client_id, [
             'active' => 1, 'invoice_emails' => 1,
         ]);
+    }
+
+
+
+    public function get_accounts($where= []){
+        $this->db->where($where);
+        $this->db->where('active', 1);
+        $this->db->order_by('account_type_id,account_detail_type_id', 'desc');
+        $accounts = $this->db->get(db_prefix() . 'acc_accounts')->result_array();
+        return $accounts;
     }
 }

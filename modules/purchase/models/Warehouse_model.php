@@ -8105,7 +8105,6 @@ class Warehouse_model extends App_Model {
     		$data['address'] 	= $this->get_shipping_address_from_invoice($invoice_id);
     		$data['staff_id'] 	= $invoice_value->sale_agent;
     		$data['invoice_no'] 	= format_invoice_number($invoice_value->id);
-
     		$data['total_money'] 	= (float)$invoice_value->subtotal + (float)$invoice_value->total_tax;
     		$data['after_discount'] 	= (float)$invoice_value->subtotal + (float)$invoice_value->total_tax;
 

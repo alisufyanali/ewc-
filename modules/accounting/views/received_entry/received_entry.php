@@ -5,18 +5,18 @@
             <div class="panel_s">
                 <div class="panel-body">
                     <?php $arrAtt = array();
-                $arrAtt['data-type']='currency';
-                ?>
+                    $arrAtt['data-type']='currency';
+                    ?>
                     <?php echo form_open_multipart($this->uri->uri_string(),array('id'=>'received-entry-form','autocomplete'=>'off')); ?>
                     <h4 class="no-margin font-bold">Received Voucher Entry</h4>
                     <hr />
                     <div class="row">
                         <div class="col-md-6">
-                            <?php $value = (isset($received_entry) ? _d($received_entry->received_date) : _d(date('Y-m-d'))); ?>
+                            <?php $value = (isset($received_entry->received_date) ? _d($received_entry->received_date) : _d(date('Y-m-d'))); ?>
                             <?php echo render_date_input('received_date','Received Date',$value); ?>
                         </div>
                         <div class="col-md-6">
-                            <?php $value = (isset($received_entry) ? $received_entry->VNo : $voucher_no); ?>
+                            <?php $value = (isset($received_entry->VNo) ? $received_entry->VNo : $voucher_no); ?>
                             <?php echo render_input('VNo','Voucher No',$value,'text' ,[ "readonly" =>"readonly" ]); ?>
                         </div>
                     </div>
@@ -24,7 +24,7 @@
                        
 
                         <div class="col-md-6">
-                            <?php $value = (isset($received_entry) ? $received_entry->reference_no : null); ?>
+                            <?php $value = (isset($received_entry->reference_no) ? $received_entry->reference_no : null); ?>
                             <?php echo render_input('reference_no','Reference No',$value,'text'); ?>
                         </div>
                     </div>
@@ -37,10 +37,10 @@
                                     data-width="100%">
                                     <option value=""></option>
                                     <option value="Cash"
-                                        <?php echo ((isset($received_entry) && $received_entry->mode_of_payment == 'Cash' ) ? 'Selected' : null); ?>>
+                                        <?php echo ((isset($received_entry->mode_of_payment) && $received_entry->mode_of_payment == 'Cash' ) ? 'Selected' : null); ?>>
                                         Cash</option>
                                     <option value="Bank"
-                                        <?php echo ((isset($received_entry) && $received_entry->mode_of_payment == 'Bank' ) ? 'Selected' : null); ?>>
+                                        <?php echo ((isset($received_entry->mode_of_payment) && $received_entry->mode_of_payment == 'Bank' ) ? 'Selected' : null); ?>>
                                         Bank</option>
                                 </select>
 
@@ -58,7 +58,7 @@
                                             $HeadCode = $value['HeadCode'] ; 
                                             $PHeadCode = $value['PHeadCode'] ; 
                                             $name = $value['name'] ; 
-                                            $selected = ((isset($received_entry) && $received_entry->modes_accounts == $value['HeadCode'] ) ? 'Selected' : null); 
+                                            $selected = ((isset($received_entry->modes_accounts) && $received_entry->modes_accounts == $value['HeadCode'] ) ? 'Selected' : null); 
                                             echo '<option value="'.$HeadCode.'" data-value="'.$PHeadCode.'" '.$selected.' >'.$name .' - ' .$HeadCode .' </option>' ; 
                                         }
                                     }
@@ -66,6 +66,24 @@
                             </select>
                         </div>
                     </div>
+
+                    <?php
+                    if(isset($invoice_id)){
+                    ?>
+                      <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php $value = (isset($invoice_total) ? $invoice_total : null); ?>
+                                <?php echo render_input('invoice_total','invoice Total',$value,'text' , ['disabled' =>'disabled']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php $value = (isset($invoice_paid) ? $invoice_paid : null); ?>
+                                <?php echo render_input('invoice_paid','invoice paid',$value,'text' , ['disabled' =>'disabled']); ?>
+                            </div>
+                        </div>
+                    <?php
+                    }
+                    ?>
                     <br>
                     <br>
                     <div id="received_entry_container"></div>

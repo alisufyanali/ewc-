@@ -3090,7 +3090,7 @@ class Purchase_model extends App_Model
     $html = '<table class="table">
         <tbody>
           <tr>
-          <td class="font_td_cpn"><img src="https://yaaftpos.com/EWC_NEW/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" class="img-responsive" alt="EWC INTERIORS" style="width: 180px"></td>
+          <td class="font_td_cpn"><img src="https://ewchomes.com/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" class="img-responsive" alt="EWC INTERIORS" style="width: 180px"></td>
            
             <td class="width_20"></td>
             

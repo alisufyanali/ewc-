@@ -611,12 +611,19 @@ class Invoices extends AdminController
     public function record_invoice_payment_ajax($id)
     {
         $this->load->model('payment_modes_model');
-        $this->load->model('payments_model');
-        $data['payment_modes'] = $this->payment_modes_model->get('', [
-            'expenses_only !=' => 1,
-        ]);
+        $this->load->model('payments_model'); 
+        // $data['payment_modes'] = $this->payment_modes_model->get('', [
+        //     'expenses_only !=' => 1,
+        // ]);
+
+        $data['payment_modes'] = $this->payments_model->get_accounts(' HeadCode in (10101 , 10102)  ');
+        $data['modes_accounts'] = $this->payments_model->get_accounts(' PHeadCode in (10101 , 10102)  ');
+
         $data['invoice']  = $this->invoices_model->get($id);
         $data['payments'] = $this->payments_model->get_invoice_payments($id);
+        // echo '<pre>';
+        // print_r($data);
+        // exit;
         $this->load->view('admin/invoices/record_payment_template', $data);
     }
 

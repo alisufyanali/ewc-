@@ -5,8 +5,8 @@
             <div class="panel_s">
                 <div class="panel-body">
                     <?php $arrAtt = array();
-                $arrAtt['data-type']='currency';
-                ?>
+                    $arrAtt['data-type']='currency';
+                    ?>
                     <?php echo form_open_multipart($this->uri->uri_string(),array('id'=>'payment-entry-form','autocomplete'=>'off')); ?>
                     <h4 class="no-margin font-bold"><?php echo _l($title); ?></h4>
                     <hr />

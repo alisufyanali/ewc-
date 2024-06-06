@@ -46,14 +46,14 @@
                             class="ajax-search<?php if(isset($invoice) && empty($invoice->clientid)){echo ' customer-removed';} ?>"
                             data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                             <?php $selected = (isset($invoice) ? $invoice->clientid : '');
-                 if($selected == ''){
-                   $selected = (isset($customer_id) ? $customer_id: '');
-                 }
-                 if($selected != ''){
-                    $rel_data = get_relation_data('customer',$selected);
-                    $rel_val = get_relation_values($rel_data,'customer');
-                    echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
-                 } ?>
+                                if($selected == ''){
+                                $selected = (isset($customer_id) ? $customer_id: '');
+                                }
+                                if($selected != ''){
+                                    $rel_data = get_relation_data('customer',$selected);
+                                    $rel_val = get_relation_values($rel_data,'customer');
+                                    echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
+                                } ?>
                         </select>
 
                     </div>
@@ -211,8 +211,8 @@
                                 <i class="fa fa-cog"></i>
                             </a>
                             <?php }
-                    echo $prefix;
-                  ?>
+                                echo $prefix;
+                            ?>
                         </span>
                         <input type="text" name="number" class="form-control"
                             value="<?php echo ($_is_draft) ? 'DRAFT' : $_invoice_number; ?>"
@@ -353,8 +353,8 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                           <label for="currency_value">Currency Value </label>
-                           <input type="number" id="currency_value" name="currency_value" Value="1" >
+                            <label for="currency_value">Currency Value </label>
+                            <input type="number" id="currency_value" name="currency_value" Value="1">
                         </div>
 
                         <div class="col-md-6">

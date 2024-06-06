@@ -8738,37 +8738,45 @@ class Accounting_model extends App_Model
                             $node['datecreated'] = date('Y-m-d H:i:s');
                             $node['addedfrom'] = get_staff_user_id();
                             $data_insert[] = $node;
-                        }else{
+                    }else{
                             $node = [];
-                            $node['itemable_id'] = $value['id'];
-                            $node['split'] = $payment_account;
-                            $node['account'] = $deposit_to;
-                            $node['item'] = $item_id;
-                            $node['debit'] = $item_total;
-                            $node['customer'] = $invoice->clientid;
-                            $node['paid'] = $paid;
-                            $node['date'] = $invoice->date;
-                            $node['tax'] = 0;
-                            $node['credit'] = 0;
-                            $node['description'] = '';
-                            $node['rel_id'] = $invoice_id;
-                            $node['rel_type'] = 'invoice';
-                            $node['datecreated'] = date('Y-m-d H:i:s');
-                            $node['addedfrom'] = get_staff_user_id();
-                            $data_insert[] = $node;
+                            // $node['itemable_id'] = $value['id'];
+                            // // suf
+                            // $node['split'] = $payment_account;
+                            // $head_id = $this->get_HeadId( $invoice->clientid , 'customer' );
+                            // $node['account'] = $head_id ;
+                            // $node['acc_no'] = $this->get_HeadCodeById($head_id) ;
+                            // $node['acc_title'] = $this->get_HeadName($node['acc_no']);
+                            // $node['VNo'] = 'INV-'. $invoice->number;
+                            // $node['item'] = $item_id;
+                            // $node['debit'] = $item_total;
+                            // $node['customer'] = $invoice->clientid;
+                            // $node['paid'] = $paid;
+                            // $node['date'] = $invoice->date;
+                            // $node['tax'] = 0;
+                            // $node['credit'] = 0;
+                            // $node['description'] = 'Customer Debit For Invoice No ' .$invoice_id;
+                            // $node['rel_id'] = $invoice_id;
+                            // $node['rel_type'] = 'invoice';
+                            // $node['datecreated'] = date('Y-m-d H:i:s');
+                            // $node['addedfrom'] = get_staff_user_id();
+                            // $data_insert[] = $node;
         
                             $node = [];
                             $node['itemable_id'] = $value['id'];
                             $node['split'] = $deposit_to;
                             $node['customer'] = $invoice->clientid;
                             $node['account'] = $payment_account;
+                            $node['acc_no'] = $this->get_HeadCodeById($payment_account) ;
+                            $node['acc_title'] = $this->get_HeadName($node['acc_no']);
+                            $node['VNo'] = 'INV-'. $invoice->number;
                             $node['item'] = $item_id;
                             $node['date'] = $invoice->date;
                             $node['paid'] = $paid;
                             $node['tax'] = 0;
                             $node['debit'] = 0;
                             $node['credit'] = $item_total;
-                            $node['description'] = '';
+                            $node['description'] = 'Inventory credit For Invoice No ' .$invoice_id;
                             $node['rel_id'] = $invoice_id;
                             $node['rel_type'] = 'invoice';
                             $node['datecreated'] = date('Y-m-d H:i:s');
@@ -8796,8 +8804,13 @@ class Accounting_model extends App_Model
      * @return boolean
      */
     public function automatic_payment_conversion($payment_id){
-        $this->delete_convert($payment_id, 'payment');
+        // $this->delete_convert($payment_id, 'payment');
 
+        $rec['received_date'] = to_sql_date($rec['received_date']);
+        $rec['datecreated'] = date('Y-m-d H:i:s');
+        $rec['addedfrom'] = get_staff_user_id();
+        $this->db->insert(db_prefix().'acc_received_entries', $rec);
+        
         $this->load->model('payments_model');
         $payment = $this->payments_model->get($payment_id);
         $payment_account = get_option('acc_payment_payment_account');
@@ -8861,8 +8874,14 @@ class Accounting_model extends App_Model
                 if(count($data_insert) == 0){   
                     if(get_option('acc_payment_automatic_conversion') == 1){
                         $node = [];
-                        $node['split'] = $payment_account;
-                        $node['account'] = $deposit_to;
+                        $node['split'] = $invoice->modes_accounts;
+                        $node['account'] = $payment->paymentmode;
+
+                        $head_code = $this->get_HeadCodeById($payment->paymentmode);
+                        $node['acc_no'] = $head_code;
+                        $node['acc_title'] = $this->get_HeadName($head_code);
+                        $node['VNo'] = $this->get_max_pv_no();
+
                         $node['customer'] = $invoice->clientid;
                         $node['debit'] = $payment_total;
                         $node['credit'] = 0;
@@ -8875,9 +8894,14 @@ class Accounting_model extends App_Model
                         $data_insert[] = $node;
 
                         $node = [];
-                        $node['split'] = $deposit_to;
+                        $node['split'] = $invoice->paymentmode;
                         $node['customer'] = $invoice->clientid;
-                        $node['account'] = $payment_account;
+                        
+                        $node['account'] = $this->get_IdByHeadCode($payment->modes_accounts);
+                        $node['acc_no'] = $payment->modes_accounts;
+                        $node['acc_title'] = $this->get_HeadName($payment->modes_accounts);
+                        $node['VNo'] = $this->get_max_pv_no();
+
                         $node['date'] = $payment->date;
                         $node['debit'] = 0;
                         $node['credit'] = $payment_total;
@@ -21644,6 +21668,17 @@ class Accounting_model extends App_Model
     }
 
 
+    public function get_IdByHeadCode($HeadCode) {
+
+        $newdata = $this->db->select('*')
+                ->from('tblacc_accounts')
+                ->where('HeadCode',$HeadCode)
+                ->get()
+                ->row();
+
+        return $newdata->id;
+    }
+
 
     
 
@@ -21959,12 +21994,14 @@ class Accounting_model extends App_Model
      * @param array $data 
      * @return boolean
      */
-    public function add_received_entry($data){
+    public function add_received_entry($data , $invoice_id =null){
         $received_entry = json_decode($data['received_entry']);
         unset($data['received_entry']);
 
         $data['received_date'] = to_sql_date($data['received_date']);
-        
+        if(isset($invoice_id)){
+            $data['inv_id'] = $invoice_id;
+        }
         $data['datecreated'] = date('Y-m-d H:i:s');
         $data['addedfrom'] = get_staff_user_id();
         
@@ -21983,13 +22020,14 @@ class Accounting_model extends App_Model
                     $node['acc_no'] = $this->get_HeadCodeById($value[0]) ;
                     $node['VNo'] = $data['VNo'];
                     $node['date'] = $data['received_date'];
-
                     $node['debit'] = 0;
                     $node['credit'] =  $value[1];
-
                     $node['description'] = $value[2];
                     $node['rel_id'] = $insert_id;
                     $node['rel_type'] = 'received_entry';
+                    if(isset($invoice_id)){
+                        $node['inv_id'] = $invoice_id;
+                    }
                     $node['datecreated'] = date('Y-m-d H:i:s');
                     $node['addedfrom'] = get_staff_user_id();
                     $this->db->insert(db_prefix().'acc_account_history', $node);
@@ -21999,10 +22037,11 @@ class Accounting_model extends App_Model
                     $new['acc_no'] = $data['modes_accounts'] ;
                     $new['VNo'] = $data['VNo'];
                     $new['date'] = $data['received_date'];
-
                     $new['debit'] = $value[1];
                     $new['credit'] =  0;
-
+                    if(isset($invoice_id)){
+                        $new['inv_id'] = $invoice_id;
+                    }
                     $new['description'] = $value[2] ;
                     $new['rel_id'] = $insert_id ;
                     $new['rel_type'] = 'received_exit' ;
@@ -22094,10 +22133,10 @@ class Accounting_model extends App_Model
         $this->db->where('id', $id);
         $this->db->update(db_prefix().'acc_received_entries', $data);
 
+        $invoice_id = $this->get_Inv_id_from_received_entry($id);
         $this->db->where('rel_id', $id);
         // $this->db->where('rel_type', 'received_entry');
         $this->db->where_in('rel_type', ['received_entry', 'received_exit']);
-
         $this->db->delete(db_prefix() . 'acc_account_history');
 
         $data_insert = [];
@@ -22108,16 +22147,15 @@ class Accounting_model extends App_Model
                 $node['account'] = $value[0];
                 $node['acc_no'] = $this->get_HeadCodeById($value[0]) ;
                 $node['VNo'] = $data['VNo'];
-
-              
                 $node['debit'] = 0;
                 $node['credit'] =  $value[1];
-
-
                 $node['date'] = $data['received_date'];
                 $node['description'] = $value[2];
                 $node['rel_id'] = $id;
                 $node['rel_type'] = 'received_entry';
+                if(isset($invoice_id)){
+                    $node['inv_id'] = $invoice_id;
+                }
                 $node['datecreated'] = date('Y-m-d H:i:s');
                 $node['addedfrom'] = get_staff_user_id();
                 $this->db->insert(db_prefix().'acc_account_history', $node);
@@ -22127,13 +22165,14 @@ class Accounting_model extends App_Model
                 $new['acc_no'] = $data['modes_accounts'] ;
                 $new['VNo'] = $data['VNo'];
                 $new['date'] = $data['received_date'];
-
                 $new['debit'] = $value[1];
                 $new['credit'] = 0;
-
                 $new['description'] = $value[2] ;
                 $new['rel_id'] = $id ;
                 $new['rel_type'] = 'received_exit' ;
+                if(isset($invoice_id)){
+                    $node['inv_id'] = $invoice_id;
+                }
                 $new['datecreated'] = date('Y-m-d H:i:s');
                 $new['addedfrom'] = get_staff_user_id();
                 $this->db->insert(db_prefix().'acc_account_history', $new);
@@ -22157,10 +22196,6 @@ class Accounting_model extends App_Model
     }
 
 
-
-
-
-
     public function get_Pur_id_from_payment_entry($id) {
         
         $this->db->select('*');
@@ -22176,6 +22211,56 @@ class Accounting_model extends App_Model
 
 
 
+ 
+
+    
+    
+
+    public function get_CustomerByInvoiceId($id) {
+        $newdata = $this->db->select('*')
+                ->from('tblinvoices')
+                ->where('id',$id)
+                ->get()
+                ->row();
+
+        return $newdata;
+    }
+ 
+    
+
+    public function get_paidAmountByInvoiceId($id) {
+        $newdata = $this->db->select('sum(credit) as total')
+                ->from('tblacc_account_history')
+                ->where('inv_id',$id)
+                ->where('rel_type' , 'received_entry' )
+                ->group_by('inv_id')
+                ->get()
+                ->row();
+
+        return $newdata;
+    }
+ 
+    
+    public function get_remainAmountByInvoiceId($id) {
+        $newdata = $this->db->select('credit')
+                ->from('tblacc_account_history')
+                ->where('rel_id',$id)
+                ->where('rel_type' , 'invoice')
+                ->get()
+                ->row();
+
+        return $newdata;
+    }
+    
+
+    public function get_Inv_id_from_received_entry($id) {
+        
+        $this->db->select('*');
+        $this->db->where('id', $id);
+        $payment = $this->db->get('tblacc_received_entries')->row();
+        
+        return $payment->inv_id; 
+    }
 
 
 

@@ -981,7 +981,7 @@ $("#sku_code").keyup(function(){
         jQuery.ajax({
             type: "POST",
             data: {skucode:skucode},
-            url: 'https://yaaftpos.com/EWC_NEW/admin/warehouse/check_sku_code',
+            url: 'https://ewchomes.com/admin/warehouse/check_sku_code',
             success: function(data) {
                 if(data != ""){
                     alert('SKU CODE ALREADY EXIST!');

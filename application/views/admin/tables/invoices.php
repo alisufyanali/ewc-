@@ -81,7 +81,6 @@ foreach ($data['payment_modes'] as $mode) {
 if (count($modesIds) > 0) {
     array_push($where, 'AND ' . db_prefix() . 'invoices.id IN (SELECT invoiceid FROM ' . db_prefix() . 'invoicepaymentrecords WHERE paymentmode IN ("' . implode('", "', $modesIds) . '"))');
 }
-
 $years     = $this->ci->invoices_model->get_invoices_years();
 $yearArray = [];
 foreach ($years as $year) {
@@ -93,8 +92,7 @@ if (count($yearArray) > 0) {
     array_push($where, 'AND YEAR(date) IN (' . implode(', ', $yearArray) . ')');
 }
 
- array_push($where, 'AND gsttype = "GST"');
-
+//  array_push($where, 'AND gsttype = "GST"');
 
 if (count($filter) > 0) {
     array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
@@ -132,6 +130,8 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 $output  = $result['output'];
 $rResult = $result['rResult'];
 
+
+
 foreach ($rResult as $aRow) {
     $row = [];
 
@@ -150,7 +150,11 @@ foreach ($rResult as $aRow) {
 
     $numberOutput .= '<div class="row-options">';
 
-    $numberOutput .= '<a href="' . site_url('invoice/' . $aRow['id'] . '/' . $aRow['hash']) . '" target="_blank">' . _l('view') . '</a>';
+    $rec_url = admin_url('accounting/new_received_entry/' . $aRow["id"]  . '/rec');
+
+    $numberOutput .= '<a href="'.$rec_url.'" target="_blank" > Received Now </a>';
+    $numberOutput .= '| <a href="' . site_url('invoice/' . $aRow['id'] . '/' . $aRow['hash']) . '" target="_blank">' . _l('view') . '</a>';
+
     if (has_permission('invoices', '', 'edit')) {
         $numberOutput .= ' | <a href="' . admin_url('invoices/invoice/' . $aRow['id']) . '">' . _l('edit') . '</a>';
     }

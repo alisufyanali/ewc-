@@ -77,7 +77,7 @@
 						<hr class="hr-panel-heading" />
 						<div class="row">
 							<div class="col-md-6 col-sm-6">
-								<img src="https://yaaftpos.com/EWC_NEW/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" class="img-responsive" alt="EWC INTERIORS" style="height: 115px;">
+								<img src="https://ewchomes.com/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" class="img-responsive" alt="EWC INTERIORS" style="height: 115px;">
 								<address>
 									<?php echo format_organization_info(); ?>
 								</address>

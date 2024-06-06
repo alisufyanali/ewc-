@@ -9269,6 +9269,8 @@ var_dump($data['group'] ); die;
             $data['purchase_paid'] = $purchase_data->total ;
             $id =null;
         }
+
+
         if ($this->input->post()) {
        
             $data                = $this->input->post();
@@ -9453,13 +9455,35 @@ var_dump($data['group'] ); die;
      * add received entry
      * @return view
      */
-    public function new_received_entry($id = ''){
+    public function new_received_entry($id = '' ,  $rec = null){
+        $invoice_id = null ;
+        if(isset($rec)){
+            $invoice_data = $this->accounting_model->get_paidAmountByinvoiceId($id);
+
+            $customer_data = $this->accounting_model->get_CustomerByInvoiceId($id);
+            $customer[0]['account'] = $this->accounting_model->get_HeadId($customer_data->clientid , 'customer');
+            $customer[0]['debit'] = $customer_data->total - $invoice_data->total ;
+            $customer[0]['description'] = null ;
+            $result['details'] = $customer ;
+            $data['received_entry'] = (object) $result;
+            
+            // echo '<pre>';
+            // print_r( $data['received_entry']);
+            // exit;
+            $invoice_id = $id ;
+            $data['invoice_id'] = $id ;
+            $data['invoice_total'] = $customer_data->total ;
+            $data['invoice_paid'] = $invoice_data->total ;
+            $id =null;
+        }
+
+
         if ($this->input->post()) {
             $data                = $this->input->post();
             $data['description'] = $this->input->post('description', false);
  
             if($id == ''){
-                $success = $this->accounting_model->add_received_entry($data);
+                $success = $this->accounting_model->add_received_entry($data ,$invoice_id);
                 echo 1;
                 if ($success === 'close_the_book') {
                     $message = _l('has_closed_the_book');
@@ -9485,6 +9509,16 @@ var_dump($data['group'] ); die;
 
         if($id != ''){
             $data['received_entry'] = $this->accounting_model->get_received_entry($id);
+            if(isset($data['received_entry']->inv_id)){
+
+                $invoice_id = $data['received_entry']->inv_id ;
+                $invoice_data = $this->accounting_model->get_paidAmountByinvoiceId($invoice_id);
+                $customer_data = $this->accounting_model->get_CustomerByInvoiceId($invoice_id);
+                $data['invoice_id'] = $invoice_id ;
+                $data['invoice_total'] = $customer_data->total ;
+                $data['invoice_paid'] = $invoice_data->total ;
+              
+            }
         }
 
         $this->load->model('currencies_model');
@@ -9496,7 +9530,7 @@ var_dump($data['group'] ); die;
       
         $data['modes_accounts'] = $this->accounting_model->get_accounts(null , ' PHeadCode in (10101 , 10102)  ');
         // echo '<pre>';
-        // print_r($data['modes_accounts']);
+        // print_r($data['received_entry']);
         // exit;
 
         $this->load->view('received_entry/received_entry', $data);

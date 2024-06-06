@@ -144,16 +144,13 @@ class Invoices_model extends App_Model
                     $this->load->model('projects_model');
                     $invoice->project_data = $this->projects_model->get($invoice->project_id);
                 }
-
                 $invoice->visible_attachments_to_customer_found = false;
                 foreach ($invoice->attachments as $attachment) {
                     if ($attachment['visible_to_customer'] == 1) {
                         $invoice->visible_attachments_to_customer_found = true;
-
                         break;
                     }
                 }
-
                 $client          = $this->clients_model->get($invoice->clientid);
                 $invoice->client = $client;
                 if (!$invoice->client) {
@@ -349,71 +346,71 @@ class Invoices_model extends App_Model
     {
         
         $meritype = 'Invoice';
-        // if($data['gsttype'] == "GST"){
+        if($data['gsttype'] == "GST"){
         
-        //     $totaltax = $data['subtotal'] * 18 / 100;
-        //     $curl = curl_init();
-        //     curl_setopt_array($curl, array(
-        //     CURLOPT_URL => 'https://gw.fbr.gov.pk/imsp/v1/api/Live/PostData',
-        //     CURLOPT_RETURNTRANSFER => true,
-        //     CURLOPT_ENCODING => '',
-        //     CURLOPT_MAXREDIRS => 10,
-        //     CURLOPT_TIMEOUT => 0,
-        //     CURLOPT_FOLLOWLOCATION => true,
-        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        //     CURLOPT_CUSTOMREQUEST => 'POST',
-        //     CURLOPT_POSTFIELDS =>'{
-        //         "InvoiceNumber":"",
-        //         "POSID":153018,
-        //         "USIN":"07E00355",
-        //         "DateTime": "'.date('Y-m-d').'",
-        //         "BuyerNTN": "",
-        //         "BuyerCNIC": "",
-        //         "BuyerName": "",
-        //         "BuyerPhoneNumber": "",
-        //         "TotalBillAmount": '.$data['subtotal'].',
-        //         "TotalQuantity": 1,
-        //         "TotalSaleValue": '.$data['subtotal'].',
-        //         "TotalTaxCharged": '.$totaltax.',
-        //         "Discount": 0,
-        //         "FurtherTax": 0,
-        //         "PaymentMode": 1,
-        //         "RefUSIN": null,
-        //         "InvoiceType": 1,
-        //     "Items":[
-        //             {
-        //             "ItemCode":"'.$data['sku_code'].'",
-        //             "ItemName":"EWC CARPET '.$data['sku_code'].'",
-        //             "Quantity":1.0,
-        //             "PCTCode":"11001010",
-        //             "TaxRate": 0.18,
-        //             "SaleValue": '.$data['subtotal'].',
-        //             "PCTCode" : "57011010",
-        //             "TotalAmount": '.$data['total'].',
-        //             "TaxCharged": '.$totaltax.',
-        //             "Discount":0.0,
-        //             "FurtherTax":0.0,
-        //             "InvoiceType":1,
-        //             "RefUSIN":null
-        //             }
-        //     ]}',
+            // $totaltax = $data['subtotal'] * 18 / 100;
+            // $curl = curl_init();
+            // curl_setopt_array($curl, array(
+            // CURLOPT_URL => 'https://gw.fbr.gov.pk/imsp/v1/api/Live/PostData',
+            // CURLOPT_RETURNTRANSFER => true,
+            // CURLOPT_ENCODING => '',
+            // CURLOPT_MAXREDIRS => 10,
+            // CURLOPT_TIMEOUT => 0,
+            // CURLOPT_FOLLOWLOCATION => true,
+            // CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            // CURLOPT_CUSTOMREQUEST => 'POST',
+            // CURLOPT_POSTFIELDS =>'{
+            //     "InvoiceNumber":"",
+            //     "POSID":153018,
+            //     "USIN":"07E00355",
+            //     "DateTime": "'.date('Y-m-d').'",
+            //     "BuyerNTN": "",
+            //     "BuyerCNIC": "",
+            //     "BuyerName": "",
+            //     "BuyerPhoneNumber": "",
+            //     "TotalBillAmount": '.$data['subtotal'].',
+            //     "TotalQuantity": 1,
+            //     "TotalSaleValue": '.$data['subtotal'].',
+            //     "TotalTaxCharged": '.$totaltax.',
+            //     "Discount": 0,
+            //     "FurtherTax": 0,
+            //     "PaymentMode": 1,
+            //     "RefUSIN": null,
+            //     "InvoiceType": 1,
+            // "Items":[
+            //         {
+            //         "ItemCode":"'.$data['sku_code'].'",
+            //         "ItemName":"EWC CARPET '.$data['sku_code'].'",
+            //         "Quantity":1.0,
+            //         "PCTCode":"11001010",
+            //         "TaxRate": 0.18,
+            //         "SaleValue": '.$data['subtotal'].',
+            //         "PCTCode" : "57011010",
+            //         "TotalAmount": '.$data['total'].',
+            //         "TaxCharged": '.$totaltax.',
+            //         "Discount":0.0,
+            //         "FurtherTax":0.0,
+            //         "InvoiceType":1,
+            //         "RefUSIN":null
+            //         }
+            // ]}',
             
-        //     CURLOPT_HTTPHEADER => array(
-        //         'Authorization: Bearer 5af83e6f-72fe-3dbb-a770-1f540c16f16d',
-        //         'Content-Type: application/json'
-        //     ),
-        //     ));
+            // CURLOPT_HTTPHEADER => array(
+            //     'Authorization: Bearer 5af83e6f-72fe-3dbb-a770-1f540c16f16d',
+            //     'Content-Type: application/json'
+            // ),
+            // ));
             
-        //     $response = curl_exec($curl);
-        //     curl_close($curl);
-        //     $response = json_decode($response);
+            // $response = curl_exec($curl);
+            // curl_close($curl);
+            // $response = json_decode($response);
             
-        //     // print_r($response);
-        //     // die();
-        //     $data['fbrinvoiceno'] = $response->InvoiceNumber;
+            // print_r($response);
+            // die();
+            $data['fbrinvoiceno'] = $response->InvoiceNumber;
             
-        //     $meritype = 'GST Invoice';
-        // }
+            $meritype = 'GST Invoice';
+        }
     
         
        
@@ -648,11 +645,12 @@ class Invoices_model extends App_Model
             if ($save_and_send === true) {
                 $this->send_invoice_to_client($insert_id, '', true, '', true);
             }
-            hooks()->do_action('after_invoice_added', $insert_id);
+             hooks()->do_action('after_invoice_added', $insert_id);
 
             return $insert_id;
         }
 
+        
         return false;
     }
 
