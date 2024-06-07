@@ -1233,3 +1233,43 @@ function get_recived_amount($id)
 return $newdata->credit;
 
 }
+
+
+
+
+
+
+
+
+
+function get_invoice_received_amount($id)
+{
+    $CI = &get_instance();
+
+    $newdata = $CI->db->select('sum(credit) as total')
+                ->from('tblacc_account_history')
+                ->where('inv_id',$id)
+                ->where('rel_type' , 'received_entry')
+                ->group_by('inv_id')
+                ->get()
+                ->row();
+
+        return $newdata->total;
+}
+
+
+
+
+function get_invoice_paid_amount($id)
+{
+    $CI = &get_instance();
+    $newdata = $CI->db->select('credit')
+    ->from('tblacc_account_history')
+    ->where('rel_id',$id)
+    ->where('rel_type' , 'invoice')
+    ->get()
+    ->row();
+
+    return $newdata->credit;
+
+}

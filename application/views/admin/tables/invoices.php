@@ -92,6 +92,7 @@ if (count($yearArray) > 0) {
     array_push($where, 'AND YEAR(date) IN (' . implode(', ', $yearArray) . ')');
 }
 
+// suf
 //  array_push($where, 'AND gsttype = "GST"');
 
 if (count($filter) > 0) {
@@ -178,14 +179,25 @@ foreach ($rResult as $aRow) {
     
     $row[] = $aRow['clients_phone'];
 
-    $row[] = '<a href="' . admin_url('projects/view/' . $aRow['project_id']) . '">' . $aRow['project_name'] . '</a>';
-    ;
+    // $row[] = '<a href="' . admin_url('projects/view/' . $aRow['project_id']) . '">' . $aRow['project_name'] . '</a>';
 
-    $row[] = render_tags($aRow['tags']);
+    $received_amount = get_invoice_received_amount($aRow['id']); 
+    $paid_amount = get_invoice_paid_amount($aRow['id']);
+    $total = $received_amount - $paid_amount; 
+    $row[] = $received_amount ;
+    $row[] = $total ;
 
-    $row[] = _d($aRow['duedate']);
+    if($total == 0){
+        $row[] = '<span class="label label-success ">Paid</span>';
+    }elseif($received_amount == null){
+        $row[] = '<span class="label label-danger ">UnPaid</span>';
+    }elseif($total < 0) {
+        $row[] = '<span class="label label-primary ">Partical</span>';
 
-    $row[] = format_invoice_status($aRow[db_prefix() . 'invoices.status']);
+    }
+
+    // $row[] = _d($aRow['duedate']);
+    // $row[] = format_invoice_status($aRow[db_prefix() . 'invoices.status']);
 
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {

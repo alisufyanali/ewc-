@@ -18,15 +18,26 @@
                                 <div class="col-md-3">
                                     <?php echo render_date_input('to_date','to_date', _d($to_date)); ?>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <?php 
-                                    $method = [
-                                            1 => ['id' => 'cash', 'name' => _l('cash')],
-                                            2 => ['id' => 'accrual', 'name' => _l('accrual')],
-                                          ];
-                                    echo render_select('accounting_method', $method, array('id', 'name'),'accounting_method', $accounting_method, array(), array(), '', '', false);
-                                    ?>
+
+                                    <label class="bold" for="accounts">
+                                        <small class="req text-danger">* </small> Accounts</label>
+                                    <select class="selectpicker" required name="accounts" id="accounts"
+                                        data-width="100%">
+                                        <option value=""></option>
+                                        <?php 
+                                            if (isset($accounts)) {
+                                                foreach ($accounts as $key => $value) {
+                                                    $HeadCode = $value['HeadCode'] ; 
+                                                    $name = $value['name'] ; 
+                                                    echo '<option value="'.$HeadCode.'" >'.$name .' - ' .$HeadCode .' </option>' ; 
+                                                }
+                                            }
+                                        ?>
+                                    </select>
                                 </div>
+
                                 <div class="col-md-3">
                                     <?php echo form_hidden('type', 'general_ledger'); ?>
                                     <button type="submit"

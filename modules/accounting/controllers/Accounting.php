@@ -2490,6 +2490,8 @@ var_dump($data['group'] ); die;
 
                 $categoryOutput .= '<div class="row-options">';
 
+                    $categoryOutput .= '<a href="' . admin_url('accounting/journal_entry_print/' . $aRow['id']) . '" class="text-success">Print</a> | ';
+
                 if (has_permission('accounting_journal_entry', '', 'edit')) {
                     $categoryOutput .= '<a href="' . admin_url('accounting/journal_entry_export/' . $aRow['id']) . '" class="text-success">' . _l('acc_export_excel') . '</a>';
                 }
@@ -2863,6 +2865,8 @@ var_dump($data['group'] ); die;
         $data['to_date'] = date('Y-m-d');
         $data['accounting_method'] = get_option('acc_accounting_method');
         $data['currency'] = $this->currencies_model->get_base_currency();
+        $data['accounts'] = $this->accounting_model->get_accounts();
+         
         $this->load->view('report/includes/general_ledger', $data);
     }
 
@@ -4998,6 +5002,11 @@ var_dump($data['group'] ); die;
         $writer->writeToFile(str_replace($filename, ACCOUTING_EXPORT_XLSX.$filename, $filename));
         $this->download_xlsx_file(ACCOUTING_EXPORT_XLSX.$filename);
         die();
+    }
+
+
+    public function journal_entry_print($id){
+    
     }
 
     /**
