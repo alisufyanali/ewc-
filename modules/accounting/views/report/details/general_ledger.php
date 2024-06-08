@@ -3,22 +3,53 @@
         <table class="tree">
             <tbody>
                 <tr>
-                    <td colspan="7">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
                         <h3 class="text-center no-margin-top-20 no-margin-left-24">
                             <?php echo get_option('companyname'); ?></h3>
                     </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td colspan="7">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
                         <h4 class="text-center no-margin-top-20 no-margin-left-24"><?php echo _l('general_ledger'); ?>
                         </h4>
-                    </td>
+                    </td> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td colspan="7">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
                         <p class="text-center no-margin-top-20 no-margin-left-24">
                             <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?></p>
                     </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <p class="text-center no-margin-top-20 no-margin-left-24">
+                            <strong>  <?php echo $data_report['HeadCode'] .' - '. $data_report['HeadName']; ?> </strong>
+                        </p>
+                    </td> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
               
                 <tr class="tr_header">
@@ -33,14 +64,34 @@
 
 
                 <?php               
-
                 // $data = $this->accounting_model->get_html_general_ledger($data_report['data']['accounts_receivable'], ['html' => '', 'row_index' => $row_index + 1, 'total_amount' => 0, 'total_py_amount' => 0], $parent_index, $currency);
                 // $row_index = $data['row_index'];
                 // echo html_entity_decode($data['html']);
                 // $total += $data['total_amount'];
+                $TotalCredit=0;
+                $TotalDebit=0;
+                $CurBalance = 0;
 
                 if(isset($data_report['data'])){
+                    // echo '<pre>';
+                    // print_r($data_report['data']);
+                    echo '<tr class="tr_header">';
+                    echo '<td></td>';
+                    echo '<td></td>';
+                    echo '<td></td>';
+                    echo '<td></td>';
+                    echo '<td></td>';
+                    echo '<td class="text-right">Balance B/F </td>';
+                    if($data_report["pre_balance"] < 0 ){
+                        echo '<td class="text-right">('.abs($data_report["pre_balance"]).')</td>';
+                    }else{
+                        echo '<td class="text-right">'.$data_report["pre_balance"].'</td>';
+                    }
+                    echo '</tr> ';
+
                     $i =0;
+                    $CurBalance =  $data_report['pre_balance']  ; 
+
                     foreach ($data_report['data'] as $key => $value) {
                         $i++;
                         echo '<tr>';
@@ -50,15 +101,41 @@
                         echo '<td>' .$value["description"].'</td>';
                         echo '<td class="text-right">' .$value["debit"].'</td>';
                         echo '<td class="text-right">' .$value["credit"].'</td>';
-                        echo '<td class="text-right">' .$value["description"].'</td>';
+                       
+                        $TotalDebit += $value["debit"];
+                        $TotalCredit += $value["credit"];
+ 
+                        $CurBalance += $value["debit"];
+                        $CurBalance -= $value["credit"];
+                        
+                        if($CurBalance < 0 ){
+                            echo '<td class="text-right">(' .abs($CurBalance).')</td>';
+                        }else{
+                            echo '<td class="text-right">' .$CurBalance.'</td>';
+                        }
                         echo '</tr> ';
                     }
                 }
-
-                ?>
-
-                   
+                ?> 
             </tbody>
+
+            <tfoot>
+                <?php
+                  echo '<tr class="tr_header">';
+                  echo '<td></td>';
+                  echo '<td></td>';
+                  echo '<td></td>';
+                  echo '<td></td>';
+                  echo '<td class="text-right text-bold">' .$TotalDebit.'</td>';
+                  echo '<td class="text-right text-bold">' .$TotalCredit.'</td>';
+                  if($CurBalance < 0){
+                    echo '<td class="text-right">(' .abs($CurBalance).')</td>';
+                    }else{
+                        echo '<td class="text-right">' .$CurBalance.'</td>';
+                    }
+                  echo '</tr> ';
+                ?>
+            </tfoot>
         </table>
     </div>
 </div>

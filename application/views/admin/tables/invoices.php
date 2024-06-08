@@ -189,11 +189,12 @@ foreach ($rResult as $aRow) {
 
     if($total == 0){
         $row[] = '<span class="label label-success ">Paid</span>';
-    }elseif($received_amount == null){
+    }elseif($received_amount == null   ){
         $row[] = '<span class="label label-danger ">UnPaid</span>';
-    }elseif($total < 0) {
+    }elseif($total < 0 || ($aRow['total'] >= $received_amount)) {
         $row[] = '<span class="label label-primary ">Partical</span>';
-
+    }else{
+        $row[] = '';
     }
 
     // $row[] = _d($aRow['duedate']);

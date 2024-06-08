@@ -22,9 +22,8 @@
                                 <div class="col-md-3">
 
                                     <label class="bold" for="accounts">
-                                        <small class="req text-danger">* </small> Accounts</label>
-                                    <select class="selectpicker" required name="accounts" id="accounts"
-                                        data-width="100%">
+                                        <small class="req text-danger">*</small>Accounts</label>
+                                    <select class="" required name="accounts" data-live-search="true" id="accounts" data-width="100%">
                                         <option value=""></option>
                                         <?php 
                                             if (isset($accounts)) {
@@ -82,6 +81,14 @@
     <!-- box loading -->
     <div id="box-loading"></div>
     <?php init_tail(); ?>
+    <script>
+        $(document).ready(function() {
+    setTimeout(function() {
+        $('select[name="accounts"]').selectpicker();
+    }, 100); // Adjust the delay time as needed
+});
+
+    </script>
     </body>
 
     </html>

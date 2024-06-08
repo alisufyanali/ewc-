@@ -5859,7 +5859,7 @@ class Accounting_model extends App_Model
      * get data general ledger 
      * @return array
      */
-    
+    // suf
     public function get_data_general_ledger($data_filter){
         $this->load->model('currencies_model');
         $currency = $this->currencies_model->get_base_currency();
@@ -6016,12 +6016,8 @@ class Accounting_model extends App_Model
         // return ['data' => $data_report, 'total' => $data_total, 'from_date' => $from_date, 'to_date' => $to_date];
 
         
-
         
-        if(isset($data_filter['accounts'])){
-            $accounts = $data_filter['accounts'];
-            $this->db->where('acc_no', $accounts);
-        }
+        $accounts = $data_filter['accounts'];
 
         if(isset($data_filter['from_date'])){
             $from_date = to_sql_date($data_filter['from_date']);
@@ -6031,13 +6027,32 @@ class Accounting_model extends App_Model
         if(isset($data_filter['to_date'])){
             $to_date = to_sql_date($data_filter['to_date']);
             $this->db->where('date <= ' , $to_date);
-        }
+        } 
 
-        $this->db->order_by('date', 'asc');
-        $account_history = $this->db->get(db_prefix().'acc_account_history')->result_array();
+        $this->db->select('tblacc_account_history.* , tblacc_accounts.name');
+        $this->db->from('tblacc_account_history');
+        $this->db->join('tblacc_accounts','tblacc_account_history.acc_no = tblacc_accounts.HeadCode', 'left');
+        $this->db->where('tblacc_account_history.acc_no',$accounts);
 
+        $query  = $this->db->get();
+        $account_history =  $query->result_array();
+        
+        $HeadName =   $this->get_HeadName($accounts) ;
+        $HeadCode =   $accounts  ;
 
-        return ['data' => $account_history, 'from_date' => $from_date, 'to_date' => $to_date];
+        
+        $acc_balance = $this->general_led_report_accbalance($accounts);
+        $pre_balance = $this->general_led_report_prebalance($accounts,$from_date);
+        $pre_balance = $acc_balance + $pre_balance ;
+
+        return [
+            'data' => $account_history,
+            'pre_balance' => $pre_balance,
+            'from_date' => $from_date,
+            'to_date' => $to_date ,
+            'HeadName' => $HeadName ,
+            'HeadCode' => $HeadCode
+         ];
     }
 
     /**
@@ -8770,27 +8785,27 @@ class Accounting_model extends App_Model
                             $data_insert[] = $node;
                     }else{
                             $node = [];
-                            // $node['itemable_id'] = $value['id'];
+                            $node['itemable_id'] = $value['id'];
                             // // suf
-                            // $node['split'] = $payment_account;
-                            // $head_id = $this->get_HeadId( $invoice->clientid , 'customer' );
-                            // $node['account'] = $head_id ;
-                            // $node['acc_no'] = $this->get_HeadCodeById($head_id) ;
-                            // $node['acc_title'] = $this->get_HeadName($node['acc_no']);
-                            // $node['VNo'] = 'INV-'. $invoice->number;
-                            // $node['item'] = $item_id;
-                            // $node['debit'] = $item_total;
-                            // $node['customer'] = $invoice->clientid;
-                            // $node['paid'] = $paid;
-                            // $node['date'] = $invoice->date;
-                            // $node['tax'] = 0;
-                            // $node['credit'] = 0;
-                            // $node['description'] = 'Customer Debit For Invoice No ' .$invoice_id;
-                            // $node['rel_id'] = $invoice_id;
-                            // $node['rel_type'] = 'invoice';
-                            // $node['datecreated'] = date('Y-m-d H:i:s');
-                            // $node['addedfrom'] = get_staff_user_id();
-                            // $data_insert[] = $node;
+                            $node['split'] = $payment_account;
+                            $head_id = $this->get_HeadId( $invoice->clientid , 'customer' );
+                            $node['account'] = $head_id ;
+                            $node['acc_no'] = $this->get_HeadCodeById($head_id) ;
+                            $node['acc_title'] = $this->get_HeadName($node['acc_no']);
+                            $node['VNo'] = 'INV-'. $invoice->number;
+                            $node['item'] = $item_id;
+                            $node['debit'] = $item_total;
+                            $node['customer'] = $invoice->clientid;
+                            $node['paid'] = $paid;
+                            $node['date'] = $invoice->date;
+                            $node['tax'] = 0;
+                            $node['credit'] = 0;
+                            $node['description'] = 'Customer Debit For Invoice No ' .$invoice_id;
+                            $node['rel_id'] = $invoice_id;
+                            $node['rel_type'] = 'invoice';
+                            $node['datecreated'] = date('Y-m-d H:i:s');
+                            $node['addedfrom'] = get_staff_user_id();
+                            $data_insert[] = $node;
         
                             $node = [];
                             $node['itemable_id'] = $value['id'];
@@ -21807,11 +21822,13 @@ class Accounting_model extends App_Model
                     $node['date'] = $data['payment_date'];
                     $node['debit'] = $value[1];
                     $node['credit'] = 0;
-                    $node['description'] = $value[2];
                     $node['rel_id'] = $insert_id;
                     $node['rel_type'] = 'payment_entry';
                     if(isset($purchase_id)){
                         $node['pur_id'] = $purchase_id;
+                        $node['description'] = $value[2] . ' (Debit For Pur No '  . $purchase_id .')' ;
+                    }else{
+                        $node['description'] = $value[2];
                     }
                     $node['datecreated'] = date('Y-m-d H:i:s');
                     $node['addedfrom'] = get_staff_user_id();
@@ -21829,6 +21846,9 @@ class Accounting_model extends App_Model
                     $new['rel_type'] = 'payment_exit' ;
                     if(isset($purchase_id)){
                         $node['pur_id'] = $purchase_id;
+                        $node['description'] = $value[2] . ' (Debit For Pur No '  . $purchase_id .')' ;
+                    }else{
+                        $node['description'] = $value[2];
                     }
                     $new['datecreated'] = date('Y-m-d H:i:s');
                     $new['addedfrom'] = get_staff_user_id();
@@ -21937,12 +21957,14 @@ class Accounting_model extends App_Model
                 $node['VNo'] = $data['VNo'];
                 $node['debit'] = $value[1];
                 $node['credit'] = 0;
-                $node['date'] = $data['payment_date'];
-                $node['description'] = $value[2];
+                $node['date'] = $data['payment_date']; 
                 $node['rel_id'] = $id;
                 $node['rel_type'] = 'payment_entry';
                 if(isset($purchase_id)){
                     $node['pur_id'] = $purchase_id;
+                    $node['description'] = $value[2] . ' (Debit For Pur No '  . $purchase_id .')' ;
+                }else{
+                    $node['description'] = $value[2];
                 }
                 $node['datecreated'] = date('Y-m-d H:i:s');
                 $node['addedfrom'] = get_staff_user_id();
@@ -21955,12 +21977,16 @@ class Accounting_model extends App_Model
                 $new['date'] = $data['payment_date'];
                 $new['debit'] = 0;
                 $new['credit'] = $value[1];
-                $new['description'] = $value[2] ;
                 $new['rel_id'] = $id ;
                 $new['rel_type'] = 'payment_exit' ;
+
                 if(isset($purchase_id)){
-                    $node['pur_id'] = $purchase_id;
+                    $new['pur_id'] = $purchase_id;
+                    $new['description'] = $value[2] . ' (Debit For Pur No '  . $purchase_id .')' ;
+                }else{
+                    $new['description'] = $value[2];
                 }
+
                 $new['datecreated'] = date('Y-m-d H:i:s');
                 $new['addedfrom'] = get_staff_user_id();
                 $this->db->insert(db_prefix().'acc_account_history', $new);
@@ -22052,11 +22078,13 @@ class Accounting_model extends App_Model
                     $node['date'] = $data['received_date'];
                     $node['debit'] = 0;
                     $node['credit'] =  $value[1];
-                    $node['description'] = $value[2];
                     $node['rel_id'] = $insert_id;
                     $node['rel_type'] = 'received_entry';
                     if(isset($invoice_id)){
                         $node['inv_id'] = $invoice_id;
+                        $node['description'] = $value[2] .' (Credit For Inv No ' . $invoice_id . ')';
+                    }else{
+                        $node['description'] = $value[2];
                     }
                     $node['datecreated'] = date('Y-m-d H:i:s');
                     $node['addedfrom'] = get_staff_user_id();
@@ -22071,8 +22099,11 @@ class Accounting_model extends App_Model
                     $new['credit'] =  0;
                     if(isset($invoice_id)){
                         $new['inv_id'] = $invoice_id;
+                        $new['description'] = $value[2] .' (Credit For Inv No ' . $invoice_id . ')';
+                    }else{
+                        $new['description'] = $value[2] ;
                     }
-                    $new['description'] = $value[2] ;
+                    
                     $new['rel_id'] = $insert_id ;
                     $new['rel_type'] = 'received_exit' ;
                     $new['datecreated'] = date('Y-m-d H:i:s');
@@ -22180,11 +22211,14 @@ class Accounting_model extends App_Model
                 $node['debit'] = 0;
                 $node['credit'] =  $value[1];
                 $node['date'] = $data['received_date'];
-                $node['description'] = $value[2];
                 $node['rel_id'] = $id;
                 $node['rel_type'] = 'received_entry';
+              
                 if(isset($invoice_id)){
                     $node['inv_id'] = $invoice_id;
+                    $node['description'] = $value[2] .' (Credit For Inv No ' . $invoice_id . ')';
+                }else{
+                    $node['description'] = $value[2];
                 }
                 $node['datecreated'] = date('Y-m-d H:i:s');
                 $node['addedfrom'] = get_staff_user_id();
@@ -22197,11 +22231,14 @@ class Accounting_model extends App_Model
                 $new['date'] = $data['received_date'];
                 $new['debit'] = $value[1];
                 $new['credit'] = 0;
-                $new['description'] = $value[2] ;
                 $new['rel_id'] = $id ;
                 $new['rel_type'] = 'received_exit' ;
+               
                 if(isset($invoice_id)){
-                    $node['inv_id'] = $invoice_id;
+                    $new['inv_id'] = $invoice_id;
+                    $new['description'] = $value[2] .' (Credit For Inv No ' . $invoice_id . ')';
+                }else{
+                    $new['description'] = $value[2];
                 }
                 $new['datecreated'] = date('Y-m-d H:i:s');
                 $new['addedfrom'] = get_staff_user_id();
@@ -22310,7 +22347,38 @@ class Accounting_model extends App_Model
 
 
 
+    public function general_led_report_accbalance($cmbCode){
 
+        $this->db->select('balance , vendor_id , customer_id');
+        $this->db->from('tblacc_accounts');
+        $this->db->where('tblacc_accounts.HeadCode',$cmbCode);
+        $query = $this->db->get()->row();
+  
+        if(isset($query->balance)){
+            if(isset($query->vendor_id)){
+                return $query->balance * -1;
+            }else{
+                return $query->balance;
+            }
+        }else{
+            return 0;
+        }
+
+    }
+
+
+
+    public function general_led_report_prebalance($cmbCode,$dtpFromDate){
+
+        $this->db->select('sum(tblacc_account_history.Debit) as predebit, sum(tblacc_account_history.Credit) as precredit');
+        $this->db->from('tblacc_account_history');
+        $this->db->where('date < ',$dtpFromDate);
+        $this->db->where('tblacc_account_history.acc_no',$cmbCode);
+        $query = $this->db->get()->row();
+
+  
+        return $balance = $query->predebit - $query->precredit;
+    }
 
 
 

@@ -1254,7 +1254,11 @@ function get_invoice_received_amount($id)
                 ->get()
                 ->row();
 
+    if(isset($newdata->total)){
         return $newdata->total;
+    }else{
+        return 0;
+    }
 }
 
 
@@ -1270,6 +1274,10 @@ function get_invoice_paid_amount($id)
     ->get()
     ->row();
 
-    return $newdata->credit;
+    if(isset($newdata->credit)){
+        return $newdata->credit;
+    }else{
+        return 0;
+    }
 
 }
