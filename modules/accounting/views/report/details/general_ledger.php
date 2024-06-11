@@ -4,11 +4,15 @@
             <tbody>
                 <tr>
                     <td></td>
-                    <td></td>
+                    <td>
+                        <img src="<?php echo get_option('custom_pdf_logo_image_url'); ?>" style="width:10rem" alt=""
+                            srcset="">
+                    </td>
                     <td></td>
                     <td>
                         <h3 class="text-center no-margin-top-20 no-margin-left-24">
-                            <?php echo get_option('companyname'); ?></h3>
+                            <?php echo get_option('companyname'); ?>
+                        </h3>
                     </td>
                     <td></td>
                     <td></td>
@@ -21,22 +25,13 @@
                     <td>
                         <h4 class="text-center no-margin-top-20 no-margin-left-24"><?php echo _l('general_ledger'); ?>
                         </h4>
-                    </td> 
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <p class="text-center no-margin-top-20 no-margin-left-24">
-                            <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?></p>
                     </td>
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <td>
+                        <p class="text-center no-margin-top-20 no-margin-left-24">
+                        From :<?php echo  _d($data_report['to_date']); ?></p>
+                    </td>
                 </tr>
                 <tr>
                     <td></td>
@@ -44,14 +39,17 @@
                     <td></td>
                     <td>
                         <p class="text-center no-margin-top-20 no-margin-left-24">
-                            <strong>  <?php echo $data_report['HeadCode'] .' - '. $data_report['HeadName']; ?> </strong>
+                            <strong class="" > <?php echo $data_report['HeadCode'] .' - '. $data_report['HeadName']; ?> </strong>
                         </p>
-                    </td> 
+                    </td>
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <td>
+                        <p class="text-center no-margin-top-20 no-margin-left-24">
+                        To : <?php echo _d($data_report['to_date']); ?></p>
+                    </td>
                 </tr>
-              
+
                 <tr class="tr_header">
                     <td class="text-bold"><?php echo _l('no'); ?></td>
                     <td class="text-bold"> Voucher Date</td>
@@ -60,14 +58,10 @@
                     <td class="total_amount text-bold"><?php echo _l('debit'); ?></td>
                     <td class="total_amount text-bold"><?php echo _l('credit'); ?></td>
                     <td class="total_amount text-bold"><?php echo _l('balance'); ?></td>
-                </tr> 
+                </tr>
 
 
-                <?php               
-                // $data = $this->accounting_model->get_html_general_ledger($data_report['data']['accounts_receivable'], ['html' => '', 'row_index' => $row_index + 1, 'total_amount' => 0, 'total_py_amount' => 0], $parent_index, $currency);
-                // $row_index = $data['row_index'];
-                // echo html_entity_decode($data['html']);
-                // $total += $data['total_amount'];
+                <?php                
                 $TotalCredit=0;
                 $TotalDebit=0;
                 $CurBalance = 0;
@@ -116,7 +110,7 @@
                         echo '</tr> ';
                     }
                 }
-                ?> 
+                ?>
             </tbody>
 
             <tfoot>

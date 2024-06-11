@@ -166,16 +166,11 @@ $tbltotal .= '
     <td align="right" width="15%">' . app_format_money($invoice->total, $invoice->currency_name) . '</td>
 </tr>';
 
-if (count($invoice->payments) > 0 && get_option('show_total_paid_on_invoice') == 1) {
+if (count($invoice->receivedvouchers) > 0 && get_option('show_total_paid_on_invoice') == 1) {
     $tbltotal .= '
     <tr>
         <td align="right" width="85%"><strong>' . _l('invoice_total_paid') . '</strong></td>
-        <td align="right" width="15%">-' . app_format_money(sum_from_table(db_prefix() . 'invoicepaymentrecords', [
-        'field' => 'amount',
-        'where' => [
-            'invoiceid' => $invoice->id,
-        ],
-    ]), $invoice->currency_name) . '</td>
+        <td align="right" width="15%">-' . app_format_money( get_invoice_received_amount($invoice->id), $invoice->currency_name) . '</td>
     </tr>';
 }
 
@@ -213,38 +208,38 @@ $fbrimage = '<div style="text-align:center"><img src="http://localhost/ewc-/asse
 // 
 $pdf->writeHTML($fbrimage, true, false, false, false, '');
 
-if (count($invoice->payments) > 0 && get_option('show_transactions_on_invoice_pdf') == 1) {
-    $pdf->Ln(4);
-    $border = 'border-bottom-color:#000000;border-bottom-width:1px;border-bottom-style:solid; 1px solid black;';
-    $pdf->SetFont($font_name, 'B', $font_size);
-    $pdf->Cell(0, 0, _l('invoice_received_payments') . ':', 0, 1, 'L', 0, '', 0);
-    $pdf->SetFont($font_name, '', $font_size);
-    $pdf->Ln(4);
-    $tblhtml = '<table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="0">
-        <tr height="20"  style="color:#000;border:1px solid #000;">
-        <th width="25%;" style="' . $border . '">' . _l('invoice_payments_table_number_heading') . '</th>
-        <th width="25%;" style="' . $border . '">' . _l('invoice_payments_table_mode_heading') . '</th>
-        <th width="25%;" style="' . $border . '">' . _l('invoice_payments_table_date_heading') . '</th>
-        <th width="25%;" style="' . $border . '">' . _l('invoice_payments_table_amount_heading') . '</th>
-    </tr>';
-    $tblhtml .= '<tbody>';
-    foreach ($invoice->payments as $payment) {
-        $payment_name = $payment['name'];
-        if (!empty($payment['paymentmethod'])) {
-            $payment_name .= ' - ' . $payment['paymentmethod'];
+if(isset($invoice->transactions_allowed ) && $invoice->transactions_allowed  == 1  ){
+    if (count($invoice->receivedvouchers) > 0 && get_option('show_transactions_on_invoice_pdf') == 1) {
+        $pdf->Ln(4);
+        $border = 'border-bottom-color:#000000;border-bottom-width:1px;border-bottom-style:solid; 1px solid black;';
+        $pdf->SetFont($font_name, 'B', $font_size);
+        $pdf->Cell(0, 0, _l('invoice_received_payments') . ':', 0, 1, 'L', 0, '', 0);
+        $pdf->SetFont($font_name, '', $font_size);
+        $pdf->Ln(4);
+        $tblhtml = '<table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="0">
+            <tr height="20"  style="color:#000;border:1px solid #000;">
+            <th width="25%;" style="' . $border . '"> VNo</th>
+            <th width="25%;" style="' . $border . '"> Received Method</th>
+            <th width="25%;" style="' . $border . '"> VDate</th>
+            <th width="25%;" style="' . $border . '"> Amount</th>
+        </tr>';
+        $tblhtml .= '<tbody>';
+        foreach ($invoice->receivedvouchers as $received) {
+            $received_name = get_receivedvoucher_paymentexit($received->VNo);;
+
+            $tblhtml .= '
+                <tr>
+                <td>' . $received->VNo . '</td>
+                <td>' . $received_name . '</td>
+                <td>' . _d($received->date) . '</td>
+                <td>' . app_format_money($received->credit, $invoice->currency_name) . '</td>
+                </tr>
+            ';
         }
-        $tblhtml .= '
-            <tr>
-            <td>' . $payment['paymentid'] . '</td>
-            <td>' . $payment_name . '</td>
-            <td>' . _d($payment['date']) . '</td>
-            <td>' . app_format_money($payment['amount'], $invoice->currency_name) . '</td>
-            </tr>
-        ';
+        $tblhtml .= '</tbody>';
+        $tblhtml .= '</table>';
+        $pdf->writeHTML($tblhtml, true, false, false, false, '');
     }
-    $tblhtml .= '</tbody>';
-    $tblhtml .= '</table>';
-    $pdf->writeHTML($tblhtml, true, false, false, false, '');
 }
 
 if (found_invoice_mode($payment_modes, $invoice->id, true, true)) {

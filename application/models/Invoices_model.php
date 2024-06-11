@@ -87,8 +87,8 @@ class Invoices_model extends App_Model
 	   return $invoices;
     }
 
-		public function get_unpaid_invoices()
-		{
+    public function get_unpaid_invoices()
+    {
 			if (!staff_can('view', 'invoices')) {
 				$where = get_invoices_where_sql_for_staff(get_staff_user_id());
 				$this->db->where($where);
@@ -130,7 +130,10 @@ class Invoices_model extends App_Model
             $this->db->where(db_prefix() . 'invoices' . '.id', $id);
             $invoice = $this->db->get()->row();
             if ($invoice) {
-                $invoice->total_left_to_pay = get_invoice_total_left_to_pay($invoice->id, $invoice->total);
+                // $invoice->total_left_to_pay = get_invoice_total_left_to_pay($invoice->id, $invoice->total);
+
+                $invoice->total_left_to_pay = $invoice->total - get_invoice_received_amount($id)  ;
+
                 if($invoice->gsttype == "GST"){
                     $invoice->items       = get_items_by_type('GST Invoice', $id);
                 }
@@ -160,6 +163,8 @@ class Invoices_model extends App_Model
 
                 $this->load->model('payments_model');
                 $invoice->payments = $this->payments_model->get_invoice_payments($id);
+                
+                $invoice->receivedvouchers = $this->get_recivedvoucherby_invoice_id($id);
 
                 $this->load->model('email_schedule_model');
                 $invoice->scheduled_email = $this->email_schedule_model->get($id, 'invoice');
@@ -1945,4 +1950,20 @@ class Invoices_model extends App_Model
             'active' => 1, 'invoice_emails' => 1,
         ]);
     }
+
+    
+
+        function get_recivedvoucherby_invoice_id($id)
+        {
+
+            $newdata = $this->db->select('*')
+                        ->from('tblacc_account_history')
+                        ->where('inv_id',$id)
+                        ->where('rel_type' , 'received_entry')
+                        ->get()
+                        ->result();
+
+            return $newdata;
+        }
+
 }

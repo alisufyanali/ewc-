@@ -2035,7 +2035,7 @@ class Accounting_model extends App_Model
 
         $this->db->where($where);
         $this->db->where('active', 1);
-        $this->db->order_by('account_type_id,account_detail_type_id', 'desc');
+        $this->db->order_by('HeadCode', 'asc');
         $accounts = $this->db->get(db_prefix() . 'acc_accounts')->result_array();
 
         
@@ -22099,7 +22099,7 @@ class Accounting_model extends App_Model
                     $new['credit'] =  0;
                     if(isset($invoice_id)){
                         $new['inv_id'] = $invoice_id;
-                        $new['description'] = $value[2] .' (Credit For Inv No ' . $invoice_id . ')';
+                        $new['description'] = $value[2] .' (Debit For Inv No ' . $invoice_id . ')';
                     }else{
                         $new['description'] = $value[2] ;
                     }
@@ -22236,7 +22236,7 @@ class Accounting_model extends App_Model
                
                 if(isset($invoice_id)){
                     $new['inv_id'] = $invoice_id;
-                    $new['description'] = $value[2] .' (Credit For Inv No ' . $invoice_id . ')';
+                    $new['description'] = $value[2] .' (Debit For Inv No ' . $invoice_id . ')';
                 }else{
                     $new['description'] = $value[2];
                 }

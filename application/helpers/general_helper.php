@@ -1281,3 +1281,25 @@ function get_invoice_paid_amount($id)
     }
 
 }
+
+
+
+
+function get_receivedvoucher_paymentexit($vno)
+{
+    $CI = &get_instance();
+
+    $newdata = $CI->db->select('tblacc_accounts.name as HeadName')
+                ->from('tblacc_account_history')
+                ->join( 'tblacc_accounts','tblacc_accounts.HeadCode = tblacc_account_history.acc_no', 'left')
+                ->where('VNo',$vno)
+                ->where('rel_type' , 'received_exit')
+                ->get()
+                ->row();
+
+    if(isset($newdata->HeadName)){
+        return $newdata->HeadName;
+    }else{
+        return 0;
+    }
+}

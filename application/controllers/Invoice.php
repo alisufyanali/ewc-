@@ -17,6 +17,7 @@ class Invoice extends ClientsController
 
         // Handle Invoice PDF generator
         if ($this->input->post('invoicepdf')) {
+             $invoice->transactions_allowed = $this->input->post('transactions_allowed');
             try {
                 $pdf = invoice_pdf($invoice);
             } catch (Exception $e) {
@@ -46,13 +47,24 @@ class Invoice extends ClientsController
             $this->payments_model->process_payment($this->input->post(), $id);
         }
 
-        if ($this->input->post('paymentpdf')) {
-            $payment = $this->payments_model->get($this->input->post('paymentpdf'));
+        // if ($this->input->post('paymentpdf')) {
+        //     $payment = $this->payments_model->get($this->input->post('paymentpdf'));
+        //     // Confirm that the payment is related to the invoice.
+        //     if ($payment->invoiceid == $id) {
+        //         $payment->invoice_data = $this->invoices_model->get($payment->invoiceid);
+        //         $paymentpdf            = payment_pdf($payment);
+        //         $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf', 'D');
+        //         die;
+        //     }
+        // }
+        
+        if ($this->input->post('receviedpdf')) {
+            $recevied = $this->payments_model->get($this->input->post('receviedpdf'));
             // Confirm that the payment is related to the invoice.
-            if ($payment->invoiceid == $id) {
-                $payment->invoice_data = $this->invoices_model->get($payment->invoiceid);
-                $paymentpdf            = payment_pdf($payment);
-                $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf', 'D');
+            if ($recevied->invoiceid == $id) {
+                $recevied->invoice_data = $this->invoices_model->get($recevied->invoiceid);
+                $receviedpdf            = recevied_pdf($recevied);
+                $receviedpdf->Output(mb_strtoupper(slug_it(_l('recevied') . '-' . $recevied->receviedid), 'UTF-8') . '.pdf', 'D');
                 die;
             }
         }
@@ -70,6 +82,10 @@ class Invoice extends ClientsController
         $this->disableSubMenu();
         $data['hash']      = $hash;
         $data['invoice']   = hooks()->apply_filters('invoice_html_pdf_data', $invoice);
+      
+        // echo '<pre>';
+        // print_r($invoice);
+        // exit;
         $data['bodyclass'] = 'viewinvoice';
         $this->data($data);
         $this->view('invoicehtml');

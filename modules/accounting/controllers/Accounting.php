@@ -2865,7 +2865,7 @@ var_dump($data['group'] ); die;
         $data['to_date'] = date('Y-m-d');
         $data['accounting_method'] = get_option('acc_accounting_method');
         $data['currency'] = $this->currencies_model->get_base_currency();
-        $data['accounts'] = $this->accounting_model->get_accounts();
+        $data['accounts'] = $this->accounting_model->get_accounts(null,  'HeadLevel = 4 ');
          
         $this->load->view('report/includes/general_ledger', $data);
     }
@@ -9171,6 +9171,29 @@ var_dump($data['group'] ); die;
         $data['accounts'] = $this->accounting_model->get_accounts();
         $data['accounts_to_select'] = $this->accounting_model->get_data_account_to_select();
         $this->load->view('payment_entry/manage', $data);
+    }
+
+
+     /**
+     * payment entry
+     * @return view
+     */
+    public function payment_pdf($id){
+        $data['title']         = _l('payment_pdf');
+        // $data['payment_entry'] = $this->accounting_model->get_payment_entry($id);
+        // if(isset($data['payment_entry']->pur_id)){
+        //     $purchase_id = $data['payment_entry']->pur_id ;
+        //     $purchase_data = $this->accounting_model->get_paidAmountByPurchaseId($purchase_id);
+        //     $suplier_data = $this->accounting_model->get_remainAmountByPurchaseId($purchase_id);
+        //     $data['purchase_id'] = $purchase_id ;
+        //     $data['purchase_total'] = $suplier_data->credit ;
+        //     $data['purchase_paid'] = $purchase_data->total ;
+        // }
+        $paymentpdf            = payment_pdf($payment);
+        // $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf', 'D');
+        $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf', 'I');
+        die;
+
     }
 
     /**

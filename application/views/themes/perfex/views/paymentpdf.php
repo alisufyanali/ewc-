@@ -7,6 +7,10 @@ $dimensions = $pdf->getPageDimensions();
 // Get Y position for the separation
 $y = $pdf->getY();
 
+// Background Image
+$pdf->Image('https://ewchomes.com/uploads/output-onlinepngtools.png', 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
+
+
 $company_info = '<div style="color:#424242;">
 <img src="https://ewchomes.com/uploads/company/f86c57053ea4c32da3871c0ff57503b0.png" class="img-responsive" alt="EWC INTERIORS" style="height: 115px;">';
 $company_info .= format_organization_info();
@@ -21,8 +25,7 @@ $right_info = $swap == '1' ? $company_info : $client_details;
 pdf_multi_row($left_info, $right_info, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
 
 $pdf->SetFontSize(15);
-
-$receit_heading = '<div style="text-align:center">' . mb_strtoupper(_l('payment_receipt'), 'UTF-8') . '</div>';
+$receit_heading = '<div style="text-align:center ;background-color: #000 ; color: #fff; ">' . mb_strtoupper(_l('payment_receipt'), 'UTF-8') . '</div>';
 $pdf->Ln(20);
 $pdf->writeHTMLCell(0, '', '', '', $receit_heading, 0, 1, false, true, 'L', true);
 $pdf->SetFontSize($font_size);
