@@ -6,8 +6,24 @@ $color    = pr_get_chat_color(get_staff_user_id(), 'chat_color');
 $currentChatColor = validateChatColorBeforeApply($color);
 
 ?>
+<style>
+  .click-chat {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: #e1ef08;
+    width: 4rem;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 3rem;
+}
+</style>
 <div class="modal_container"></div>
 <div id="pusherChat">
+<div class="click-chat">
+<i class="fa fa-comment" aria-hidden="true"></i>
+
+</div>
   <div id="mainChatId" class="draggable" style="display:none;">
     <div id="membersContent">
       <div class="chatMain">

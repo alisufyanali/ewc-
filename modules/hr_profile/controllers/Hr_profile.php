@@ -1167,6 +1167,7 @@ class Hr_profile extends AdminController
 		if (!is_admin() && !has_permission('staffmanage_job_position', '', 'create')) {
 			access_denied('Leads Import');
 		}
+		
 		$total_row_false    = 0; 
 		$total_rows         = 0;
 		$dataerror          = 0;

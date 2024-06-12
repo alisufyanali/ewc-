@@ -392,7 +392,7 @@ function playPushSound() {
 
 var positions = JSON.parse(localStorage.positions || "{}");
 var availableWidth = document.body.clientWidth - 305;
-var availableHeight = document.body.clientHeight - 250;
+var availableHeight = document.body.clientHeight - 400;
 
 $("#pusherChat .draggable").draggable({
     axis: "x,y",
