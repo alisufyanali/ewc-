@@ -84,6 +84,7 @@
                     echo '</tr> ';
 
                     $i =0;
+                    
                     $CurBalance =  $data_report['pre_balance']  ; 
 
                     foreach ($data_report['data'] as $key => $value) {

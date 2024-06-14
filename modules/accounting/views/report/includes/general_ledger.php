@@ -23,7 +23,8 @@
 
                                     <label class="bold" for="accounts">
                                         <small class="req text-danger">*</small>Accounts</label>
-                                    <select class="" required name="accounts" data-live-search="true" id="accounts" data-width="100%">
+                                    <select class="" required name="accounts" data-live-search="true" id="accounts"
+                                        data-width="100%">
                                         <option value=""></option>
                                         <?php 
                                             if (isset($accounts)) {
@@ -82,12 +83,11 @@
     <div id="box-loading"></div>
     <?php init_tail(); ?>
     <script>
-        $(document).ready(function() {
-    setTimeout(function() {
-        $('select[name="accounts"]').selectpicker();
-    }, 100); // Adjust the delay time as needed
-});
-
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('select[name="accounts"]').selectpicker();
+        }, 100); // Adjust the delay time as needed
+    });
     </script>
     </body>
 

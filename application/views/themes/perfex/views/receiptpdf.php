@@ -3,7 +3,8 @@
 defined('BASEPATH') or exit('No direct script access allowed'); 
 
 
-if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_for == 'office') ){
+
+if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_for == 'office') ){
 
     $dimensions = $pdf->getPageDimensions();
 
@@ -14,15 +15,15 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     $info_right_column = '<br><table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="0" style=" margin:0">
     <tr>
         <th style="width:60%; text-align:right"><b> Voucher No :</b></th>
-        <th style="width:40%; text-align: right; ">'.$payment->VNo.'</th>
+        <th style="width:40%; text-align: right; ">'.$receipt->VNo.'</th>
     </tr>
     <tr>
         <th style="width:60%; text-align:right"><b> Mode of Payment :</b> </th>
-        <th style="width:40%; text-align: right; ">'.$payment->mode_of_payment.'</th>
+        <th style="width:40%; text-align: right; ">'.$receipt->mode_of_payment.'</th>
     </tr> 
     <tr> 
         <th style="width:60%; text-align:right"><b> Date :</b> </th>
-        <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($payment->payment_date)).'</th>
+        <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($receipt->payment_date)).'</th>
     </tr>
     '; 
     $info_right_column .= '</table>'; 
@@ -45,7 +46,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     $headerhtml = '<table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="0" style=" margin:0">
     <tr>
         <td> </td>
-        <td colspan="2" style="background-color: #000 ;  color:#fff;  font-size: 24px;  text-align: center; " > PAYMENT VOUCHER </td>
+        <td colspan="2" style="background-color: #000 ;  color:#fff;  font-size: 24px;  text-align: center; " > RECEIPT VOUCHER </td>
         <td> </td>
     </tr>   
     <tr>
@@ -58,7 +59,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     $pdf->writeHTML($headerhtml, true, false, false, false, ''); 
 
     // Header
-    $tblhtml = '<h5>Payment Details (DR)</h5>
+    $tblhtml = '<h5>Receipt Details (DR)</h5>
     <table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="10" border="0">
     <thead>
     <tr height="30" style="color:#fff; " bgcolor="#000">
@@ -72,7 +73,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     '; 
 
     $total_debit = 0;
-    foreach ($payment->details as $key => $detail ) {
+    foreach ($receipt->details as $key => $detail ) {
         # code...
         $key++;  
         $total_debit += $detail["debit"] ;
@@ -97,7 +98,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
 
     // Header
-    $tblhtml_2 = '<h5>Payment Details (CR)</h5>
+    $tblhtml_2 = '<h5>Receipt Details (CR)</h5>
 
     <table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="10" border="0">
     <thead>
@@ -114,17 +115,17 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
     $tblhtml_2 .= '<tr>'; 
     $tblhtml_2 .= '<td style="font-size:14px; "> 1</td>'; 
-    $tblhtml_2 .= '<td style="font-size:14px; "> '.$payment->modes_accounts.' - '.$payment->HeadName.' </td>'; 
-    $tblhtml_2 .= '<td style="font-size:14px; text-align:right; ">'.$payment->payee_name.'</td>'; 
-    $tblhtml_2 .= '<td style="font-size:14px; text-align:right; ">'.$payment->mode_of_payment.'</td>'; 
-    $tblhtml_2 .= '<td style="text-align:right; font-size:14px; " >'.number_format($payment->amount ,2).' </td>'; 
+    $tblhtml_2 .= '<td style="font-size:14px; "> '.$receipt->modes_accounts.' - '.$receipt->HeadName.' </td>'; 
+    $tblhtml_2 .= '<td style="font-size:14px; text-align:right; ">'.$receipt->payee_name.'</td>'; 
+    $tblhtml_2 .= '<td style="font-size:14px; text-align:right; ">'.$receipt->mode_of_payment.'</td>'; 
+    $tblhtml_2 .= '<td style="text-align:right; font-size:14px; " >'.number_format($receipt->amount ,2).' </td>'; 
     $tblhtml_2 .= '</tr>'; 
     $tblhtml_2 .= '</tbody>'; 
 
     $tblhtml_2 .= '<tfoot>'; 
     $tblhtml_2 .= '<tr  style="color:#fff; " bgcolor="#000">'; 
     $tblhtml_2 .= '<td  style="text-align:right; " colspan="4" > Total</td>'; 
-    $tblhtml_2 .= '<td  style="text-align:right" >'.number_format($payment->amount ,2).'  </td>'; 
+    $tblhtml_2 .= '<td  style="text-align:right" >'.number_format($receipt->amount ,2).'  </td>'; 
     $tblhtml_2 .= '</tr>'; 
     $tblhtml_2 .= '</tfoot>'; 
 
@@ -134,7 +135,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
 
 
-    $amount = $payment->amount;
+    $amount = $receipt->amount;
     $formatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
     $words = $formatter->format($amount);
 
@@ -153,7 +154,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
     <tr>
         <th width="30%"><b>Issued By </b></th>
-        <th width="70%">: '.get_staff_full_name($payment->addedfrom).'  </th>
+        <th width="70%">: '.get_staff_full_name($receipt->addedfrom).'  </th>
     </tr>
 
     <thead>
@@ -205,13 +206,13 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
 
 
-if(isset($payment->pdf_for) && ($payment->pdf_for == 'both' ) ){
+if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both' ) ){
 
     $pdf->AddPage(); // Add a new page
 
 }
 
-if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_for == 'client') ){
+if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_for == 'client') ){
 
     $dimensions = $pdf->getPageDimensions();
 
@@ -223,15 +224,15 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     $info_right_column = '<br><table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="0" style=" margin:0">
     <tr>
         <th style="width:60%; text-align:right"><b> Voucher No :</b></th>
-        <th style="width:40%; text-align: right; ">'.$payment->VNo.'</th>
+        <th style="width:40%; text-align: right; ">'.$receipt->VNo.'</th>
     </tr>
     <tr>
         <th style="width:60%; text-align:right"><b> Mode of Payment :</b> </th>
-        <th style="width:40%; text-align: right; ">'.$payment->mode_of_payment.'</th>
+        <th style="width:40%; text-align: right; ">'.$receipt->mode_of_payment.'</th>
     </tr> 
     <tr> 
         <th style="width:60%; text-align:right"><b> Date :</b> </th>
-        <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($payment->payment_date)).'</th>
+        <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($receipt->payment_date)).'</th>
     </tr>
     '; 
     $info_right_column .= '</table>'; 
@@ -254,7 +255,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     $headerhtml = '<table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="0" style=" margin:0">
     <tr>
         <td> </td>
-        <td colspan="2" style="background-color: #000 ;  color:#fff;  font-size: 24px;  text-align: center; " > PAYMENT VOUCHER </td>
+        <td colspan="2" style="background-color: #000 ;  color:#fff;  font-size: 24px;  text-align: center; " > RECEIPT VOUCHER </td>
         <td> </td>
     </tr>   
     <tr>
@@ -267,7 +268,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     $pdf->writeHTML($headerhtml, true, false, false, false, ''); 
 
     // Header
-    $tblhtml = '<h5>Payment Details (DR)</h5>
+    $tblhtml = '<h5>Receipt Details (DR)</h5>
     <table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="10" border="0">
     <thead>
     <tr height="30" style="color:#fff; " bgcolor="#000">
@@ -281,7 +282,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     '; 
 
     $total_debit = 0;
-    foreach ($payment->details as $key => $detail ) {
+    foreach ($receipt->details as $key => $detail ) {
         # code...
         $key++;  
         $total_debit += $detail["debit"] ;
@@ -313,7 +314,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
 
 
-    $amount = $payment->amount;
+    $amount = $receipt->amount;
     $formatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
     $words = $formatter->format($amount);
 
@@ -332,7 +333,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
 
     <tr>
         <th width="30%"><b>Issued By </b></th>
-        <th width="70%">: '.get_staff_full_name($payment->addedfrom).'  </th>
+        <th width="70%">: '.get_staff_full_name($receipt->addedfrom).'  </th>
     </tr>
 
     <thead>

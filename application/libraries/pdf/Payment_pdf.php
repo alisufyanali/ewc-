@@ -23,7 +23,7 @@ class Payment_pdf extends App_pdf
         $this->payment = $payment;
         $this->tag     = $tag;
 
-        $this->SetTitle(_l('payment') . ' #' . $this->payment->paymentid);
+        $this->SetTitle(_l('payment') . ' #' . $this->payment->VNo);
     }
 
     public function prepare()

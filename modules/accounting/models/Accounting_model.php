@@ -6435,7 +6435,8 @@ class Accounting_model extends App_Model
      * @param  array $data_filter 
      * @return array              
      */
-    public function get_data_trial_balance($data_filter){
+    // 14 -06 -2024 
+    public function get_data_trial_balance_old($data_filter){
         $from_date = date('Y-m-01');
         $to_date = date('Y-m-d');
         $accounting_method = 'cash';
@@ -6553,6 +6554,70 @@ class Accounting_model extends App_Model
         
     }
 
+    
+    public function get_data_trial_balance($data_filter){
+        $from_date = date('Y-m-01');
+        $to_date = date('Y-m-d');
+        $accounting_method = 'cash';
+        $acc_show_account_numbers = get_option('acc_show_account_numbers');
+
+       
+        if(isset($data_filter['from_date'])){
+            $from_date = to_sql_date($data_filter['from_date']);
+        }
+
+        if(isset($data_filter['to_date'])){
+            $to_date = to_sql_date($data_filter['to_date']);
+        }
+
+        
+        $this->db->select('*');
+        $this->db->from('tblacc_accounts');
+        $this->db->where('HeadLevel' , 1);
+        $query  = $this->db->get();
+        $account_level_1 =  $query->result_array();
+
+        
+        $this->db->select('*');
+        $this->db->from('tblacc_accounts');
+        $this->db->where('HeadLevel' , 2);
+        $query  = $this->db->get();
+        $account_level_2 =  $query->result_array();
+
+        
+        $this->db->select('*');
+        $this->db->from('tblacc_accounts');
+        $this->db->where('HeadLevel' , 3);
+        $query  = $this->db->get();
+        $account_level_3 =  $query->result_array();
+
+        
+        $this->db->select('*');
+        $this->db->from('tblacc_accounts');
+        $this->db->where('HeadLevel' , 4);
+        $query  = $this->db->get();
+        $account_level_4 =  $query->result_array();
+
+        
+        // $this->db->select('child.headcode AS child_code, child.name AS child_name, parent.headcode AS parent_code, parent.name AS parent_name');
+        // $this->db->from('tblacc_accounts AS child');
+        // $this->db->join('tblacc_accounts AS parent', 'child.pheadcode = parent.headcode');
+        // $this->db->order_by('child_code', 'ASC');
+        // $query = $this->db->get();
+        // $result = $query->result_array();
+
+
+        
+        return [ 
+            'account_level_1' => $account_level_1, 
+            'account_level_2' => $account_level_2, 
+            'account_level_3' => $account_level_3, 
+            'account_level_4' => $account_level_4, 
+            'data' => $result,
+            'total' => $data_total, 'from_date' => $from_date, 'to_date' => $to_date];
+        
+    }
+
     /**
      * import xlsx banking
      * @param  array $data
@@ -6609,6 +6674,8 @@ class Accounting_model extends App_Model
             foreach ($details as $key => $value) {
                 $data_details[] = [
                     "account" => $value['account'],
+                    "acc_no" => $value['acc_no'],
+                    "HeadName" => $this->get_HeadName($value['acc_no']),
                     "debit" => floatval($value['debit']),
                     "credit" => floatval($value['credit']),
                     "description" => $value['description']];
@@ -21884,6 +21951,8 @@ class Accounting_model extends App_Model
             foreach ($details as $key => $value) {
                 $data_details[] = [
                     "account" => $value['account'],
+                    "acc_no" => $value['acc_no'],
+                    "HeadName" => $this->get_HeadName($value['acc_no']),
                     "debit" => floatval($value['debit']), 
                     "description" => $value['description'],
                 ];
@@ -22118,7 +22187,7 @@ class Accounting_model extends App_Model
 
         return false;
     }
-
+    
 
 
 
@@ -22140,8 +22209,11 @@ class Accounting_model extends App_Model
             foreach ($details as $key => $value) {
                 $data_details[] = [
                     "account" => $value['account'],
+                    "acc_no" => $value['acc_no'],
+                    "HeadName" => $this->get_HeadName($value['acc_no']),
                     "debit" => floatval($value['debit']), 
                     "description" => $value['description']];
+                    
             }
             if(count($data_details) < 10){
 

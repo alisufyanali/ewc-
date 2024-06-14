@@ -2490,7 +2490,7 @@ var_dump($data['group'] ); die;
 
                 $categoryOutput .= '<div class="row-options">';
 
-                    $categoryOutput .= '<a href="' . admin_url('accounting/journal_entry_print/' . $aRow['id']) . '" class="text-success">Print</a> | ';
+                    $categoryOutput .= '<a href="' . admin_url('accounting/journal_entry_pdf/' . $aRow['id']) . '" target="_blank" class="text-success">Print</a> | ';
 
                 if (has_permission('accounting_journal_entry', '', 'edit')) {
                     $categoryOutput .= '<a href="' . admin_url('accounting/journal_entry_export/' . $aRow['id']) . '" class="text-success">' . _l('acc_export_excel') . '</a>';
@@ -2569,6 +2569,7 @@ var_dump($data['group'] ); die;
         $this->load->view('journal_entry/journal_entry', $data);
     }
 
+ 
     /**
      * delete journal entry
      * @param  integer $id
@@ -2927,13 +2928,14 @@ var_dump($data['group'] ); die;
      * report trial balance
      * @return view
      */
-    public function rp_trial_balance(){
+    public function rp_trial_balance(){ 
         $this->load->model('currencies_model');
         $data['title'] = _l('trial_balance');
         $data['from_date'] = date('Y-m-01');
         $data['to_date'] = date('Y-m-d');
         $data['accounting_method'] = get_option('acc_accounting_method');
         $data['currency'] = $this->currencies_model->get_base_currency();
+        $data['accounts'] = $this->accounting_model->get_accounts(null,  'HeadLevel = 4 ');
         $this->load->view('report/includes/trial_balance', $data);
     }
 
@@ -5005,9 +5007,6 @@ var_dump($data['group'] ); die;
     }
 
 
-    public function journal_entry_print($id){
-    
-    }
 
     /**
      * download xlsx file
@@ -9180,18 +9179,12 @@ var_dump($data['group'] ); die;
      */
     public function payment_pdf($id){
         $data['title']         = _l('payment_pdf');
-        // $data['payment_entry'] = $this->accounting_model->get_payment_entry($id);
-        // if(isset($data['payment_entry']->pur_id)){
-        //     $purchase_id = $data['payment_entry']->pur_id ;
-        //     $purchase_data = $this->accounting_model->get_paidAmountByPurchaseId($purchase_id);
-        //     $suplier_data = $this->accounting_model->get_remainAmountByPurchaseId($purchase_id);
-        //     $data['purchase_id'] = $purchase_id ;
-        //     $data['purchase_total'] = $suplier_data->credit ;
-        //     $data['purchase_paid'] = $purchase_data->total ;
-        // }
+        $payment = $this->accounting_model->get_payment_entry($id);
+        $payment->HeadName = $this->accounting_model->get_HeadName($payment->modes_accounts);
+        $payment->pdf_for = $this->input->get('for');
+        
         $paymentpdf            = payment_pdf($payment);
-        // $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf', 'D');
-        $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf', 'I');
+        $paymentpdf->Output(mb_strtoupper(slug_it(_l('payment') . '-' . $payment->VNo), 'UTF-8') . '.pdf', 'I');
         die;
 
     }
@@ -9252,6 +9245,10 @@ var_dump($data['group'] ); die;
                 $categoryOutput = _d($aRow['payment_date']);
 
                 $categoryOutput .= '<div class="row-options">';
+
+                  $categoryOutput .= ' <a href="' . admin_url('accounting/payment_pdf/' . $aRow['id']) . '?for=both" target="_blank"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>';
+                  $categoryOutput .= ' | <a href="' . admin_url('accounting/payment_pdf/' . $aRow['id']) . '?for=office" target="_blank"><i class="fa fa-building" aria-hidden="true"></i></a>';
+                  $categoryOutput .= ' | <a href="' . admin_url('accounting/payment_pdf/' . $aRow['id']) . '?for=client" target="_blank"><i class="fa fa-user" aria-hidden="true"></i></a>';
  
                 // if (has_permission('accounting_payment_entry', '', 'edit')) {
                     $categoryOutput .= ' | <a href="' . admin_url('accounting/new_payment_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
@@ -9390,6 +9387,16 @@ var_dump($data['group'] ); die;
 
 
 
+
+
+
+
+
+
+
+
+
+
     
 
 
@@ -9461,6 +9468,11 @@ var_dump($data['group'] ); die;
 
                 $categoryOutput .= '<div class="row-options">';
  
+                
+                $categoryOutput .= ' <a href="' . admin_url('accounting/receipt_pdf/' . $aRow['id']) . '?for=both" target="_blank"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>';
+                $categoryOutput .= ' | <a href="' . admin_url('accounting/receipt_pdf/' . $aRow['id']) . '?for=office" target="_blank"><i class="fa fa-building" aria-hidden="true"></i></a>';
+                $categoryOutput .= ' | <a href="' . admin_url('accounting/receipt_pdf/' . $aRow['id']) . '?for=client" target="_blank"><i class="fa fa-user" aria-hidden="true"></i></a>';
+
                 // if (has_permission('accounting_received_entry', '', 'edit')) {
                     $categoryOutput .= ' | <a href="' . admin_url('accounting/new_received_entry/' . $aRow['id']) . '">' . _l('edit') . '</a>';
                 // }
@@ -9593,12 +9605,47 @@ var_dump($data['group'] ); die;
 
 
 
+     /**
+     * receipt entry
+     * @return view
+     */
+    public function receipt_pdf($id){
+        $data['title']         = _l('receipt_pdf');
+        $receipt = $this->accounting_model->get_received_entry($id);
+        
+        // echo '<pre>';
+        // print_r($receipt);
+        // exit;
+        $receipt->HeadName = $this->accounting_model->get_HeadName($receipt->modes_accounts);
+        $receipt->pdf_for = $this->input->get('for');
+        
+        $receiptpdf            = receipt_pdf($receipt);
+        $receiptpdf->Output(mb_strtoupper(slug_it(_l('receipt') . '-' . $receipt->VNo), 'UTF-8') . '.pdf', 'I');
+        die;
+
+    }
 
 
 
 
 
 
+
+    
+    public function journal_entry_pdf($id){
+
+        $journal_entry = $this->accounting_model->get_journal_entry($id);
+        
+        // echo '<pre>';
+        // print_r($journal_entry);
+        // exit;
+        $journal_entry->HeadName = $this->accounting_model->get_HeadName($journal_entry->modes_accounts);
+        $journal_entry->pdf_for = $this->input->get('for');
+        
+        $journal_entrypdf            = journal_entry_pdf($journal_entry);
+        $journal_entrypdf->Output(mb_strtoupper(slug_it(_l('journal_entry') . '-' . $journal_entry->VNo), 'UTF-8') . '.pdf', 'I');
+        die;
+    }
 
 
 

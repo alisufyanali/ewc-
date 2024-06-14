@@ -313,3 +313,27 @@ function pdf_multi_row($left, $right, $pdf, $left_width = 40)
     $pdf->setPage(max($page_end_1, $page_end_2));
     $pdf->SetXY($pdf->GetX(), $ynew);
 }
+
+
+/**
+ * Generate receipt pdf
+ * @param  mixed $receipt receipt from database
+ * @param  string $tag     tag for bulk pdf exporter
+ * @return object
+ */
+function receipt_pdf($receipt, $tag = '')
+{
+    return app_pdf('receipt', LIBSPATH . 'pdf/Receipt_pdf', $receipt, $tag);
+}
+
+
+/**
+ * Generate receipt pdf
+ * @param  mixed $receipt receipt from database
+ * @param  string $tag     tag for bulk pdf exporter
+ * @return object
+ */
+function journal_entry_pdf($journal_entry, $tag = '')
+{
+    return app_pdf('journal_entry', LIBSPATH . 'pdf/Journal_entry_pdf', $journal_entry, $tag);
+}

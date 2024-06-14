@@ -18,15 +18,28 @@
                                 <div class="col-md-3">
                                     <?php echo render_date_input('to_date','to_date', _d($to_date)); ?>
                                 </div>
+
+
                                 <div class="col-md-3">
-                                    <?php 
-                                    $method = [
-                                            1 => ['id' => 'cash', 'name' => _l('cash')],
-                                            2 => ['id' => 'accrual', 'name' => _l('accrual')],
-                                          ];
-                                    echo render_select('accounting_method', $method, array('id', 'name'),'accounting_method', $accounting_method, array(), array(), '', '', false);
-                                    ?>
+
+                                    <label class="bold" for="accounts">
+                                        <small class="req text-danger">*</small>Accounts</label>
+                                    <select class="" required name="accounts" data-live-search="true" id="accounts"
+                                        data-width="100%">
+                                        <option value=""></option>
+                                        <?php 
+                                            if (isset($accounts)) {
+                                                foreach ($accounts as $key => $value) {
+                                                    $HeadCode = $value['HeadCode'] ; 
+                                                    $name = $value['name'] ; 
+                                                    echo '<option value="'.$HeadCode.'" >'.$name .' - ' .$HeadCode .' </option>' ; 
+                                                }
+                                            }
+                                        ?>
+                                    </select>
                                 </div>
+
+
                                 <div class="col-md-3">
                                     <?php echo form_hidden('type', 'trial_balance'); ?>
                                     <button type="submit"
@@ -71,6 +84,14 @@
     <!-- box loading -->
     <div id="box-loading"></div>
     <?php init_tail(); ?>
+
+    <script>
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('select[name="accounts"]').selectpicker();
+        }, 100); // Adjust the delay time as needed
+    });
+    </script>
     </body>
 
     </html>
