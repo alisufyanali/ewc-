@@ -5437,6 +5437,14 @@ class Warehouse_model extends App_Model {
 				unset($data['minimum_inventory']);
 			}
 
+				$measurement = $data['measurement'];
+				unset($data['measurement']);
+				if($measurement == 'Feet'){
+					$data['group_id'] = 1 ;
+				}else{
+					$data['group_id'] = 2 ;
+				}
+
 
 			//update
 			$this->db->where('commodity_code', $data['commodity_code']);

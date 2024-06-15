@@ -2951,7 +2951,7 @@ class warehouse extends AdminController {
 
 									} else {
 										/*case input name*/
-										$this->db->like(db_prefix() . 'items_groups.commodity_group_code', $value_cell_commodity_group);
+										$this->db->like(db_prefix() . 'items_groups.name', $value_cell_commodity_group);
 
 										$commodity_group_value = $this->db->get(db_prefix() . 'items_groups')->result_array();
 										if (count($commodity_group_value) == 0) {
@@ -3017,7 +3017,7 @@ class warehouse extends AdminController {
 									/*case input id*/
 									if (is_numeric($value_cell_sub_group)) {
 
-										$this->db->where('id', $value_cell_sub_group);
+										$this->db->where('sub_group_name', $value_cell_sub_group);
 										$sub_group_value = $this->db->count_all_results(db_prefix() . 'wh_sub_group');
 
 										if ($sub_group_value == 0) {
@@ -3030,7 +3030,7 @@ class warehouse extends AdminController {
 
 									} else {
 										/*case input  name*/
-										$this->db->like(db_prefix() . 'wh_sub_group.sub_group_code', $value_cell_sub_group);
+										$this->db->like(db_prefix() . 'wh_sub_group.sub_group_name', $value_cell_sub_group);
 
 										$sub_group_value = $this->db->get(db_prefix() . 'wh_sub_group')->result_array();
 										if (count($sub_group_value) == 0) {
@@ -3048,99 +3048,99 @@ class warehouse extends AdminController {
 								//check commodity_group exist  (input: id or name contract)
 								if (is_null($value_cell_style_id) != true && ($value_cell_style_id != '0')  && $value_cell_style_id != '' ) {
 									/*case input id*/
-									if (is_numeric($value_cell_style_id)) {
+									// if (is_numeric($value_cell_style_id)) {
 
-										$this->db->where('style_type_id', $value_cell_style_id);
-										$style_id_value = $this->db->count_all_results(db_prefix() . 'ware_style_type');
+									// 	$this->db->where('style_type_id', $value_cell_style_id);
+									// 	$style_id_value = $this->db->count_all_results(db_prefix() . 'ware_style_type');
 
-										if ($style_id_value == 0) {
-											$string_error .= _l('style_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id style_id*/
-											$flag_id_style_id = $value_cell_style_id;
-										}
+									// 	if ($style_id_value == 0) {
+									// 		$string_error .= _l('style_id') . _l('does_not_exist');
+									// 		$flag2 = 1;
+									// 	} else {
+									// 		/*get id style_id*/
+									// 		$flag_id_style_id = $value_cell_style_id;
+									// 	}
 
-									} else {
-										/*case input  name*/
-										$this->db->like(db_prefix() . 'ware_style_type.style_code', $value_cell_style_id);
+									// } else {
+									// 	/*case input  name*/
+									// 	$this->db->like(db_prefix() . 'ware_style_type.style_code', $value_cell_style_id);
 
-										$style_id_value = $this->db->get(db_prefix() . 'ware_style_type')->result_array();
-										if (count($style_id_value) == 0) {
-											$string_error .= _l('style_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id style_id*/
+									// 	$style_id_value = $this->db->get(db_prefix() . 'ware_style_type')->result_array();
+									// 	if (count($style_id_value) == 0) {
+									// 		$string_error .= _l('style_id') . _l('does_not_exist');
+									// 		$flag2 = 1;
+									// 	} else {
+									// 		/*get id style_id*/
 
-											$flag_id_style_id = $style_id_value[0]['style_type_id'];
-										}
-									}
+									// 		$flag_id_style_id = $style_id_value[0]['style_type_id'];
+									// 	}
+									// }
 
 								}
 
 								//check body_code exist  (input: id or name contract)
 								if (is_null($value_cell_model_id) != true && ($value_cell_model_id != '0') && $value_cell_model_id != '' ) {
 									/*case input id*/
-									if (is_numeric($value_cell_model_id)) {
+									// if (is_numeric($value_cell_model_id)) {
 
-										$this->db->where('body_type_id', $value_cell_model_id);
-										$model_id_value = $this->db->count_all_results(db_prefix() . 'ware_body_type');
+									// 	$this->db->where('body_type_id', $value_cell_model_id);
+									// 	$model_id_value = $this->db->count_all_results(db_prefix() . 'ware_body_type');
 
-										if ($model_id_value == 0) {
-											$string_error .= _l('model_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id model_id*/
-											$flag_id_model_id = $value_cell_model_id;
-										}
+									// 	if ($model_id_value == 0) {
+									// 		$string_error .= _l('model_id') . _l('does_not_exist');
+									// 		$flag2 = 1;
+									// 	} else {
+									// 		/*get id model_id*/
+									// 		$flag_id_model_id = $value_cell_model_id;
+									// 	}
 
-									} else {
-										/*case input name*/
-										$this->db->like(db_prefix() . 'ware_body_type.body_code', $value_cell_model_id);
+									// } else {
+									// 	/*case input name*/
+									// 	$this->db->like(db_prefix() . 'ware_body_type.body_code', $value_cell_model_id);
 
-										$model_id_value = $this->db->get(db_prefix() . 'ware_body_type')->result_array();
-										if (count($model_id_value) == 0) {
-											$string_error .= _l('model_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id model_id*/
+									// 	$model_id_value = $this->db->get(db_prefix() . 'ware_body_type')->result_array();
+									// 	if (count($model_id_value) == 0) {
+									// 		$string_error .= _l('model_id') . _l('does_not_exist');
+									// 		$flag2 = 1;
+									// 	} else {
+									// 		/*get id model_id*/
 
-											$flag_id_model_id = $model_id_value[0]['body_type_id'];
-										}
-									}
+									// 		$flag_id_model_id = $model_id_value[0]['body_type_id'];
+									// 	}
+									// }
 
 								}
 
 								//check size_code exist  (input: id or name contract)
 								if (is_null($value_cell_size_id) != true && ($value_cell_size_id != '0') && $value_cell_size_id != '') {
 									/*case input id*/
-									if (is_numeric($value_cell_size_id)) {
+									// if (is_numeric($value_cell_size_id)) {
 
-										$this->db->where('size_type_id', $value_cell_size_id);
-										$size_id_value = $this->db->count_all_results(db_prefix() . 'ware_size_type');
+									// 	$this->db->where('size_type_id', $value_cell_size_id);
+									// 	$size_id_value = $this->db->count_all_results(db_prefix() . 'ware_size_type');
 
-										if ($size_id_value == 0) {
-											$string_error .= _l('size_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id size_id*/
-											$flag_id_size_id = $value_cell_size_id;
-										}
+									// 	if ($size_id_value == 0) {
+									// 		$string_error .= _l('size_id') . _l('does_not_exist');
+									// 		$flag2 = 1;
+									// 	} else {
+									// 		/*get id size_id*/
+									// 		$flag_id_size_id = $value_cell_size_id;
+									// 	}
 
-									} else {
-										/*case input name*/
-										$this->db->like(db_prefix() . 'ware_size_type.size_code', $value_cell_size_id);
+									// } else {
+									// 	/*case input name*/
+									// 	$this->db->like(db_prefix() . 'ware_size_type.size_code', $value_cell_size_id);
 
-										$size_id_value = $this->db->get(db_prefix() . 'ware_size_type')->result_array();
-										if (count($size_id_value) == 0) {
-											$string_error .= _l('size_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id size_id*/
+									// 	$size_id_value = $this->db->get(db_prefix() . 'ware_size_type')->result_array();
+									// 	if (count($size_id_value) == 0) {
+									// 		$string_error .= _l('size_id') . _l('does_not_exist');
+									// 		$flag2 = 1;
+									// 	} else {
+									// 		/*get id size_id*/
 
-											$flag_id_size_id = $size_id_value[0]['size_type_id'];
-										}
-									}
+									// 		$flag_id_size_id = $size_id_value[0]['size_type_id'];
+									// 	}
+									// }
 
 								}
 
@@ -3211,6 +3211,14 @@ class warehouse extends AdminController {
 									$rd['purchase_price'] = isset($data[$row][12]) ? $data[$row][12] : null;
 									$rd['minimum_inventory'] = isset($value_cell_minimum_inventory) ? $value_cell_minimum_inventory : 0;
 									$rd['without_checking_warehouse'] =  0;
+
+									$rd['Breadth'] = isset($data[$row][22]) ? $data[$row][22] : null;
+									$rd['Width'] = isset($data[$row][23]) ? $data[$row][23] : null;
+									$rd['Feet'] = isset($data[$row][24]) ? $data[$row][24] : null;
+									$rd['Meters'] = isset($data[$row][25]) ? $data[$row][25] : null;
+									$rd['group_id'] = isset($data[$row][26]) ? $data[$row][26] : null;
+									$rd['initail_quantity'] = isset($data[$row][27]) ? $data[$row][27] : null;
+									$rd['as_of_date'] = isset($data[$row][28]) ? $data[$row][28] : null;
 
 								}
 
@@ -3303,7 +3311,7 @@ class warehouse extends AdminController {
 			}
 
 		}
-		
+
 		echo json_encode([
 			'message' =>'Not enought rows for importing',
 			'total_row_success' => $total_row_success,
