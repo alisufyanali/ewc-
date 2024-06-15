@@ -1303,3 +1303,29 @@ function get_receivedvoucher_paymentexit($vno)
         return 0;
     }
 }
+
+
+
+
+
+
+  function general_led_report_accbalance($cmbCode){
+
+    $CI = &get_instance();
+
+    $CI->db->select('balance , vendor_id , customer_id');
+    $CI->db->from('tblacc_accounts');
+    $CI->db->where('tblacc_accounts.HeadCode',$cmbCode);
+    $query = $CI->db->get()->row();
+
+    if(isset($query->balance)){
+        if(isset($query->vendor_id)){
+            return $query->balance * -1;
+        }else{
+            return $query->balance;
+        }
+    }else{
+        return 0;
+    }
+
+}

@@ -31,7 +31,11 @@
                                                 foreach ($accounts as $key => $value) {
                                                     $HeadCode = $value['HeadCode'] ; 
                                                     $name = $value['name'] ; 
-                                                    echo '<option value="'.$HeadCode.'" >'.$name .' - ' .$HeadCode .' </option>' ; 
+                                                    $selected = null;
+                                                    if(isset($_GET['code'])){
+                                                       $selected = ($HeadCode == $_GET['code']) ? 'selected' : null  ;
+                                                    }
+                                                    echo '<option value="'.$HeadCode.'" '.$selected.'>'.$name .' - ' .$HeadCode .' </option>' ; 
                                                 }
                                             }
                                         ?>

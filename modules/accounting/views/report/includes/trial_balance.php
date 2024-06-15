@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head();?>
+<style>
+    .page{
+        width:75% !important;
+    } 
+</style>
+
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -19,10 +25,8 @@
                                     <?php echo render_date_input('to_date','to_date', _d($to_date)); ?>
                                 </div>
 
-
                                 <div class="col-md-3">
-
-                                    <label class="bold" for="accounts">
+                                     <label class="bold" for="accounts">
                                         <small class="req text-danger">*</small>Accounts</label>
                                     <select class="" required name="accounts" data-live-search="true" id="accounts"
                                         data-width="100%">

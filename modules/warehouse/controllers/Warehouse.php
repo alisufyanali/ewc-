@@ -2742,7 +2742,6 @@ class warehouse extends AdminController {
 
 					// Setup our new file path
 					$newFilePath = $tmpDir . $_FILES['file_csv']['name'];
-
 					if (move_uploaded_file($tmpFilePath, $newFilePath)) {
 						$import_result = true;
 						$rows = [];
@@ -3304,6 +3303,7 @@ class warehouse extends AdminController {
 			}
 
 		}
+		
 		echo json_encode([
 			'message' =>'Not enought rows for importing',
 			'total_row_success' => $total_row_success,

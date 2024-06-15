@@ -12,14 +12,12 @@
                      <div class="col-md-12">
                       <h4 class="no-margin font-bold"><i class="fa fa-clone menu-icon menu-icon" aria-hidden="true"></i> <?php echo _l($title); ?></h4>
                       <br>
-
                     </div>
                   </div>
 
                   <div class="row row-margin-bottom">
                     <div class="col-md-4 ">
                         <?php if (has_permission('warehouse', '', 'create') || is_admin() || has_permission('warehouse', '', 'edit') ) { ?>
-
                           
                         <a href="#" onclick="new_commodity_item(); return false;" class="btn btn-info pull-left display-block mr-4 button-margin-r-b" data-toggle="sidebar-right" data-target=".commodity_list-add-edit-modal">
                             <?php echo _l('add'); ?>
@@ -510,7 +508,6 @@
                                 
                                  <div class="col-md-3">
                                      <?php echo render_select('sub_group',$sub_groups,array('id','sub_group_name'),'Sub Category'); ?>
-                                     <?php echo render_select('group',$groups,array('id','group_name'),'Category'); ?>
                                 </div>
                                 
                                  <div class="clearfix"></div>
@@ -535,11 +532,7 @@
                                 
                                 <div class="col-md-3">
                                     <?php 
-                                    
-                                    if(has_permission('pricingtabs','','Purchase Price') == 1) { 
-				                    $attr = array();
                                     echo render_input('purchase_price', 'Cost Price','', 'number', $attr);
-                                    }
                                     ?>
                                 </div>
                                 

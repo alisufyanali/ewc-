@@ -92,10 +92,36 @@
                         echo '<tr>';
                         echo '<td>'.$i .'</td>';
                         echo '<td>' .$value["date"].'</td>';
-                        echo '<td>' .$value["VNo"].'</td>';
+
+                        $url = $value["VNo"];
+                        $pattern_pv = '/^PV.*/';
+                        $pattern_rv = '/^RV.*/';
+                        $pattern_jv = '/^JV.*/';
+                        $pattern_inv = '/^INV.*/';
+                        $pattern_pur = '/^PUR.*/';
+                        
+                        // Check if $url matches the pattern for PV
+                        if (preg_match($pattern_pv, $url)) {
+                            echo '<td> <a target="_blank" href="'.admin_url("accounting/new_payment_entry/". $value["rel_id"]).'" >' .$value["VNo"].' </a></td>';
+                        } elseif (preg_match($pattern_rv, $url)) {
+                            echo '<td> <a target="_blank" href="'.admin_url("accounting/new_received_entry/". $value["rel_id"]).'" >' .$value["VNo"].' </a></td>';
+                        } elseif (preg_match($pattern_jv, $url)) {
+                            echo '<td> <a target="_blank" href="'.admin_url("accounting/new_journal_entry/". $value["rel_id"]).'" >' .$value["VNo"].' </a></td>';
+                        }  
+                        elseif (preg_match($pattern_inv, $url)) {
+                            echo '<td> <a target="_blank" href="'.admin_url("invoices/invoice/". $value["rel_id"]).'" >' .$value["VNo"].' </a></td>';
+                        }  
+                        elseif (preg_match($pattern_pur, $url)) {
+                            echo '<td> <a target="_blank" href="'.admin_url("warehouse/manage_goods_receipt/". $value["rel_id"]).'" >' .$value["VNo"].' </a></td>';
+                        }  
+                        else {
+                            echo '<td>' .$value["VNo"].'</td>';
+                        }
+                        
+
                         echo '<td>' .$value["description"].'</td>';
-                        echo '<td class="text-right">' .$value["debit"].'</td>';
-                        echo '<td class="text-right">' .$value["credit"].'</td>';
+                        echo '<td class="text-right">' .number_format($value["debit"] ,2).'</td>';
+                        echo '<td class="text-right">' .number_format($value["credit"] ,2).'</td>';
                        
                         $TotalDebit += $value["debit"];
                         $TotalCredit += $value["credit"];
@@ -104,9 +130,9 @@
                         $CurBalance -= $value["credit"];
                         
                         if($CurBalance < 0 ){
-                            echo '<td class="text-right">(' .abs($CurBalance).')</td>';
+                            echo '<td class="text-right">(' .number_format(abs($CurBalance) ,2).')</td>';
                         }else{
-                            echo '<td class="text-right">' .$CurBalance.'</td>';
+                            echo '<td class="text-right">' .number_format($CurBalance ,2).'</td>';
                         }
                         echo '</tr> ';
                     }
@@ -121,12 +147,12 @@
                   echo '<td></td>';
                   echo '<td></td>';
                   echo '<td></td>';
-                  echo '<td class="text-right text-bold">' .$TotalDebit.'</td>';
-                  echo '<td class="text-right text-bold">' .$TotalCredit.'</td>';
+                  echo '<td class="text-right text-bold">' .number_format($TotalDebit ,2).'</td>';
+                  echo '<td class="text-right text-bold">' .number_format($TotalCredit ,2).'</td>';
                   if($CurBalance < 0){
-                    echo '<td class="text-right">(' .abs($CurBalance).')</td>';
+                    echo '<td class="text-right">(' .number_format(abs($CurBalance) ,2).')</td>';
                     }else{
-                        echo '<td class="text-right">' .$CurBalance.'</td>';
+                        echo '<td class="text-right">' .number_format($CurBalance ,2).'</td>';
                     }
                   echo '</tr> ';
                 ?>

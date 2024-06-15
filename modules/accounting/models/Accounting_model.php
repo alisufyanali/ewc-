@@ -6739,6 +6739,8 @@ class Accounting_model extends App_Model
             if($value[0] != ''){
                 $node = [];
                 $node['account'] = $value[0];
+                $node['acc_no'] = $this->get_HeadCodeById($value[0]) ;
+                $node['VNo'] = $data['VNo'];
                 $node['debit'] = $value[1];
                 $node['credit'] = $value[2];
                 $node['date'] = $data['journal_date'];
@@ -22442,7 +22444,7 @@ class Accounting_model extends App_Model
 
     public function general_led_report_prebalance($cmbCode,$dtpFromDate){
 
-        $this->db->select('sum(tblacc_account_history.Debit) as predebit, sum(tblacc_account_history.Credit) as precredit');
+        $this->db->select('sum(tblacc_account_history.Debit) as predebit , sum(tblacc_account_history.Credit) as precredit');
         $this->db->from('tblacc_account_history');
         $this->db->where('date < ',$dtpFromDate);
         $this->db->where('tblacc_account_history.acc_no',$cmbCode);

@@ -1,8 +1,14 @@
+<style>
+    td{
+        padding:0.5rem;
+    }
+</style>
 <div id="accordion">
     <div class="card">
         <table class="tree">
             <tbody>
                 <tr>
+                    <td></td>
                     <td colspan="4">
                         <h3 class="text-center no-margin-top-20 no-margin-left-24">
                             <?php echo get_option('companyname'); ?></h3>
@@ -11,6 +17,7 @@
                     <td></td>
                 </tr>
                 <tr>
+                    <td></td>
                     <td colspan="4">
                         <h4 class="text-center no-margin-top-20 no-margin-left-24"><?php echo _l('trial_balance'); ?>
                         </h4>
@@ -19,6 +26,7 @@
                     <td></td>
                 </tr>
                 <tr>
+                    <td></td>
                     <td colspan="4">
                         <p class="text-center no-margin-top-20 no-margin-left-24">
                             <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?> s</p>
@@ -82,7 +90,7 @@
                                     if(isset($data_report['account_level_3'])){
                                         foreach ($data_report['account_level_3'] as $key => $level_3) {
                                             if($level_3['PHeadCode']  == $level_2['HeadCode'] ){
-                                                echo '<tr bgcolor="#eefff">';
+                                                echo '<tr bgcolor="aliceblue">';
                                                 echo '<td></td>';
                                                 echo '<td></td>';
                                                 echo '<td>'.$level_3["HeadCode"].' - '.$level_3["name"].'</td>';
@@ -91,31 +99,77 @@
                                                 echo '<td></td>';
                                                 echo '</tr> ';
 
+                                                $debit_total = 0;
+                                                $credit_total = 0;
                                              //  ======================================================================== 
                                                 if(isset($data_report['account_level_4'])){
                                                     foreach ($data_report['account_level_4'] as $key => $level_4) {
                                                         if($level_4['PHeadCode']  == $level_3['HeadCode'] ){
+                                                        
+                                                           
+                                                            $sql="SELECT SUM(tblacc_account_history.debit) AS Debit, SUM(tblacc_account_history.credit) AS Credit
+                                                             FROM tblacc_account_history WHERE  acc_no = ". $level_4["HeadCode"];
+
+                                                            $q1=$this->db->query($sql);
+                                                            $oResultTrial = $q1->row();
+
                                                             echo '<tr>';
                                                             echo '<td></td>';
                                                             echo '<td></td>';
                                                             echo '<td></td>';
-                                                            echo '<td>'.$level_4["HeadCode"].' - '.$level_4["name"].'</td>';
-                                                            echo '<td></td>';
-                                                            echo '<td></td>';
+                                                            echo '<td><a href="'.admin_url("accounting/rp_general_ledger?code=" .$level_4["HeadCode"] ).'" target="_blank" >'.$level_4["HeadCode"].' - '.$level_4["name"].'</a> </td>';
+
+                                                            $total = $oResultTrial->Debit - $oResultTrial->Credit;
+                                                            
+                                                            $pre_balance =  general_led_report_accbalance($level_4["HeadCode"]);
+                                                            
+                                                            $total_balance = $total + $pre_balance ;
+                                                            
+                                                            if($total_balance > 0){
+                                                               $debit_total += $total_balance;
+                                                                echo '<td style="text-align:right">'.$total_balance.'</td>';
+                                                                echo '<td style="text-align:right">0.00</td>';
+                                                            }else{
+                                                               $credit_total += $total_balance;
+                                                                echo '<td style="text-align:right">0.00</td>';
+                                                                echo '<td style="text-align:right">('.number_format(abs($total_balance),2).')</td>';
+                                                            }
+
                                                             echo '</tr> ';
                                                         }
                                                     }
                                                 }
+
+                                                
+                                                echo '<tr style="background-color:#000 ; color: #fff">';
+                                                echo '<td></td>';
+                                                echo '<td></td>';
+                                                echo '<td></td>';
+                                                echo '<td style="text-align:right">Sub Total</td>';
+                                                echo '<td style="text-align:right">'.number_format($debit_total, 2).' </td>';
+                                                if($credit_total > 0){
+                                                    echo '<td style="text-align:right">'.number_format($credit_total, 2).'</td>';
+                                                }else{
+                                                    echo '<td style="text-align:right">('.number_format(abs($credit_total), 2).')</td>';
+                                                }
+                                                echo '</tr> ';
                                              //  ======================================================================== 
                                             }
                                         }
+
                                     }
+
+
+                                    
                                 }
                              //  ======================================================================== 
                             }
                         }
 
                     //  ======================================================================== 
+
+
+                
 
                     }
                 }
