@@ -5351,7 +5351,8 @@ class Warehouse_model extends App_Model {
 	 * @return integer
 	 */
 	public function import_xlsx_commodity($data, $flag_insert_id) {
-		//update column unit name use sales/items
+		
+		// update column unit name use sales/items
 		if(isset($data['unit_id'])){
 			$unit_type = get_unit_type($data['unit_id']);
 			if($unit_type){
@@ -5384,7 +5385,7 @@ class Warehouse_model extends App_Model {
 		if(isset($data['purchase_price']) && isset($data['rate']) && isset($data['profif_ratio'])){
 			/*get profit*/
 
-			$data['profif_ratio'] = $this->caculator_profit_rate_model($data['purchase_price'], $data['rate']);
+		$data['profif_ratio'] = $this->caculator_profit_rate_model($data['purchase_price'], $data['rate']);
 
 		}elseif(isset($data['profif_ratio']) && isset($data['rate'])){
 			/*get purchase*/
@@ -5406,6 +5407,13 @@ class Warehouse_model extends App_Model {
 			return ['status' => false, 'message' => _l('rate') . _l('not_yet_entered')];
 		}
 		
+		$measurement = $data['measurement'];
+		unset($data['measurement']);
+		if($measurement == 'Feet'){
+			$data['group_id'] = 1 ;
+		}else{
+			$data['group_id'] = 2 ;
+		}
 		/*check update*/
 
 		$item = $this->db->query('select * from tblitems where commodity_code = "'.$data['commodity_code'].'"')->row();
@@ -5437,13 +5445,7 @@ class Warehouse_model extends App_Model {
 				unset($data['minimum_inventory']);
 			}
 
-				$measurement = $data['measurement'];
-				unset($data['measurement']);
-				if($measurement == 'Feet'){
-					$data['group_id'] = 1 ;
-				}else{
-					$data['group_id'] = 2 ;
-				}
+			
 
 
 			//update
@@ -5504,7 +5506,6 @@ class Warehouse_model extends App_Model {
 				return ['status' => false, 'message' => _l('commodity_code').': '. $data['commodity_code'] ._l('wh_has').  _l('sku_code') ._l('exist')];
 			}
 
-
 			$minimum_inventory = 0;
 			if(isset($data['minimum_inventory'])){
 				$minimum_inventory = $data['minimum_inventory'];
@@ -5522,6 +5523,7 @@ class Warehouse_model extends App_Model {
 
 			unset($data['tags']);
 
+			
 			//insert
 			$this->db->insert(db_prefix() . 'items', $data);
 			$insert_id = $this->db->insert_id();
@@ -11700,8 +11702,9 @@ class Warehouse_model extends App_Model {
     public function check_sku_duplicate($data)
     {	
     	if(isset($data['item_id']) && $data['item_id'] != ''){
-    	//check update
-    		$this->db->where('sku_code', $data['sku_code']);
+		//check update
+    	
+			$this->db->where('sku_code', $data['sku_code']);
     		$this->db->where('id != ', $data['item_id']);
 
     		$items = $this->db->get(db_prefix() . 'items')->result_array();

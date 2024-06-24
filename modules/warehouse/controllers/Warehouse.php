@@ -2748,29 +2748,25 @@ class warehouse extends AdminController {
 
 						//Writer file
 						$writer_header = array(
-							"(*)" ._l('commodity_code')          =>'string',
-							"(*)" ._l('commodity_name')          =>'string',
-							_l('commodity_barcode')          =>'string',
-							_l('sku_code')          =>'string',
-							_l('sku_name')          =>'string',
-							_l('Tags')          =>'string',
-							_l('description')          =>'string',
-							_l('commodity_type')          =>'string',
-							_l('unit_id')          =>'string',
-							"(*)" ._l('commodity_group')          =>'string',
-							_l('sub_group')          =>'string',
-							_l('_profit_rate'). "(%)"          =>'string',
-							_l('purchase_price')          =>'string',
-							"(*)" ._l('rate')          =>'string',
-							_l('tax')          =>'string',
-							_l('origin')          =>'string',
-							_l('style_id')          =>'string',
-							_l('model_id')          =>'string',
-							_l('size_id')          =>'string',
-							_l('_color')          =>'string',
-							_l('guarantee_month')          =>'string',
+							_l('sku_code')     			     =>'string',
+							_l('description')   	         =>'string',
+							"(*)" ._l('commodity_group')     =>'string',
+							_l('sub_group')   		         =>'string',
+							_l('_profit_rate'). "(%)"		 =>'string',
+							_l('purchase_price')			 =>'string',
+							"(*)" ._l('rate')				 =>'string',
+							_l('tax')        			     =>'string',
 							_l('minimum_inventory')          =>'string',
-							_l('error')                     =>'string',
+							_l('unit_id')                    =>'string',
+							_l('length')          			 =>'string',
+							_l('width')          			 =>'string',
+							_l('feet')          		   	 =>'string',
+							_l('meters')          			 =>'string',
+							_l('measurement')          		 =>'string',
+							_l('initail_quantity')           =>'string',
+							_l('as_of_date')	             =>'string',
+							_l('supplier')         			 =>'string',
+							_l('error')                      =>'string',
 						);
 
                         $widths_arr = array();
@@ -2780,7 +2776,7 @@ class warehouse extends AdminController {
 
                         $writer = new XLSXWriter();
 
-                        $col_style1 =[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+                        $col_style1 =[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
                         $style1 = ['widths'=> $widths_arr, 'fill' => '#ff9800',  'font-style'=>'bold', 'color' => '#0a0a0a', 'border'=>'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13 ];
 
                         $writer->writeSheetHeader_v2('Sheet1', $writer_header,  $col_options = ['widths'=> $widths_arr, 'fill' => '#f44336',  'font-style'=>'bold', 'color' => '#0a0a0a', 'border'=>'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13 ], $col_style1, $style1);
@@ -2820,204 +2816,78 @@ class warehouse extends AdminController {
 								$flag_id_style_id;
 								$flag_id_model_id;
 								$flag_id_size_id;
+								$flag_id_supplier;
 
-
-
-								$value_cell_commodity_code = isset($data[$row][0]) ? $data[$row][0] : null; //A
-								$value_cell_description = isset($data[$row][1]) ? $data[$row][1] : null; //B
-								$value_cell_commodity_barcode = isset($data[$row][2]) ? $data[$row][2] : ''; //A
-								$value_cell_sku_code = isset($data[$row][3]) ? $data[$row][3] : ''; //A
-								$value_cell_sku_name = isset($data[$row][4]) ? $data[$row][4] : ''; //A
-								$value_cell_tag = isset($data[$row][5]) ? $data[$row][5] : ''; //A
-								$value_cell_long_description = isset($data[$row][6]) ? $data[$row][6] : ''; //A
-								$value_cell_commodity_type = isset($data[$row][7]) ? $data[$row][7] : '';
-								$value_cell_unit_id = isset($data[$row][8]) ? $data[$row][8] : '';
-								$value_cell_commodity_group = isset($data[$row][9]) ? $data[$row][9] : null;
-								$value_cell_sub_group = isset($data[$row][10]) ? $data[$row][10] : '';
-								$value_cell_profit_rate = isset($data[$row][11]) ? $data[$row][11] : '';
-								$value_cell_purchase_price = isset($data[$row][12]) ? $data[$row][12] : '';
-								$value_cell_rate = isset($data[$row][13]) ? $data[$row][13] : '';
-								$value_cell_tax = isset($data[$row][14]) ? $data[$row][14] : '';
-								$value_cell_origin = isset($data[$row][15]) ? $data[$row][15] : '';
-								$value_cell_style_id = isset($data[$row][16]) ? $data[$row][16] : '';
-								$value_cell_model_id = isset($data[$row][17]) ? $data[$row][17] : '';
-								$value_cell_size_id = isset($data[$row][18]) ? $data[$row][18] : '';
-								$value_cell_color_id = isset($data[$row][19]) ? $data[$row][19] : '';
-								$value_cell_warranty = isset($data[$row][20]) ? $data[$row][20] : null;
-								$value_cell_minimum_inventory = isset($data[$row][21]) ? $data[$row][21] : '';
-
+								$value_cell_sku_code 			= isset($data[$row][0]) ? $data[$row][0] : null; //A
+								$value_cell_description 		= isset($data[$row][1]) ? $data[$row][1] : null; //B
+								$value_cell_commodity_group 	= isset($data[$row][2]) ? $data[$row][2] : ''; //A
+								$value_cell_sub_group 			= isset($data[$row][3]) ? $data[$row][3] : ''; //A
+								$value_cell_profit_rate 		= isset($data[$row][4]) ? $data[$row][4] : ''; //A
+								$value_cell_purchase_price  	= isset($data[$row][5]) ? $data[$row][5] : ''; //A
+								$value_cell_rate 				= isset($data[$row][6]) ? $data[$row][6] : '';
+								$value_cell_tax 		 		= isset($data[$row][7]) ? $data[$row][7] : '';
+								$value_cell_minimum_inventory 	= isset($data[$row][8]) ? $data[$row][8] : null;
+								$value_cell_unit_id 			= isset($data[$row][9]) ? $data[$row][9] : '';
+								$value_cell_length 				= isset($data[$row][10]) ? $data[$row][10] : '';
+								$value_cell_width 				= isset($data[$row][11]) ? $data[$row][11] : '';
+								$value_cell_feet 				= isset($data[$row][12]) ? $data[$row][12] : '';
+								$value_cell_meters 				= isset($data[$row][13]) ? $data[$row][13] : '';
+								$value_cell_measurement 		= isset($data[$row][14]) ? $data[$row][14] : '';
+								$value_cell_initail_quantity 	= isset($data[$row][15]) ? $data[$row][15] : '';
+								$value_cell_as_of_date 			= isset($data[$row][16]) ? $data[$row][16] : '';
+								$value_cell_supplier 			= isset($data[$row][17]) ? $data[$row][17] : '';
 
 								$pattern = '#^[a-z][a-z0-9\._]{2,31}@[a-z0-9\-]{3,}(\.[a-z]{2,4}){1,2}$#';
-
 								$reg_day = '#^(((1)[0-2]))(\/)\d{4}-(3)[0-1])(\/)(((0)[0-9])-[0-2][0-9]$#'; /*yyyy-mm-dd*/
 
 								/*check null*/
-								if (is_null($value_cell_commodity_code) == true) {
-									$string_error .= _l('commodity_code') . _l('not_yet_entered');
+								if (is_null($value_cell_sku_code) == true) {
+									$string_error .= _l('sku_code') . _l('not_yet_entered');
 									$flag = 1;
 								}
-
-								if (is_null($value_cell_commodity_group) == true) {
-									$string_error .= _l('commodity_group') . _l('not_yet_entered');
-									$flag = 1;
-								}
-
 
 								if (is_null($value_cell_description) == true) {
-									$string_error .= _l('commodity_name') . _l('not_yet_entered');
+									$string_error .= _l('description') . _l('not_yet_entered');
 									$flag = 1;
 								}
-
-								//check commodity_type exist  (input: id or name contract)
-								if (is_null($value_cell_commodity_type) != true && $value_cell_commodity_type != '0' && $value_cell_commodity_type != '') {
-									/*case input  id*/
-									if (is_numeric($value_cell_commodity_type)) {
-
-										$this->db->where('commodity_type_id', $value_cell_commodity_type);
-										$commodity_type_value = $this->db->count_all_results(db_prefix() . 'ware_commodity_type');
-
-										if ($commodity_type_value == 0) {
-											$string_error .= _l('commodity_type') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id commodity_type*/
-											$flag_id_commodity_type = $value_cell_commodity_type;
-										}
-
-									} else {
-										/*case input name*/
-										$this->db->like(db_prefix() . 'ware_commodity_type.commondity_code', $value_cell_commodity_type);
-
-										$commodity_type_value = $this->db->get(db_prefix() . 'ware_commodity_type')->result_array();
-										if (count($commodity_type_value) == 0) {
-											$string_error .= _l('commodity_type') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id commodity_type*/
-
-											$flag_id_commodity_type = $commodity_type_value[0]['commodity_type_id'];
-										}
-									}
-
-								}
-
+  
 								//check unit_code exist  (input: id or name contract)
-								if (is_null($value_cell_unit_id) != true && ( $value_cell_unit_id != '0')  && $value_cell_unit_id != '') {
-									/*case input id*/
-									if (is_numeric($value_cell_unit_id)) {
+								// if (is_null($value_cell_unit_id) != true && ( $value_cell_unit_id != '0')  && $value_cell_unit_id != '') {
+								// 	/*case input id*/
+								// 	if (is_numeric($value_cell_unit_id)) {
 
-										$this->db->where('unit_type_id', $value_cell_unit_id);
-										$unit_id_value = $this->db->count_all_results(db_prefix() . 'ware_unit_type');
+								// 		$this->db->where('unit_type_id', $value_cell_unit_id);
+								// 		$unit_id_value = $this->db->count_all_results(db_prefix() . 'ware_unit_type');
 
-										if ($unit_id_value == 0) {
-											$string_error .= _l('unit_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id unit_id*/
-											$flag_id_unit_id = $value_cell_unit_id;
-										}
+								// 		if ($unit_id_value == 0) {
+								// 			$string_error .= _l('unit_id') . _l('does_not_exist');
+								// 			$flag2 = 1;
+								// 		} else {
+								// 			/*get id unit_id*/
+								// 			$flag_id_unit_id = $value_cell_unit_id;
+								// 		}
 
-									} else {
-										/*case input name*/
-										$this->db->like(db_prefix() . 'ware_unit_type.unit_code', $value_cell_unit_id);
+								// 	} else {
+								// 		/*case input name*/
+								// 		$this->db->like(db_prefix() . 'ware_unit_type.unit_code', $value_cell_unit_id);
 
-										$unit_id_value = $this->db->get(db_prefix() . 'ware_unit_type')->result_array();
-										if (count($unit_id_value) == 0) {
-											$string_error .= _l('unit_id') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get unit_id*/
-											$flag_id_unit_id = $unit_id_value[0]['unit_type_id'];
-										}
-									}
-
-								}
-
-								//check commodity_group exist  (input: id or name contract)
-								if (is_null($value_cell_commodity_group) != true && ($value_cell_commodity_group != '0') && $value_cell_commodity_group != '') {
-									/*case input id*/
-									if (is_numeric($value_cell_commodity_group)) {
-
-										$this->db->where('id', $value_cell_commodity_group);
-										$commodity_group_value = $this->db->count_all_results(db_prefix() . 'items_groups');
-
-										if ($commodity_group_value == 0) {
-											$string_error .= _l('commodity_group') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id commodity_group*/
-											$flag_id_commodity_group = $value_cell_commodity_group;
-										}
-
-									} else {
-										/*case input name*/
-										$this->db->like(db_prefix() . 'items_groups.name', $value_cell_commodity_group);
-
-										$commodity_group_value = $this->db->get(db_prefix() . 'items_groups')->result_array();
-										if (count($commodity_group_value) == 0) {
-											$string_error .= _l('commodity_group') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id commodity_group*/
-
-											$flag_id_commodity_group = $commodity_group_value[0]['id'];
-										}
-									}
-
-								}
-
-								//check commodity_group exist  (input: id or name contract)
-								if (is_null($value_cell_warranty) != true) {
-									/*case input id*/
-									if (!is_numeric($value_cell_warranty)) {
-										/*case input name*/
-										$string_error .= _l('guarantee_month') . _l('_check_invalid');
-										$flag2 = 1;
-										
-									}
-
-								}
-
-
-								//check taxes exist  (input: id or name contract)
-								if (is_null($value_cell_tax) != true && ($value_cell_tax!= '0')  && $value_cell_tax != '') {
-									/*case input id*/
-									if (is_numeric($value_cell_tax)) {
-
-										$this->db->where('id', $value_cell_tax);
-										$cell_tax_value = $this->db->count_all_results(db_prefix() . 'taxes');
-
-										if ($cell_tax_value == 0) {
-											$string_error .= _l('tax') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id cell_tax*/
-											$flag_id_tax = $value_cell_tax;
-										}
-
-									} else {
-										/*case input name*/
-										$this->db->like(db_prefix() . 'taxes.name', $value_cell_tax);
-
-										$cell_tax_value = $this->db->get(db_prefix() . 'taxes')->result_array();
-										if (count($cell_tax_value) == 0) {
-											$string_error .= _l('tax') . _l('does_not_exist');
-											$flag2 = 1;
-										} else {
-											/*get id warehouse_id*/
-
-											$flag_id_tax = $cell_tax_value[0]['id'];
-										}
-									}
-
-								}
+								// 		$unit_id_value = $this->db->get(db_prefix() . 'ware_unit_type')->result_array();
+								// 		if (count($unit_id_value) == 0) {
+								// 			$string_error .= _l('unit_id') . _l('does_not_exist');
+								// 			$flag2 = 1;
+								// 		} else {
+								// 			/*get unit_id*/
+								// 			$flag_id_unit_id = $unit_id_value[0]['unit_type_id'];
+								// 		}
+								// 	}
+								// } 
 
 								//check commodity_group exist  (input: id or name contract)
 								if (is_null($value_cell_sub_group) != true && $value_cell_sub_group != '') {
 									/*case input id*/
 									if (is_numeric($value_cell_sub_group)) {
 
-										$this->db->where('sub_group_name', $value_cell_sub_group);
+										$this->db->where('id', $value_cell_sub_group);
 										$sub_group_value = $this->db->count_all_results(db_prefix() . 'wh_sub_group');
 
 										if ($sub_group_value == 0) {
@@ -3044,106 +2914,7 @@ class warehouse extends AdminController {
 									}
 
 								}
-
-								//check commodity_group exist  (input: id or name contract)
-								if (is_null($value_cell_style_id) != true && ($value_cell_style_id != '0')  && $value_cell_style_id != '' ) {
-									/*case input id*/
-									// if (is_numeric($value_cell_style_id)) {
-
-									// 	$this->db->where('style_type_id', $value_cell_style_id);
-									// 	$style_id_value = $this->db->count_all_results(db_prefix() . 'ware_style_type');
-
-									// 	if ($style_id_value == 0) {
-									// 		$string_error .= _l('style_id') . _l('does_not_exist');
-									// 		$flag2 = 1;
-									// 	} else {
-									// 		/*get id style_id*/
-									// 		$flag_id_style_id = $value_cell_style_id;
-									// 	}
-
-									// } else {
-									// 	/*case input  name*/
-									// 	$this->db->like(db_prefix() . 'ware_style_type.style_code', $value_cell_style_id);
-
-									// 	$style_id_value = $this->db->get(db_prefix() . 'ware_style_type')->result_array();
-									// 	if (count($style_id_value) == 0) {
-									// 		$string_error .= _l('style_id') . _l('does_not_exist');
-									// 		$flag2 = 1;
-									// 	} else {
-									// 		/*get id style_id*/
-
-									// 		$flag_id_style_id = $style_id_value[0]['style_type_id'];
-									// 	}
-									// }
-
-								}
-
-								//check body_code exist  (input: id or name contract)
-								if (is_null($value_cell_model_id) != true && ($value_cell_model_id != '0') && $value_cell_model_id != '' ) {
-									/*case input id*/
-									// if (is_numeric($value_cell_model_id)) {
-
-									// 	$this->db->where('body_type_id', $value_cell_model_id);
-									// 	$model_id_value = $this->db->count_all_results(db_prefix() . 'ware_body_type');
-
-									// 	if ($model_id_value == 0) {
-									// 		$string_error .= _l('model_id') . _l('does_not_exist');
-									// 		$flag2 = 1;
-									// 	} else {
-									// 		/*get id model_id*/
-									// 		$flag_id_model_id = $value_cell_model_id;
-									// 	}
-
-									// } else {
-									// 	/*case input name*/
-									// 	$this->db->like(db_prefix() . 'ware_body_type.body_code', $value_cell_model_id);
-
-									// 	$model_id_value = $this->db->get(db_prefix() . 'ware_body_type')->result_array();
-									// 	if (count($model_id_value) == 0) {
-									// 		$string_error .= _l('model_id') . _l('does_not_exist');
-									// 		$flag2 = 1;
-									// 	} else {
-									// 		/*get id model_id*/
-
-									// 		$flag_id_model_id = $model_id_value[0]['body_type_id'];
-									// 	}
-									// }
-
-								}
-
-								//check size_code exist  (input: id or name contract)
-								if (is_null($value_cell_size_id) != true && ($value_cell_size_id != '0') && $value_cell_size_id != '') {
-									/*case input id*/
-									// if (is_numeric($value_cell_size_id)) {
-
-									// 	$this->db->where('size_type_id', $value_cell_size_id);
-									// 	$size_id_value = $this->db->count_all_results(db_prefix() . 'ware_size_type');
-
-									// 	if ($size_id_value == 0) {
-									// 		$string_error .= _l('size_id') . _l('does_not_exist');
-									// 		$flag2 = 1;
-									// 	} else {
-									// 		/*get id size_id*/
-									// 		$flag_id_size_id = $value_cell_size_id;
-									// 	}
-
-									// } else {
-									// 	/*case input name*/
-									// 	$this->db->like(db_prefix() . 'ware_size_type.size_code', $value_cell_size_id);
-
-									// 	$size_id_value = $this->db->get(db_prefix() . 'ware_size_type')->result_array();
-									// 	if (count($size_id_value) == 0) {
-									// 		$string_error .= _l('size_id') . _l('does_not_exist');
-									// 		$flag2 = 1;
-									// 	} else {
-									// 		/*get id size_id*/
-
-									// 		$flag_id_size_id = $size_id_value[0]['size_type_id'];
-									// 	}
-									// }
-
-								}
-
+   
 								//check value_cell_rate input
 								if (is_null($value_cell_rate) != true && $value_cell_rate != '') {
 									if (!is_numeric($value_cell_rate)) {
@@ -3159,9 +2930,7 @@ class warehouse extends AdminController {
 									if (!is_numeric($value_cell_purchase_price)) {
 										$string_error .= _l('purchase_price') . _l('_check_invalid');
 										$flag = 1;
-
 									}
-
 								}
 
 								//check commodity min input
@@ -3169,56 +2938,79 @@ class warehouse extends AdminController {
 									if (!is_numeric($value_cell_minimum_inventory)) {
 										$string_error .= _l('inventory_min') . _l('_check_invalid');
 										$flag = 1;
+									}
+								}
 
+
+								
+								//check supplier exist  (input: id or name contract)
+								if (is_null($value_cell_supplier) != true && $value_cell_supplier != '') {
+									/*case input id*/
+									if (is_numeric($value_cell_supplier)) {
+
+										$this->db->where('userid', $value_cell_supplier);
+										$sub_group_value = $this->db->count_all_results(db_prefix() . 'pur_vendor');
+
+										if ($sub_group_value == 0) {
+											$string_error .= _l('sub_group') . _l('does_not_exist');
+											$flag2 = 1;
+										} else {
+											/*get id sub_group*/
+											$flag_id_supplier = $value_cell_supplier;
+										}
+
+									} else {
+										/*case input  name*/
+										$this->db->like(db_prefix() . 'pur_vendor.company', $value_cell_supplier);
+
+										$sub_group_value = $this->db->get(db_prefix() . 'pur_vendor')->result_array();
+										if (count($sub_group_value) == 0) {
+											$string_error .= _l('sub_group') . _l('does_not_exist');
+											$flag2 = 1;
+										} else {
+											/*get id sub_group*/
+											$flag_id_supplier = $sub_group_value[0]['userid'];
+										}
 									}
 
 								}
-
-								
-
 								
 
 								if (($flag == 0) && ($flag2 == 0)) {
 
 
-									/*staff id is HR_code, input is HR_CODE, insert => staffid*/
-									$rd['commodity_code'] = isset($data[$row][0]) ? $data[$row][0] : '';
-									$rd['commodity_barcode'] = isset($data[$row][2]) ? $data[$row][2] : '';
-									$rd['sku_code'] = isset($data[$row][3]) ? $data[$row][3] : '';
-									$rd['sku_name'] = isset($data[$row][4]) ? $data[$row][4] : '';
-									$rd['description'] = isset($data[$row][1]) ? $data[$row][1] : '';
-									$rd['tags'] = isset($data[$row][5]) ? $data[$row][5] : '';
-									$rd['long_description'] = isset($data[$row][6]) ? $data[$row][6] : '';
+									/*staff id is HR_code, input is HR_CODE, insert => staffid*/ 
+ 
+									$rd['sku_code'] 			= isset($data[$row][0]) ? $data[$row][0] : null; //A
+									$rd['commodity_code']       = isset($data[$row][0]) ? $data[$row][0] : null; //A
 
-									$rd['commodity_type'] = isset($flag_id_commodity_type) ? $flag_id_commodity_type : '';
-									$rd['unit_id'] = isset($flag_id_unit_id) ? $flag_id_unit_id : '';
-									$rd['group_id'] = isset($flag_id_commodity_group) ? $flag_id_commodity_group : '';
-									$rd['sub_group'] = isset($flag_id_sub_group) ? $flag_id_sub_group : '';
-									$rd['guarantee'] = isset($data[$row][20]) ? $data[$row][20] : '';
-									$rd['tax'] = isset($flag_id_tax) ? $flag_id_tax : '';
+									$rd['description'] 			= isset($data[$row][0]) ? $data[$row][1] .' ' .$data[$row][10] . ' x '. $data[$row][11]  : null; //B
+									$rd['long_description'] 	= isset($data[$row][1]) ? $data[$row][1] : null; //B
 
-									$rd['origin'] = isset($data[$row][15]) ? $data[$row][15] : '';
+									$rd['group_id'] 			= isset($flag_id_commodity_group) ? $flag_id_commodity_group : '';
+									$rd['sub_group'] 			= isset($flag_id_sub_group) ? $flag_id_sub_group : '';
+	
+									$rd['profif_ratio'] 		= isset($data[$row][4]) ? $data[$row][4] : ''; //A
+									$rd['purchase_price']  		= isset($data[$row][5]) ? $data[$row][5] : ''; //A
+									$rd['rate'] 				= isset($data[$row][6]) ? $data[$row][6] : '';
 
-									$rd['style_id'] = isset($flag_id_style_id) ? $flag_id_style_id : '';
-									$rd['model_id'] = isset($flag_id_model_id) ? $flag_id_model_id : '';
-									$rd['size_id'] = isset($flag_id_size_id) ? $flag_id_size_id : '';
-									$rd['color_id'] = 0;
-									$rd['warehouse_id'] = 0;
+									$rd['tax']				    = isset($flag_id_tax) ? $flag_id_tax : '';
+									$rd['minimum_inventory']    = isset($value_cell_minimum_inventory) ? $value_cell_minimum_inventory : 0;
+									$rd['unit_id']	 			= isset($flag_id_unit_id) ? $flag_id_unit_id : '';
 
-									$rd['profif_ratio'] = isset($data[$row][11]) ? $data[$row][11] : null;
+									$rd['Breadth'] 				= isset($data[$row][10]) ? $data[$row][10] : '';
+									$rd['width'] 				= isset($data[$row][11]) ? $data[$row][11] : '';
+									$rd['feet'] 				= isset($data[$row][12]) ? $data[$row][12] : '';
+									$rd['meters'] 				= isset($data[$row][13]) ? $data[$row][13] : '';
+									$rd['measurement'] 			= isset($data[$row][14]) ? $data[$row][14] : '';
+									$rd['initail_quantity'] 	= isset($data[$row][15]) ? $data[$row][15] : '';
+									$rd['as_of_date'] 			= isset($data[$row][16]) ? $data[$row][16] : '';
+									$rd['vendor_id']	 		= isset($flag_id_supplier) ? $flag_id_supplier : '';
 
-									$rd['rate'] = isset($data[$row][13]) ? $data[$row][13] : null;
-									$rd['purchase_price'] = isset($data[$row][12]) ? $data[$row][12] : null;
-									$rd['minimum_inventory'] = isset($value_cell_minimum_inventory) ? $value_cell_minimum_inventory : 0;
+									$rd['color_id'] 				  = 0;
+									$rd['warehouse_id']				  = 0;
 									$rd['without_checking_warehouse'] =  0;
 
-									$rd['Breadth'] = isset($data[$row][22]) ? $data[$row][22] : null;
-									$rd['Width'] = isset($data[$row][23]) ? $data[$row][23] : null;
-									$rd['Feet'] = isset($data[$row][24]) ? $data[$row][24] : null;
-									$rd['Meters'] = isset($data[$row][25]) ? $data[$row][25] : null;
-									$rd['group_id'] = isset($data[$row][26]) ? $data[$row][26] : null;
-									$rd['initail_quantity'] = isset($data[$row][27]) ? $data[$row][27] : null;
-									$rd['as_of_date'] = isset($data[$row][28]) ? $data[$row][28] : null;
 
 								}
 
@@ -3244,29 +3036,27 @@ class warehouse extends AdminController {
 
 								if (($flag == 1) || ($flag2 == 1) || ($flag_insert == false)) {
 									//write error file
-									$writer->writeSheetRow('Sheet1', [
-										$value_cell_commodity_code,
-										$value_cell_description,
-										$value_cell_commodity_barcode,
-										$value_cell_sku_code,
-										$value_cell_sku_name,
-										$value_cell_tag,
-										$value_cell_long_description,
-										$value_cell_commodity_type,
-										$value_cell_unit_id,
-										$value_cell_commodity_group,
-										$value_cell_sub_group,
-										$value_cell_profit_rate,
-										$value_cell_purchase_price,
-										$value_cell_rate,
-										$value_cell_tax,
-										$value_cell_origin,
-										$value_cell_style_id,
-										$value_cell_model_id,
-										$value_cell_size_id,
-										$value_cell_color_id,
-										$value_cell_warranty,
-										$value_cell_minimum_inventory,
+									$writer->writeSheetRow('Sheet1', [ 
+
+										$value_cell_sku_code 			 ,   
+										$value_cell_description 		 ,   
+										$value_cell_commodity_group 	 ,   
+										$value_cell_sub_group 			 ,   
+										$value_cell_profit_rate 		 ,   
+										$value_cell_purchase_price  	 ,   
+										$value_cell_rate 				 ,  
+										$value_cell_tax 		 		 ,  
+										$value_cell_minimum_inventory 	 ,  
+										$value_cell_unit_id 			 ,  
+										$value_cell_length 				 ,  
+										$value_cell_width 				 ,  
+										$value_cell_feet 				 ,  
+										$value_cell_meters 				 ,  
+										$value_cell_measurement 		 ,  
+										$value_cell_initail_quantity 	 ,  
+										$value_cell_as_of_date 			 ,  
+										$value_cell_supplier 			 ,  
+										
 										$string_error,
 									]);
 
