@@ -8666,139 +8666,139 @@ class Accounting_model extends App_Model
 
             $items = get_items_table_data($invoice, 'invoice', 'html', true);
 
-            foreach($items->taxes() as $tax){
-                $t = explode('|', $tax['tax_name']);
-                $tax_name = '';
-                $tax_rate = 0;
-                if(isset($t[0])){
-                    $tax_name = $t[0];
-                }
-                if(isset($t[1])){
-                    $tax_rate = $t[1];
-                }
+            // foreach($items->taxes() as $tax){
+            //     $t = explode('|', $tax['tax_name']);
+            //     $tax_name = '';
+            //     $tax_rate = 0;
+            //     if(isset($t[0])){
+            //         $tax_name = $t[0];
+            //     }
+            //     if(isset($t[1])){
+            //         $tax_rate = $t[1];
+            //     }
 
-                $this->db->where('name', $tax_name);
-                $this->db->where('taxrate', $tax_rate);
-                $_tax = $this->db->get(db_prefix().'taxes')->row();
+            //     $this->db->where('name', $tax_name);
+            //     $this->db->where('taxrate', $tax_rate);
+            //     $_tax = $this->db->get(db_prefix().'taxes')->row();
 
-                $total_tax = $tax['total_tax'];
-                if($currency_converter == 1){
-                    $total_tax = round($this->currency_converter($invoice->currency_name, $currency->name, $tax['total_tax']), 2);
-                }
+            //     $total_tax = $tax['total_tax'];
+            //     if($currency_converter == 1){
+            //         $total_tax = round($this->currency_converter($invoice->currency_name, $currency->name, $tax['total_tax']), 2);
+            //     }
 
-                if($_tax){
-                    $tax_mapping = $this->get_tax_mapping($_tax->id);
-                    if($tax_mapping){
-                        $node = [];
-                        $node['itemable_id'] = 0;
-                        $node['split'] = $tax_mapping->payment_account;
-                        $node['account'] = $tax_mapping->deposit_to;
-                        $node['tax'] = $_tax->id;
-                        $node['item'] = 0;
-                        $node['paid'] = $paid;
-                        $node['debit'] = $total_tax;
-                        $node['credit'] = 0;
-                        $node['customer'] = $invoice->clientid;
-                        $node['date'] = $invoice->date;
-                        $node['description'] = '';
-                        $node['rel_id'] = $invoice_id;
-                        $node['rel_type'] = 'invoice';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
-                        $data_insert[] = $node;
+            //     if($_tax){
+            //         $tax_mapping = $this->get_tax_mapping($_tax->id);
+            //         if($tax_mapping){
+            //             $node = [];
+            //             $node['itemable_id'] = 0;
+            //             $node['split'] = $tax_mapping->payment_account;
+            //             $node['account'] = $tax_mapping->deposit_to;
+            //             $node['tax'] = $_tax->id;
+            //             $node['item'] = 0;
+            //             $node['paid'] = $paid;
+            //             $node['debit'] = $total_tax;
+            //             $node['credit'] = 0;
+            //             $node['customer'] = $invoice->clientid;
+            //             $node['date'] = $invoice->date;
+            //             $node['description'] = '';
+            //             $node['rel_id'] = $invoice_id;
+            //             $node['rel_type'] = 'invoice';
+            //             $node['datecreated'] = date('Y-m-d H:i:s');
+            //             $node['addedfrom'] = get_staff_user_id();
+            //             $data_insert[] = $node;
 
-                        $node = [];
-                        $node['itemable_id'] = 0;
-                        $node['split'] = $tax_mapping->deposit_to;
-                        $node['customer'] = $invoice->clientid;
-                        $node['account'] = $tax_mapping->payment_account;
-                        $node['tax'] = $_tax->id;
-                        $node['item'] = 0;
-                        $node['paid'] = $paid;
-                        $node['date'] = $invoice->date;
-                        $node['debit'] = 0;
-                        $node['credit'] = $total_tax;
-                        $node['description'] = '';
-                        $node['rel_id'] = $invoice_id;
-                        $node['rel_type'] = 'invoice';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
-                        $data_insert[] = $node;
-                    }else{
-                        $node = [];
-                        $node['itemable_id'] = 0;
-                        $node['split'] = $tax_payment_account;
-                        $node['account'] = $tax_deposit_to;
-                        $node['tax'] = $_tax->id;
-                        $node['item'] = 0;
-                        $node['date'] = $invoice->date;
-                        $node['paid'] = $paid;
-                        $node['debit'] = $total_tax;
-                        $node['customer'] = $invoice->clientid;
-                        $node['credit'] = 0;
-                        $node['description'] = '';
-                        $node['rel_id'] = $invoice_id;
-                        $node['rel_type'] = 'invoice';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
-                        $data_insert[] = $node;
+            //             $node = [];
+            //             $node['itemable_id'] = 0;
+            //             $node['split'] = $tax_mapping->deposit_to;
+            //             $node['customer'] = $invoice->clientid;
+            //             $node['account'] = $tax_mapping->payment_account;
+            //             $node['tax'] = $_tax->id;
+            //             $node['item'] = 0;
+            //             $node['paid'] = $paid;
+            //             $node['date'] = $invoice->date;
+            //             $node['debit'] = 0;
+            //             $node['credit'] = $total_tax;
+            //             $node['description'] = '';
+            //             $node['rel_id'] = $invoice_id;
+            //             $node['rel_type'] = 'invoice';
+            //             $node['datecreated'] = date('Y-m-d H:i:s');
+            //             $node['addedfrom'] = get_staff_user_id();
+            //             $data_insert[] = $node;
+            //         }else{
+            //             $node = [];
+            //             $node['itemable_id'] = 0;
+            //             $node['split'] = $tax_payment_account;
+            //             $node['account'] = $tax_deposit_to;
+            //             $node['tax'] = $_tax->id;
+            //             $node['item'] = 0;
+            //             $node['date'] = $invoice->date;
+            //             $node['paid'] = $paid;
+            //             $node['debit'] = $total_tax;
+            //             $node['customer'] = $invoice->clientid;
+            //             $node['credit'] = 0;
+            //             $node['description'] = '';
+            //             $node['rel_id'] = $invoice_id;
+            //             $node['rel_type'] = 'invoice';
+            //             $node['datecreated'] = date('Y-m-d H:i:s');
+            //             $node['addedfrom'] = get_staff_user_id();
+            //             $data_insert[] = $node;
 
-                        $node = [];
-                        $node['itemable_id'] = 0;
-                        $node['split'] = $tax_deposit_to;
-                        $node['customer'] = $invoice->clientid;
-                        $node['account'] = $tax_payment_account;
-                        $node['date'] = $invoice->date;
-                        $node['tax'] = $_tax->id;
-                        $node['item'] = 0;
-                        $node['paid'] = $paid;
-                        $node['debit'] = 0;
-                        $node['credit'] = $total_tax;
-                        $node['description'] = '';
-                        $node['rel_id'] = $invoice_id;
-                        $node['rel_type'] = 'invoice';
-                        $node['datecreated'] = date('Y-m-d H:i:s');
-                        $node['addedfrom'] = get_staff_user_id();
-                        $data_insert[] = $node;
-                    }
-                }else{
-                    $node = [];
-                    $node['itemable_id'] = 0;
-                    $node['split'] = $tax_payment_account;
-                    $node['account'] = $tax_deposit_to;
-                    $node['tax'] = 0;
-                    $node['item'] = 0;
-                    $node['date'] = $invoice->date;
-                    $node['paid'] = $paid;
-                    $node['debit'] = $total_tax;
-                    $node['customer'] = $invoice->clientid;
-                    $node['credit'] = 0;
-                    $node['description'] = '';
-                    $node['rel_id'] = $invoice_id;
-                    $node['rel_type'] = 'invoice';
-                    $node['datecreated'] = date('Y-m-d H:i:s');
-                    $node['addedfrom'] = get_staff_user_id();
-                    $data_insert[] = $node;
+            //             $node = [];
+            //             $node['itemable_id'] = 0;
+            //             $node['split'] = $tax_deposit_to;
+            //             $node['customer'] = $invoice->clientid;
+            //             $node['account'] = $tax_payment_account;
+            //             $node['date'] = $invoice->date;
+            //             $node['tax'] = $_tax->id;
+            //             $node['item'] = 0;
+            //             $node['paid'] = $paid;
+            //             $node['debit'] = 0;
+            //             $node['credit'] = $total_tax;
+            //             $node['description'] = '';
+            //             $node['rel_id'] = $invoice_id;
+            //             $node['rel_type'] = 'invoice';
+            //             $node['datecreated'] = date('Y-m-d H:i:s');
+            //             $node['addedfrom'] = get_staff_user_id();
+            //             $data_insert[] = $node;
+            //         }
+            //     }else{
+            //         $node = [];
+            //         $node['itemable_id'] = 0;
+            //         $node['split'] = $tax_payment_account;
+            //         $node['account'] = $tax_deposit_to;
+            //         $node['tax'] = 0;
+            //         $node['item'] = 0;
+            //         $node['date'] = $invoice->date;
+            //         $node['paid'] = $paid;
+            //         $node['debit'] = $total_tax;
+            //         $node['customer'] = $invoice->clientid;
+            //         $node['credit'] = 0;
+            //         $node['description'] = '';
+            //         $node['rel_id'] = $invoice_id;
+            //         $node['rel_type'] = 'invoice';
+            //         $node['datecreated'] = date('Y-m-d H:i:s');
+            //         $node['addedfrom'] = get_staff_user_id();
+            //         $data_insert[] = $node;
 
-                    $node = [];
-                    $node['itemable_id'] = 0;
-                    $node['split'] = $tax_deposit_to;
-                    $node['customer'] = $invoice->clientid;
-                    $node['account'] = $tax_payment_account;
-                    $node['date'] = $invoice->date;
-                    $node['tax'] = 0;
-                    $node['item'] = 0;
-                    $node['paid'] = $paid;
-                    $node['debit'] = 0;
-                    $node['credit'] = $total_tax;
-                    $node['description'] = '';
-                    $node['rel_id'] = $invoice_id;
-                    $node['rel_type'] = 'invoice';
-                    $node['datecreated'] = date('Y-m-d H:i:s');
-                    $node['addedfrom'] = get_staff_user_id();
-                    $data_insert[] = $node;
-                }
-            }
+            //         $node = [];
+            //         $node['itemable_id'] = 0;
+            //         $node['split'] = $tax_deposit_to;
+            //         $node['customer'] = $invoice->clientid;
+            //         $node['account'] = $tax_payment_account;
+            //         $node['date'] = $invoice->date;
+            //         $node['tax'] = 0;
+            //         $node['item'] = 0;
+            //         $node['paid'] = $paid;
+            //         $node['debit'] = 0;
+            //         $node['credit'] = $total_tax;
+            //         $node['description'] = '';
+            //         $node['rel_id'] = $invoice_id;
+            //         $node['rel_type'] = 'invoice';
+            //         $node['datecreated'] = date('Y-m-d H:i:s');
+            //         $node['addedfrom'] = get_staff_user_id();
+            //         $data_insert[] = $node;
+            //     }
+            // }
 
             foreach ($invoice->items as $value) {
                 $item = $this->get_item_by_name($value['description']);
@@ -8869,7 +8869,7 @@ class Accounting_model extends App_Model
                             $node['date'] = $invoice->date;
                             $node['tax'] = 0;
                             $node['credit'] = 0;
-                            $node['description'] = 'Customer Debit For Invoice No ' .$invoice_id;
+                            $node['description'] = 'Customer Debit For Invoice No INV-' .$invoice->number;
                             $node['rel_id'] = $invoice_id;
                             $node['rel_type'] = 'invoice';
                             $node['datecreated'] = date('Y-m-d H:i:s');
@@ -8890,7 +8890,7 @@ class Accounting_model extends App_Model
                             $node['tax'] = 0;
                             $node['debit'] = 0;
                             $node['credit'] = $item_total;
-                            $node['description'] = 'Inventory credit For Invoice No ' .$invoice_id;
+                            $node['description'] = 'Inventory credit For Invoice  INV-' .$invoice->number;
                             $node['rel_id'] = $invoice_id;
                             $node['rel_type'] = 'invoice';
                             $node['datecreated'] = date('Y-m-d H:i:s');

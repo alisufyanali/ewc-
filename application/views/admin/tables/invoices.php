@@ -182,8 +182,11 @@ foreach ($rResult as $aRow) {
     // $row[] = '<a href="' . admin_url('projects/view/' . $aRow['project_id']) . '">' . $aRow['project_name'] . '</a>';
 
     $received_amount = get_invoice_received_amount($aRow['id']); 
-    $paid_amount = get_invoice_paid_amount($aRow['id']);
-    $total = $received_amount - $paid_amount; 
+    $paid_amount     = get_invoice_paid_amount($aRow['id']);
+    $total_amount    = get_invoice_total_amount($aRow['id']);
+
+    $total = $total_amount - $received_amount ; 
+
     $row[] = $received_amount ;
     $row[] = $total ;
 

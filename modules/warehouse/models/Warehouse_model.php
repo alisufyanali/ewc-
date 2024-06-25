@@ -5407,13 +5407,13 @@ class Warehouse_model extends App_Model {
 			return ['status' => false, 'message' => _l('rate') . _l('not_yet_entered')];
 		}
 		
-		$measurement = $data['measurement'];
+		// $measurement = $data['measurement'];
 		unset($data['measurement']);
-		if($measurement == 'Feet'){
-			$data['group_id'] = 1 ;
-		}else{
-			$data['group_id'] = 2 ;
-		}
+		// if($measurement == 'Feet'){
+		// 	$data['group_id'] = 1 ;
+		// }else{
+		// 	$data['group_id'] = 2 ;
+		// }
 		/*check update*/
 
 		$item = $this->db->query('select * from tblitems where commodity_code = "'.$data['commodity_code'].'"')->row();

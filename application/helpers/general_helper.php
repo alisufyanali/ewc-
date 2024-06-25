@@ -1245,7 +1245,6 @@ return $newdata->credit;
 function get_invoice_received_amount($id)
 {
     $CI = &get_instance();
-
     $newdata = $CI->db->select('sum(credit) as total')
                 ->from('tblacc_account_history')
                 ->where('inv_id',$id)
@@ -1253,7 +1252,6 @@ function get_invoice_received_amount($id)
                 ->group_by('inv_id')
                 ->get()
                 ->row();
-
     if(isset($newdata->total)){
         return $newdata->total;
     }else{
@@ -1276,6 +1274,27 @@ function get_invoice_paid_amount($id)
 
     if(isset($newdata->credit)){
         return $newdata->credit;
+    }else{
+        return 0;
+    }
+
+}
+
+
+
+function get_invoice_total_amount($id)
+{
+    $CI = &get_instance();
+    $newdata = $CI->db->select('sum(credit) as total')
+    ->from('tblacc_account_history')
+    ->where('rel_id',$id)
+    ->where('rel_type' , 'invoice')
+    ->group_by('rel_type')
+    ->get()
+    ->row();
+
+    if(isset($newdata->total)){
+        return $newdata->total;
     }else{
         return 0;
     }

@@ -2851,38 +2851,39 @@ class warehouse extends AdminController {
 									$flag = 1;
 								}
   
-								//check unit_code exist  (input: id or name contract)
-								// if (is_null($value_cell_unit_id) != true && ( $value_cell_unit_id != '0')  && $value_cell_unit_id != '') {
-								// 	/*case input id*/
-								// 	if (is_numeric($value_cell_unit_id)) {
+								
+								if (is_null($value_cell_commodity_group) != true && $value_cell_commodity_group != '') {
+									/*case input id*/
+									if (is_numeric($value_cell_commodity_group)) {
 
-								// 		$this->db->where('unit_type_id', $value_cell_unit_id);
-								// 		$unit_id_value = $this->db->count_all_results(db_prefix() . 'ware_unit_type');
+										$this->db->where('id', $value_cell_commodity_group);
+										$group_value = $this->db->count_all_results(db_prefix() . 'items_groups');
 
-								// 		if ($unit_id_value == 0) {
-								// 			$string_error .= _l('unit_id') . _l('does_not_exist');
-								// 			$flag2 = 1;
-								// 		} else {
-								// 			/*get id unit_id*/
-								// 			$flag_id_unit_id = $value_cell_unit_id;
-								// 		}
+										if ($group_value == 0) {
+											$string_error .= _l('group') . _l('does_not_exist');
+											$flag2 = 1;
+										} else {
+											/*get id group*/
+											$flag_id_commodity_group = $value_cell_commodity_group;
+										}
 
-								// 	} else {
-								// 		/*case input name*/
-								// 		$this->db->like(db_prefix() . 'ware_unit_type.unit_code', $value_cell_unit_id);
+									} else {
+										/*case input  name*/
+										$this->db->like(db_prefix() . 'items_groups.name', $value_cell_commodity_group);
 
-								// 		$unit_id_value = $this->db->get(db_prefix() . 'ware_unit_type')->result_array();
-								// 		if (count($unit_id_value) == 0) {
-								// 			$string_error .= _l('unit_id') . _l('does_not_exist');
-								// 			$flag2 = 1;
-								// 		} else {
-								// 			/*get unit_id*/
-								// 			$flag_id_unit_id = $unit_id_value[0]['unit_type_id'];
-								// 		}
-								// 	}
-								// } 
+										$group_value = $this->db->get(db_prefix() . 'items_groups')->result_array();
+										if (count($group_value) == 0) {
+											$string_error .= _l('group') . _l('does_not_exist');
+											$flag2 = 1;
+										} else {
+											/*get id group*/
+											$flag_id_commodity_group = $group_value[0]['id'];
+										}
+									}
 
-								//check commodity_group exist  (input: id or name contract)
+								}
+								
+
 								if (is_null($value_cell_sub_group) != true && $value_cell_sub_group != '') {
 									/*case input id*/
 									if (is_numeric($value_cell_sub_group)) {
@@ -2952,7 +2953,7 @@ class warehouse extends AdminController {
 										$sub_group_value = $this->db->count_all_results(db_prefix() . 'pur_vendor');
 
 										if ($sub_group_value == 0) {
-											$string_error .= _l('sub_group') . _l('does_not_exist');
+											$string_error .= 'Vendor' . _l('does_not_exist');
 											$flag2 = 1;
 										} else {
 											/*get id sub_group*/
@@ -2965,7 +2966,7 @@ class warehouse extends AdminController {
 
 										$sub_group_value = $this->db->get(db_prefix() . 'pur_vendor')->result_array();
 										if (count($sub_group_value) == 0) {
-											$string_error .= _l('sub_group') . _l('does_not_exist');
+											$string_error .= 'Vendor' . _l('does_not_exist');
 											$flag2 = 1;
 										} else {
 											/*get id sub_group*/
@@ -2984,7 +2985,7 @@ class warehouse extends AdminController {
 									$rd['sku_code'] 			= isset($data[$row][0]) ? $data[$row][0] : null; //A
 									$rd['commodity_code']       = isset($data[$row][0]) ? $data[$row][0] : null; //A
 
-									$rd['description'] 			= isset($data[$row][0]) ? $data[$row][1] .' ' .$data[$row][10] . ' x '. $data[$row][11]  : null; //B
+									$rd['description'] 			= isset($data[$row][10]) ?  $data[$row][10] . ' x '. $data[$row][11]  : null; //B
 									$rd['long_description'] 	= isset($data[$row][1]) ? $data[$row][1] : null; //B
 
 									$rd['group_id'] 			= isset($flag_id_commodity_group) ? $flag_id_commodity_group : '';
