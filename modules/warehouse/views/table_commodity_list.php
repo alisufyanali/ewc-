@@ -368,21 +368,21 @@ $item_have_variation = $this->ci->warehouse_model->arr_item_have_variation();
 				}
 			} elseif ($aColumns[$i] == 'rate') {
 				
-				if(has_permission('pricingtabs','','Sales Price') == 1) { 
+				// if(has_permission('pricingtabs','','Sales Price') == 1) { 
 				        $_data = app_format_money((float) $aRow['rate'], '');
-			    }
-			    else{
-			        $_data = "NOT MENTIONED";
-			    }
+			    // }
+			    // else{
+			    //     $_data = "NOT MENTIONED";
+			    // }
 				
 			} elseif ($aColumns[$i] == 'purchase_price') {
 			    
-			     if(has_permission('pricingtabs','','Purchase Price') == 1) { 
+			    //  if(has_permission('pricingtabs','','Purchase Price') == 1) { 
 				$_data = app_format_money((float) $aRow['purchase_price'], '');
-			    }
-			    else{
-			        $_data = "NOT MENTIONED";
-			    }
+			    // }
+			    // else{
+			    //     $_data = "NOT MENTIONED";
+			    // }
 				// $_data = (int) $aRow['purchase_price'];
 
 			} elseif ($aColumns[$i] == 'taxrate_1') {

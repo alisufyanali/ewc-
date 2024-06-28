@@ -625,7 +625,7 @@
                         </td>
 
                         <td>
-                            <input type="number" name="discount" min="0" value="1" class="form-control"
+                            <input type="number" name="discount" min="0" value="0" class="form-control"
                                 placeholder="discount">
                         </td>
 

@@ -2931,7 +2931,7 @@ var_dump($data['group'] ); die;
     public function rp_trial_balance(){ 
         $this->load->model('currencies_model');
         $data['title'] = _l('trial_balance');
-        $data['from_date'] = date('Y-m-01');
+        $data['from_date'] = date('Y-01-01');
         $data['to_date'] = date('Y-m-d');
         $data['accounting_method'] = get_option('acc_accounting_method');
         $data['currency'] = $this->currencies_model->get_base_currency();

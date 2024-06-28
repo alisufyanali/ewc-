@@ -82,7 +82,7 @@ foreach ($rResult as $aRow) {
 
             if(get_warehouse_option('revert_goods_receipt_goods_delivery') == 1 ){
                 if ((has_permission('warehouse', '', 'delete') || is_admin()) && ($aRow['approval'] == 1)) {
-                    $name .= ' | <a href="' . admin_url('warehouse/revert_goods_receipt/' . $aRow['id'] ).'" class="text-danger _delete" >' . _l('delete_after_approval') . '</a>';
+                    $name .= ' | <a href="' . admin_url('warehouse/revert_goods_receipt/' . $aRow['id'] ).'" class="text-danger _delete" >' . _l('delete') . '</a>';
                 }
             }
             

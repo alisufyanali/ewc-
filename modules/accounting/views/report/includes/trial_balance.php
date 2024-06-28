@@ -24,26 +24,6 @@
                                 <div class="col-md-3">
                                     <?php echo render_date_input('to_date','to_date', _d($to_date)); ?>
                                 </div>
-
-                                <div class="col-md-3">
-                                     <label class="bold" for="accounts">
-                                        <small class="req text-danger">*</small>Accounts</label>
-                                    <select class="" required name="accounts" data-live-search="true" id="accounts"
-                                        data-width="100%">
-                                        <option value=""></option>
-                                        <?php 
-                                            if (isset($accounts)) {
-                                                foreach ($accounts as $key => $value) {
-                                                    $HeadCode = $value['HeadCode'] ; 
-                                                    $name = $value['name'] ; 
-                                                    echo '<option value="'.$HeadCode.'" >'.$name .' - ' .$HeadCode .' </option>' ; 
-                                                }
-                                            }
-                                        ?>
-                                    </select>
-                                </div>
-
-
                                 <div class="col-md-3">
                                     <?php echo form_hidden('type', 'trial_balance'); ?>
                                     <button type="submit"

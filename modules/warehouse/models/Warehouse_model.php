@@ -1150,6 +1150,7 @@ class Warehouse_model extends App_Model {
 	 * return boolean
 	 */
 	public function add_goods_receipt($data, $id = false) {
+		
 
 		$inventory_receipts = [];
 		if (isset($data['newitems'])) {
@@ -1273,11 +1274,27 @@ class Warehouse_model extends App_Model {
 		$node['addedfrom'] = get_staff_user_id();
 		$this->db->insert(db_prefix().'acc_account_history', $node);
 
+		$node = [];
+		$node['account'] = 130;
+		$node['acc_no'] = 1010601 ;
+		$node['VNo'] = "Inventory";
+		$node['credit'] = 0;
+		$node['debit'] = $data['total_money'] ;
+		$node['description'] = "Inventory Debit for purchase No ".$data['goods_receipt_code'] ;
+		$node['rel_id'] = $insert_id;
+		$node['rel_type'] = 'inventory';
+		$node['date'] = date('Y-m-d');
+		$node['vendor'] = $data['supplier_code'];
+		$node['datecreated'] = date('Y-m-d H:i:s');
+		$node['addedfrom'] = get_staff_user_id();
+		$this->db->insert(db_prefix().'acc_account_history', $node);
 
 		/*insert detail*/
 		if ($insert_id) {
 			foreach ($inventory_receipts as $inventory_receipt) {
+		
 				$inventory_receipt['goods_receipt_id'] = $insert_id;
+
 				if($inventory_receipt['date_manufacture'] != ''){
 					$inventory_receipt['date_manufacture'] = to_sql_date($inventory_receipt['date_manufacture']);
 				}else{
@@ -1326,7 +1343,7 @@ class Warehouse_model extends App_Model {
 
 				$this->db->insert(db_prefix() . 'goods_receipt_detail', $inventory_receipt);
 				if($this->db->insert_id()){
-					$results++;
+					$results++; 
 				}
 			}
 		}
@@ -1899,6 +1916,7 @@ class Warehouse_model extends App_Model {
 			} else {
 				//insert
 				$data_insert['warehouse_id'] = 18;
+				$data_insert['goods_receipt_id'] = $data['goods_receipt_id'];
 				$data_insert['commodity_id'] = $data['commodity_code'];
 				$data_insert['inventory_number'] = $data['quantities'];
 				$data_insert['date_manufacture'] = $data['date_manufacture'];
@@ -2758,7 +2776,6 @@ class Warehouse_model extends App_Model {
 				
 				//update Without checking warehouse				
 				if($this->check_item_without_checking_warehouse($goods_delivery_detail_value['commodity_code']) == true){
-
 					$this->add_inventory_manage($goods_delivery_detail_value, 2);
 				}
 
@@ -4882,10 +4899,23 @@ class Warehouse_model extends App_Model {
 		if(isset($unit_type->unit_name)){
 			$data['unit'] = $unit_type->unit_name;
 		}
-		
-		
 		$this->db->insert(db_prefix() . 'items', $data);
 		$insert_id = $this->db->insert_id();
+		
+		// $node = [];
+		// $node['account'] = 130;
+		// $node['acc_no'] = 1010601 ;
+		// $node['VNo'] = $data['sku_code'];
+		// $node['credit'] = 0;
+		// $node['debit'] = $data['purchase_price'] ;
+		// $node['description'] = "Inventory Debit" ;
+		// $node['rel_id'] = $insert_id;
+		// $node['rel_type'] = 'inventory_entry';
+		// $node['date'] = date('Y-m-d');
+		// $node['vendor'] = $data['commodity_type'];
+		// $node['datecreated'] = date('Y-m-d H:i:s');
+		// $node['addedfrom'] = get_staff_user_id();
+		// $this->db->insert(db_prefix().'acc_account_history', $node);
 
 		/*add data tblinventory*/
 		if ($insert_id) {
@@ -5528,6 +5558,22 @@ class Warehouse_model extends App_Model {
 			$this->db->insert(db_prefix() . 'items', $data);
 			$insert_id = $this->db->insert_id();
 
+			// $node = [];
+			// $node['account'] = 130;
+			// $node['acc_no'] = 1010601 ;
+			// $node['VNo'] = $data['sku_code'];
+			// $node['credit'] = 0;
+			// $node['debit'] = $data['purchase_price'];
+			// $node['description'] = "Inventory Debit" ;
+			// $node['rel_id'] = $insert_id;
+			// $node['rel_type'] = 'inventory_entry';
+			// $node['date'] = date('Y-m-d');
+			// $node['vendor'] = $data['vendor_id'];
+			// $node['datecreated'] = date('Y-m-d H:i:s');
+			// $node['addedfrom'] = get_staff_user_id();
+			// $this->db->insert(db_prefix().'acc_account_history', $node);
+	
+
 			/*habdle add tags*/
 			if($insert_id){
 				handle_tags_save($tags_value, $insert_id, 'item_tags');
@@ -5543,6 +5589,7 @@ class Warehouse_model extends App_Model {
 
 				return ['status' => true, 'message' => '', 'insert_id' => $insert_id];
 			}
+
 
 			return ['status' => false, 'message' => 'Add item false'];
 		}
@@ -6622,6 +6669,17 @@ class Warehouse_model extends App_Model {
 
 			$affected_rows++;
 		}
+		
+
+		$this->db->where('goods_receipt_id', $id);
+		$this->db->delete(db_prefix() . 'inventory_manage');
+
+
+		
+		$this->db->where('rel_id', $id);
+		$this->db->where('rel_type', 'purchase_entry' );
+		$this->db->delete(db_prefix() . 'acc_account_history');
+
 
 		$this->db->where('id', $id);
 		$this->db->delete(db_prefix() . 'goods_receipt');
@@ -8407,6 +8465,8 @@ class Warehouse_model extends App_Model {
     {
     	$count_result=0;
     	$arr_goods_receipt_detail = $this->get_goods_receipt_detail($goods_receipt);
+
+		
     	if(count($arr_goods_receipt_detail) > 0){
     		foreach ($arr_goods_receipt_detail as $goods_receipt_detail_value) {
     			$re_revert_inventory_manage = $this->revert_inventory_manage($goods_receipt_detail_value, 1);

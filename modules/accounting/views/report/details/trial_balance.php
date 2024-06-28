@@ -3,6 +3,24 @@
         padding:0.5rem;
     }
 </style>
+
+<?php
+
+function general_led_report_prebalance_new($cmbCode,$dtpFromDate){
+
+    $CI = &get_instance();
+
+    $CI->db->select('sum(tblacc_account_history.Debit) as predebit , sum(tblacc_account_history.Credit) as precredit');
+    $CI->db->from('tblacc_account_history');
+    $CI->db->where('date < ',$dtpFromDate);
+    $CI->db->where('tblacc_account_history.acc_no',$cmbCode);
+    $query = $CI->db->get()->row();
+
+    return $balance = $query->predebit - $query->precredit;
+}
+
+?>
+
 <div id="accordion">
     <div class="card">
         <table class="tree">
@@ -29,7 +47,7 @@
                     <td></td>
                     <td colspan="4">
                         <p class="text-center no-margin-top-20 no-margin-left-24">
-                            <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?> s</p>
+                            <?php echo _d($data_report['from_date']) .' - '. _d($data_report['to_date']); ?> </p>
                     </td>
                     <td></td>
                     <td></td>
@@ -106,10 +124,16 @@
                                                     foreach ($data_report['account_level_4'] as $key => $level_4) {
                                                         if($level_4['PHeadCode']  == $level_3['HeadCode'] ){
                                                         
-                                                           
-                                                            $sql="SELECT SUM(tblacc_account_history.debit) AS Debit, SUM(tblacc_account_history.credit) AS Credit
-                                                             FROM tblacc_account_history WHERE  acc_no = ". $level_4["HeadCode"];
-
+                                                            $from_date = $data_report['from_date'];
+                                                            $to_date = $data_report['to_date'];
+                                                           if(isset($from_date) && isset($to_date)){
+                                                                $sql="SELECT SUM(tblacc_account_history.debit) AS Debit, SUM(tblacc_account_history.credit) AS Credit
+                                                                FROM tblacc_account_history WHERE  acc_no = ". $level_4["HeadCode"] . ' and date >= "' .$from_date . '" and date <= "' .$to_date . '"' ;
+                                                           }else{
+                                                                $sql="SELECT SUM(tblacc_account_history.debit) AS Debit, SUM(tblacc_account_history.credit) AS Credit
+                                                                FROM tblacc_account_history WHERE  acc_no = ". $level_4["HeadCode"];
+                                                           }
+                                                            
                                                             $q1=$this->db->query($sql);
                                                             $oResultTrial = $q1->row();
 
@@ -119,9 +143,11 @@
                                                             echo '<td></td>';
                                                             echo '<td><a href="'.admin_url("accounting/rp_general_ledger?code=" .$level_4["HeadCode"] ).'" target="_blank" >'.$level_4["HeadCode"].' - '.$level_4["name"].'</a> </td>';
 
-                                                            $total = $oResultTrial->Debit - $oResultTrial->Credit;
                                                             
-                                                            $pre_balance =  general_led_report_accbalance($level_4["HeadCode"]);
+                                                            $total       = $oResultTrial->Debit - $oResultTrial->Credit;
+                                                            $acc_balance =  general_led_report_accbalance($level_4["HeadCode"]);
+                                                            $pre_balance =  general_led_report_prebalance_new($level_4["HeadCode"],$from_date);
+                                                            $pre_balance = $acc_balance + $pre_balance ;
                                                             
                                                             $total_balance = $total + $pre_balance ;
                                                             
@@ -153,6 +179,9 @@
                                                     echo '<td style="text-align:right">('.number_format(abs($credit_total), 2).')</td>';
                                                 }
                                                 echo '</tr> ';
+
+                                                $total_debit += $debit_total;
+                                                $total_credit += $credit_total;
                                              //  ======================================================================== 
                                             }
                                         }
@@ -176,9 +205,18 @@
               ?>
 
                 <tr class="treegrid-total-<?php echo html_entity_decode($row_index); ?> treegrid-parent-10000 tr_total">
-                    <td class="parent" colspan="3" ><?php echo _l('total'); ?></td>
+                    <td class="parent " colspan="3" > </td>
+                    <td class="parent " style="text-align:end" ><?php echo _l('total'); ?></td>
                     <td class="total_amount"><?php echo app_format_money($total_debit, $currency->name); ?> </td>
-                    <td class="total_amount"><?php echo app_format_money($total_credit, $currency->name); ?> </td>
+                    <td class="total_amount">
+                        <?php 
+                        if($credit_total > 0){
+                            echo app_format_money($total_credit, $currency->name); 
+                        }else{
+                            echo '( '.app_format_money($total_credit, $currency->name) .' )'; 
+                        } 
+                        ?>
+                    </td>
                 </tr>
             </tbody>
         </table>

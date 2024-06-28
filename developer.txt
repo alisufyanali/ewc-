@@ -1,1 +1,1 @@
-UPDATE `tbloptions` SET `value` = '138' WHERE `tbloptions`.`id` = 409;
+ALTER TABLE `tblinventory_manage` ADD `goods_receipt_id` INT NULL AFTER `commodity_id`;

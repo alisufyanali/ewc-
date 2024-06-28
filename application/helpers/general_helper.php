@@ -1328,7 +1328,7 @@ function get_receivedvoucher_paymentexit($vno)
 
 
 
-  function general_led_report_accbalance($cmbCode){
+  function general_led_report_accbalance($cmbCode ){
 
     $CI = &get_instance();
 
@@ -1346,5 +1346,10 @@ function get_receivedvoucher_paymentexit($vno)
     }else{
         return 0;
     }
+
+
+
+
+
 
 }

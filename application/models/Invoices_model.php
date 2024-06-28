@@ -497,6 +497,7 @@ class Invoices_model extends App_Model
             'items' => $items,
         ]);
 
+
         $data  = $hook['data'];
         $items = $hook['items'];
 
@@ -692,6 +693,7 @@ class Invoices_model extends App_Model
         $this->db->select('id');
         $this->db->where('clientid', $client_id);
         $this->db->where('STATUS IN (' . implode(', ', $statuses) . ')');
+        
         if (!$has_permission_view) {
             $whereUser = $noPermissionsQuery;
             $this->db->where('(' . $whereUser . ')');

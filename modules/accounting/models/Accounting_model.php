@@ -6037,6 +6037,7 @@ class Accounting_model extends App_Model
         $query  = $this->db->get();
         $account_history =  $query->result_array();
         
+        
         $HeadName =   $this->get_HeadName($accounts) ;
         $HeadCode =   $accounts  ;
 
@@ -6556,7 +6557,7 @@ class Accounting_model extends App_Model
 
     
     public function get_data_trial_balance($data_filter){
-        $from_date = date('Y-m-01');
+        $from_date = date('Y-01-01');
         $to_date = date('Y-m-d');
         $accounting_method = 'cash';
         $acc_show_account_numbers = get_option('acc_show_account_numbers');
@@ -8801,13 +8802,16 @@ class Accounting_model extends App_Model
             // }
 
             foreach ($invoice->items as $value) {
-                $item = $this->get_item_by_name($value['description']);
+                $item = $this->get_item_by_sku_code($value['sku_code']);
                 $item_id = 0;
+                $item_purchasing_amount = 0;
                 if(isset($item->id)){
                     $item_id = $item->id;
+                    $item_purchasing_amount = $item->purchase_price;
                 }
-
                 $item_total = $value['qty'] * $value['rate'];
+                $item_pur_total = $value['qty'] * $item_purchasing_amount ;
+
                 if($currency_converter == 1){
                     $item_total = round($this->currency_converter($invoice->currency_name, $currency->name, $value['qty'] * $value['rate']), 2);
                 }
@@ -8883,13 +8887,13 @@ class Accounting_model extends App_Model
                             $node['account'] = $payment_account;
                             $node['acc_no'] = $this->get_HeadCodeById($payment_account) ;
                             $node['acc_title'] = $this->get_HeadName($node['acc_no']);
-                            $node['VNo'] = 'INV-'. $invoice->number;
+                            $node['VNo'] = 'Inventory';
                             $node['item'] = $item_id;
                             $node['date'] = $invoice->date;
                             $node['paid'] = $paid;
                             $node['tax'] = 0;
                             $node['debit'] = 0;
-                            $node['credit'] = $item_total;
+                            $node['credit'] = $item_pur_total;
                             $node['description'] = 'Inventory credit For Invoice  INV-' .$invoice->number;
                             $node['rel_id'] = $invoice_id;
                             $node['rel_type'] = 'invoice';
@@ -9676,6 +9680,20 @@ class Accounting_model extends App_Model
         $this->db->where('description', $item_name);
         return $this->db->get(db_prefix() . 'items')->row();
     }
+
+    /**
+     * Gets the item by sku_code.
+     *
+     * @param      string  $item_sku_code  The itemid
+     *
+     * @return     object  The item.
+     */
+    public function get_item_by_sku_code($item_sku_code) {
+
+        $this->db->where('sku_code', $item_sku_code);
+        return $this->db->get(db_prefix() . 'items')->row();
+    }
+
 
     /**
      * Gets the item automatic
@@ -22422,7 +22440,7 @@ class Accounting_model extends App_Model
 
 
     public function general_led_report_accbalance($cmbCode){
-
+ 
         $this->db->select('balance , vendor_id , customer_id');
         $this->db->from('tblacc_accounts');
         $this->db->where('tblacc_accounts.HeadCode',$cmbCode);

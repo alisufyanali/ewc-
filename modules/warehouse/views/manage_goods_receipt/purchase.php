@@ -58,7 +58,7 @@
 							<div class="col-md-6 <?php if($pr_orders_status == false){ echo 'hide';} ;?>" >
 								<div class="form-group">
 									<label for="supplier_code"><?php echo _l('supplier_name'); ?></label>
-									<select  name="supplier_code" id="supplier_code" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+									<select  name="supplier_code" id="supplier_code" required class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
 										<option value=""></option>
 
 										<?php if(isset($vendors)){ ?>
