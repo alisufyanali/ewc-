@@ -159,6 +159,8 @@ foreach ($rResult as $aRow) {
     if (has_permission('invoices', '', 'edit')) {
         $numberOutput .= ' | <a href="' . admin_url('invoices/invoice/' . $aRow['id']) . '">' . _l('edit') . '</a>';
     }
+    $numberOutput .= ' | <a class="text-danger" href="' . admin_url('invoices/delete/' . $aRow['id']) . '">' . _l('delete') . '</a>';
+
     $numberOutput .= '</div>';
 
     $row[] = $numberOutput;

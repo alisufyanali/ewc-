@@ -1004,6 +1004,7 @@ var_dump($data['group'] ); die;
             $data['currency'] = $posts[$edit. 'currency'] ;
             $data['update_balance'] = $posts[$edit. 'update_balance'] ;
             $data['id'] = $posts[ 'id'] ;
+            
             unset($data['update_balance']);
 
 

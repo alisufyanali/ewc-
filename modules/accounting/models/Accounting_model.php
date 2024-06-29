@@ -2306,21 +2306,64 @@ class Accounting_model extends App_Model
 
         if ($insert_id) {
             if($data['balance'] != 0 && $data['balance'] != ''){
+                
+                if($data['balance'] > 0 ){
+
+                $node = [];
+                $node['account'] = 135;
+                $node['acc_no'] = 1010701;
+                $node['date']   = date('Y-m-d');
+                $node['debit']  = 0;
+                $node['credit'] = $data['balance'];
+                $node['description'] = 'Account Opening Balance Credit';
+                $node['rel_id'] = $insert_id;
+                $node['rel_type'] = 'deposit';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+                $this->db->insert(db_prefix().'acc_account_history', $node);
+
                 $node = [];
                 $node['account'] = $insert_id;
-                $node['acc_coa'] = $data['HeadCode'];
-                $node['ending_balance'] = $data['balance'];
-                $node['beginning_balance'] = 0;
-                $node['opening_balance'] = 0;
-                $node['finish'] = 1;
-                if($data['balance_as_of'] != ''){
-                    $node['ending_date'] = $data['balance_as_of'];
-                }else{
-                    $node['ending_date'] = date('Y-m-d');
-                }
-            
-                $this->db->insert(db_prefix().'acc_reconciles', $node);
-                $reconcile_id = $this->db->insert_id();
+                $node['acc_no'] = $data['HeadCode'];
+                $node['date']   = date('Y-m-d');
+                $node['debit'] = $data['balance'];
+                $node['credit']  = 0;
+                $node['description'] = 'Account Opening Balance Debit ';
+                $node['rel_id'] = $insert_id;
+                $node['rel_type'] = 'deposit';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+                $this->db->insert(db_prefix().'acc_account_history', $node);
+            }else{
+                
+                $node = [];
+                $node['account'] = 135;
+                $node['acc_no'] = 1010701;
+                $node['date']   = date('Y-m-d');
+                $node['debit'] = $data['balance'];
+                $node['credit']  = 0;
+                $node['description'] = 'Account Opening Balance Debit';
+                $node['rel_id'] = $insert_id;
+                $node['rel_type'] = 'deposit';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+                $this->db->insert(db_prefix().'acc_account_history', $node);
+
+                $node = [];
+                $node['account'] = $insert_id;
+                $node['acc_no'] = $data['HeadCode'];
+                $node['date']   = date('Y-m-d');
+                $node['debit']  = 0;
+                $node['credit'] = $data['balance'];
+                $node['description'] = 'Account Opening Balance Credit ';
+                $node['rel_id'] = $insert_id;
+                $node['rel_type'] = 'deposit';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+                $this->db->insert(db_prefix().'acc_account_history', $node);
+            }
+
+
 
             }
 
@@ -6042,9 +6085,9 @@ class Accounting_model extends App_Model
         $HeadCode =   $accounts  ;
 
         
-        $acc_balance = $this->general_led_report_accbalance($accounts);
+        // $acc_balance = $this->general_led_report_accbalance($accounts);
         $pre_balance = $this->general_led_report_prebalance($accounts,$from_date);
-        $pre_balance = $acc_balance + $pre_balance ;
+        // $pre_balance = $acc_balance + $pre_balance ;
 
         return [
             'data' => $account_history,
@@ -8820,43 +8863,44 @@ class Accounting_model extends App_Model
                  // gsttype
                 if($invoice->gsttype != "GST"){
                 
-                    if($item_automatic){
-                            $node = [];
-                            $node['itemable_id'] = $value['id'];
-                            $node['split'] = $payment_account;
-                            $node['account'] = $deposit_to;
-                            $node['item'] = $item_id;
-                            $node['date'] = $invoice->date;
-                            $node['paid'] = $paid;
-                            $node['debit'] = $item_total;
-                            $node['customer'] = $invoice->clientid;
-                            $node['tax'] = 0;
-                            $node['credit'] = 0;
-                            $node['description'] = '';
-                            $node['rel_id'] = $invoice_id;
-                            $node['rel_type'] = 'invoice';
-                            $node['datecreated'] = date('Y-m-d H:i:s');
-                            $node['addedfrom'] = get_staff_user_id();
-                            $data_insert[] = $node;
+                    // if($item_automatic){
+                    //         $node = [];
+                    //         $node['itemable_id'] = $value['id'];
+                    //         $node['split'] = $payment_account;
+                    //         $node['account'] = $deposit_to;
+                    //         $node['item'] = $item_id;
+                    //         $node['date'] = $invoice->date;
+                    //         $node['paid'] = $paid;
+                    //         $node['debit'] = $item_total;
+                    //         $node['customer'] = $invoice->clientid;
+                    //         $node['tax'] = 0;
+                    //         $node['credit'] = 0;
+                    //         $node['description'] = '';
+                    //         $node['rel_id'] = $invoice_id;
+                    //         $node['rel_type'] = 'invoice';
+                    //         $node['datecreated'] = date('Y-m-d H:i:s');
+                    //         $node['addedfrom'] = get_staff_user_id();
+                    //         $data_insert[] = $node;
         
-                            $node = [];
-                            $node['itemable_id'] = $value['id'];
-                            $node['split'] = $deposit_to;
-                            $node['customer'] = $invoice->clientid;
-                            $node['account'] = $item_automatic->income_account;
-                            $node['item'] = $item_id;
-                            $node['paid'] = $paid;
-                            $node['date'] = $invoice->date;
-                            $node['tax'] = 0;
-                            $node['debit'] = 0;
-                            $node['credit'] = $item_total;
-                            $node['description'] = '';
-                            $node['rel_id'] = $invoice_id;
-                            $node['rel_type'] = 'invoice';
-                            $node['datecreated'] = date('Y-m-d H:i:s');
-                            $node['addedfrom'] = get_staff_user_id();
-                            $data_insert[] = $node;
-                    }else{
+                    //         $node = [];
+                    //         $node['itemable_id'] = $value['id'];
+                    //         $node['split'] = $deposit_to;
+                    //         $node['customer'] = $invoice->clientid;
+                    //         $node['account'] = $item_automatic->income_account;
+                    //         $node['item'] = $item_id;
+                    //         $node['paid'] = $paid;
+                    //         $node['date'] = $invoice->date;
+                    //         $node['tax'] = 0;
+                    //         $node['debit'] = 0;
+                    //         $node['credit'] = $item_total;
+                    //         $node['description'] = '';
+                    //         $node['rel_id'] = $invoice_id;
+                    //         $node['rel_type'] = 'invoice';
+                    //         $node['datecreated'] = date('Y-m-d H:i:s');
+                    //         $node['addedfrom'] = get_staff_user_id();
+                    //         $data_insert[] = $node;
+                    // }else{
+
                             $node = [];
                             $node['itemable_id'] = $value['id'];
                             // // suf
@@ -8900,7 +8944,29 @@ class Accounting_model extends App_Model
                             $node['datecreated'] = date('Y-m-d H:i:s');
                             $node['addedfrom'] = get_staff_user_id();
                             $data_insert[] = $node;
-                    }
+
+
+
+                            
+                            $nodes = [];
+                            $nodes['account'] = 137 ;
+                            $nodes['acc_no'] =  3010201 ;
+                            $nodes['acc_title'] = '';
+                            $nodes['VNo'] = 'INCOME-'. $invoice->number;
+                            $nodes['debit'] = 0;
+                            $nodes['customer'] = $invoice->clientid;
+                            $nodes['paid'] = $paid;
+                            $nodes['date'] = $invoice->date;
+                            $nodes['tax'] = 0;
+                            $nodes['credit'] = $item_total - $item_pur_total;
+                            $nodes['description'] = 'Income For Invoice No INV-' .$invoice->number;
+                            $nodes['rel_id'] = $invoice_id;
+                            $nodes['rel_type'] = 'invoice';
+                            $nodes['datecreated'] = date('Y-m-d H:i:s');
+                            $nodes['addedfrom'] = get_staff_user_id();
+		                    $this->db->insert(db_prefix().'acc_account_history', $nodes);
+
+                    // }
                 
                 }
             }

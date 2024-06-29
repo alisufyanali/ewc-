@@ -145,9 +145,9 @@ function general_led_report_prebalance_new($cmbCode,$dtpFromDate){
 
                                                             
                                                             $total       = $oResultTrial->Debit - $oResultTrial->Credit;
-                                                            $acc_balance =  general_led_report_accbalance($level_4["HeadCode"]);
+                                                            // $acc_balance =  general_led_report_accbalance($level_4["HeadCode"]);
                                                             $pre_balance =  general_led_report_prebalance_new($level_4["HeadCode"],$from_date);
-                                                            $pre_balance = $acc_balance + $pre_balance ;
+                                                            // $pre_balance = $acc_balance + $pre_balance ;
                                                             
                                                             $total_balance = $total + $pre_balance ;
                                                             
@@ -210,11 +210,7 @@ function general_led_report_prebalance_new($cmbCode,$dtpFromDate){
                     <td class="total_amount"><?php echo app_format_money($total_debit, $currency->name); ?> </td>
                     <td class="total_amount">
                         <?php 
-                        if($credit_total > 0){
-                            echo app_format_money($total_credit, $currency->name); 
-                        }else{
-                            echo '( '.app_format_money($total_credit, $currency->name) .' )'; 
-                        } 
+                            echo app_format_money(abs($total_credit), $currency->name); 
                         ?>
                     </td>
                 </tr>

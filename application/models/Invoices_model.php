@@ -1267,6 +1267,12 @@ class Invoices_model extends App_Model
         $this->db->delete(db_prefix() . 'invoices');
 
         if ($this->db->affected_rows() > 0) {
+            
+            $this->db->where('rel_id', $id);
+            $this->db->where('rel_type', 'invoice' );
+            $this->db->delete(db_prefix() . 'acc_account_history');
+
+
             if (!is_null($invoice->short_link)) {
                 app_archive_short_link($invoice->short_link);
             }
