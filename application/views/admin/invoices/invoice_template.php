@@ -772,11 +772,11 @@
                                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                     <span class="discount-total-type-selected">
                                                         <?php if(!isset($invoice) || isset($invoice) && (is_sale_discount($invoice,'percent') || !is_sale_discount_applied($invoice))) {
-                                          echo '%';
-                                        } else {
-                                          echo _l('discount_fixed_amount');
-                                        }
-                                        ?>
+                                                            echo '%';
+                                                            } else {
+                                                            echo _l('discount_fixed_amount');
+                                                            }
+                                                        ?>
                                                     </span>
                                                     <span class="caret"></span>
                                                 </a>

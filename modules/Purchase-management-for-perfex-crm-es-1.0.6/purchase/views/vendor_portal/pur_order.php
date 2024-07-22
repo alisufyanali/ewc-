@@ -128,20 +128,14 @@
                      <td width="55%" id="total_td">
                       
                        <div class="input-group" id="discount-total">
-
                              <input type="text" disabled="true" class="form-control text-right" name="after_discount" value="<?php if(isset($pur_order)){ echo app_format_money($pur_order->total,''); } ?>">
-
                              <div class="input-group-addon">
                                 <div class="dropdown">
-                                   
                                    <span class="discount-type-selected">
                                     <?php echo html_entity_decode($base_currency->name) ;?>
                                    </span>
-                                   
-                                   
                                 </div>
                              </div>
-
                           </div>
                      </td>
 

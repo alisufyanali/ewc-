@@ -150,15 +150,21 @@ function general_led_report_prebalance_new($cmbCode,$dtpFromDate){
                                                             // $pre_balance = $acc_balance + $pre_balance ;
                                                             
                                                             $total_balance = $total + $pre_balance ;
+                                                          
+                                                            if($level_3['HeadCode']   == 50101 ){
+                                                                $credit_total += $total_balance;
+                                                                echo '<td style="text-align:right">0.00</td>';
+                                                                echo '<td style="text-align:right">('.number_format(abs($total_balance),2).')</td>';
+                                                            }
                                                             
-                                                            if($total_balance > 0){
+                                                            elseif($total_balance > 0){
                                                                $debit_total += $total_balance;
-                                                                echo '<td style="text-align:right">'.$total_balance.'</td>';
+                                                                echo '<td style="text-align:right">'.number_format($total_balance).'</td>';
                                                                 echo '<td style="text-align:right">0.00</td>';
                                                             }else{
                                                                $credit_total += $total_balance;
                                                                 echo '<td style="text-align:right">0.00</td>';
-                                                                echo '<td style="text-align:right">('.number_format(abs($total_balance),2).')</td>';
+                                                                echo '<td style="text-align:right">'.number_format(abs($total_balance),2).'</td>';
                                                             }
 
                                                             echo '</tr> ';
@@ -176,7 +182,7 @@ function general_led_report_prebalance_new($cmbCode,$dtpFromDate){
                                                 if($credit_total > 0){
                                                     echo '<td style="text-align:right">'.number_format($credit_total, 2).'</td>';
                                                 }else{
-                                                    echo '<td style="text-align:right">('.number_format(abs($credit_total), 2).')</td>';
+                                                    echo '<td style="text-align:right">'.number_format(abs($credit_total), 2).'</td>';
                                                 }
                                                 echo '</tr> ';
 

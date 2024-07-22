@@ -8901,6 +8901,10 @@ class Accounting_model extends App_Model
                     //         $data_insert[] = $node;
                     // }else{
 
+                        $cust_debit = $item_total;
+                        if($invoice->discount > 0){
+                            $cust_debit = $item_total - $invoice->discount;
+                        }
                             $node = [];
                             $node['itemable_id'] = $value['id'];
                             // // suf
@@ -8911,7 +8915,7 @@ class Accounting_model extends App_Model
                             $node['acc_title'] = $this->get_HeadName($node['acc_no']);
                             $node['VNo'] = 'INV-'. $invoice->number;
                             $node['item'] = $item_id;
-                            $node['debit'] = $item_total;
+                            $node['debit'] = $cust_debit;
                             $node['customer'] = $invoice->clientid;
                             $node['paid'] = $paid;
                             $node['date'] = $invoice->date;
@@ -8923,6 +8927,34 @@ class Accounting_model extends App_Model
                             $node['datecreated'] = date('Y-m-d H:i:s');
                             $node['addedfrom'] = get_staff_user_id();
                             $data_insert[] = $node;
+
+                        if($invoice->discount > 0){
+                            
+                            $node = [];
+                            $node['itemable_id'] = $value['id'];
+                            // // suf
+                            $node['split'] = $payment_account; 
+                            $node['account'] = 178 ;
+                            $node['acc_no'] = 3010203 ;
+                            $node['acc_title'] = 'Discount Given' ;
+                            $node['VNo'] = $this->get_max_disc_no();
+                            $node['item'] = $item_id;
+                            $node['debit'] = $invoice->discount;
+                            $node['customer'] = $invoice->clientid;
+                            $node['paid'] = $paid;
+                            $node['date'] = $invoice->date;
+                            $node['tax'] = 0;
+                            $node['credit'] = 0;
+                            $node['description'] = 'Discount Give To Customer For Invoice No INV-' .$invoice->number;
+                            $node['rel_id'] = $invoice_id;
+                            $node['rel_type'] = 'discount';
+                            $node['datecreated'] = date('Y-m-d H:i:s');
+                            $node['addedfrom'] = get_staff_user_id();
+                            $data_insert[] = $node;
+                        }
+ 
+
+                            
         
                             $node = [];
                             $node['itemable_id'] = $value['id'];
@@ -8951,17 +8983,37 @@ class Accounting_model extends App_Model
                             $nodes = [];
                             $nodes['account'] = 137 ;
                             $nodes['acc_no'] =  3010201 ;
-                            $nodes['acc_title'] = '';
+                            $nodes['acc_title'] = 'Sales of product Income';
                             $nodes['VNo'] = 'INCOME-'. $invoice->number;
                             $nodes['debit'] = 0;
                             $nodes['customer'] = $invoice->clientid;
                             $nodes['paid'] = $paid;
                             $nodes['date'] = $invoice->date;
                             $nodes['tax'] = 0;
-                            $nodes['credit'] = $item_total - $item_pur_total;
+                            $nodes['credit'] = $item_total ;
                             $nodes['description'] = 'Income For Invoice No INV-' .$invoice->number;
                             $nodes['rel_id'] = $invoice_id;
                             $nodes['rel_type'] = 'invoice';
+                            $nodes['datecreated'] = date('Y-m-d H:i:s');
+                            $nodes['addedfrom'] = get_staff_user_id();
+		                    $this->db->insert(db_prefix().'acc_account_history', $nodes);
+
+
+                            
+                            $nodes = [];
+                            $nodes['account'] = 176 ;
+                            $nodes['acc_no'] =  4020201 ;
+                            $nodes['acc_title'] = 'Cost Of Goods Sold';
+                            $nodes['VNo'] = $this->get_max_cosg_no()   ;
+                            $nodes['debit'] =   $item_pur_total;
+                            $nodes['customer'] = $invoice->clientid;
+                            $nodes['paid'] = $paid;
+                            $nodes['date'] = $invoice->date;
+                            $nodes['tax'] = 0;
+                            $nodes['credit'] = 0 ;
+                            $nodes['description'] = 'cost of sales goods For Invoice No INV-' .$invoice->number;
+                            $nodes['rel_id'] = $invoice_id;
+                            $nodes['rel_type'] = 'cost';
                             $nodes['datecreated'] = date('Y-m-d H:i:s');
                             $nodes['addedfrom'] = get_staff_user_id();
 		                    $this->db->insert(db_prefix().'acc_account_history', $nodes);
@@ -22545,17 +22597,35 @@ class Accounting_model extends App_Model
 
 
 
+ 
 
+    public function get_max_cosg_no() {
+        $this->db->select('max(VNO) as max_VNO'); // Select the maximum VNO from the table
+        $max = $this->db->get(db_prefix().'acc_account_history')->row(); // Execute the query and retrieve the result
+    
+        if ($max->max_VNO !== null) {
+            $last_number = intval(substr($max->max_VNO, 3)); // Extract the numeric part and convert it to an integer
+            $new_number = 'COSG-' . sprintf('%04d', $last_number + 1); // Increment the number and format it
+            return $new_number; // Return the new COSG number
+        }
+    
+        return 'COSG-01'; // If no existing VNO found, return the initial number 'COSG-01'
+    }
+ 
 
-
-
-
-
-
-
-
-
-
+    public function get_max_disc_no() {
+        $this->db->select('max(VNO) as max_VNO'); // Select the maximum VNO from the table
+        $max = $this->db->get(db_prefix().'acc_account_history')->row(); // Execute the query and retrieve the result
+    
+        if ($max->max_VNO !== null) {
+            $last_number = intval(substr($max->max_VNO, 3)); // Extract the numeric part and convert it to an integer
+            $new_number = 'DISC-' . sprintf('%04d', $last_number + 1); // Increment the number and format it
+            return $new_number; // Return the new COSG number
+        }
+    
+        return 'DISC-01'; // If no existing VNO found, return the initial number 'COSG-01'
+    }
+    
 
 
 
