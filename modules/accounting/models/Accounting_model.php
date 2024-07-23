@@ -8844,6 +8844,7 @@ class Accounting_model extends App_Model
             //     }
             // }
 
+            $grand_item_total = 0 ;
             foreach ($invoice->items as $value) {
                 $item = $this->get_item_by_sku_code($value['sku_code']);
                 $item_id = 0;
@@ -8858,104 +8859,12 @@ class Accounting_model extends App_Model
                 if($currency_converter == 1){
                     $item_total = round($this->currency_converter($invoice->currency_name, $currency->name, $value['qty'] * $value['rate']), 2);
                 }
+                $grand_item_total += $item_total ;
 
                 $item_automatic = $this->get_item_automatic($item_id);
                  // gsttype
                 if($invoice->gsttype != "GST"){
                 
-                    // if($item_automatic){
-                    //         $node = [];
-                    //         $node['itemable_id'] = $value['id'];
-                    //         $node['split'] = $payment_account;
-                    //         $node['account'] = $deposit_to;
-                    //         $node['item'] = $item_id;
-                    //         $node['date'] = $invoice->date;
-                    //         $node['paid'] = $paid;
-                    //         $node['debit'] = $item_total;
-                    //         $node['customer'] = $invoice->clientid;
-                    //         $node['tax'] = 0;
-                    //         $node['credit'] = 0;
-                    //         $node['description'] = '';
-                    //         $node['rel_id'] = $invoice_id;
-                    //         $node['rel_type'] = 'invoice';
-                    //         $node['datecreated'] = date('Y-m-d H:i:s');
-                    //         $node['addedfrom'] = get_staff_user_id();
-                    //         $data_insert[] = $node;
-        
-                    //         $node = [];
-                    //         $node['itemable_id'] = $value['id'];
-                    //         $node['split'] = $deposit_to;
-                    //         $node['customer'] = $invoice->clientid;
-                    //         $node['account'] = $item_automatic->income_account;
-                    //         $node['item'] = $item_id;
-                    //         $node['paid'] = $paid;
-                    //         $node['date'] = $invoice->date;
-                    //         $node['tax'] = 0;
-                    //         $node['debit'] = 0;
-                    //         $node['credit'] = $item_total;
-                    //         $node['description'] = '';
-                    //         $node['rel_id'] = $invoice_id;
-                    //         $node['rel_type'] = 'invoice';
-                    //         $node['datecreated'] = date('Y-m-d H:i:s');
-                    //         $node['addedfrom'] = get_staff_user_id();
-                    //         $data_insert[] = $node;
-                    // }else{
-
-                        $cust_debit = $item_total;
-                        if($invoice->discount > 0){
-                            $cust_debit = $item_total - $invoice->discount;
-                        }
-                            $node = [];
-                            $node['itemable_id'] = $value['id'];
-                            // // suf
-                            $node['split'] = $payment_account;
-                            $head_id = $this->get_HeadId( $invoice->clientid , 'customer' );
-                            $node['account'] = $head_id ;
-                            $node['acc_no'] = $this->get_HeadCodeById($head_id) ;
-                            $node['acc_title'] = $this->get_HeadName($node['acc_no']);
-                            $node['VNo'] = 'INV-'. $invoice->number;
-                            $node['item'] = $item_id;
-                            $node['debit'] = $cust_debit;
-                            $node['customer'] = $invoice->clientid;
-                            $node['paid'] = $paid;
-                            $node['date'] = $invoice->date;
-                            $node['tax'] = 0;
-                            $node['credit'] = 0;
-                            $node['description'] = 'Customer Debit For Invoice No INV-' .$invoice->number;
-                            $node['rel_id'] = $invoice_id;
-                            $node['rel_type'] = 'invoice';
-                            $node['datecreated'] = date('Y-m-d H:i:s');
-                            $node['addedfrom'] = get_staff_user_id();
-                            $data_insert[] = $node;
-
-                        if($invoice->discount > 0){
-                            
-                            $node = [];
-                            $node['itemable_id'] = $value['id'];
-                            // // suf
-                            $node['split'] = $payment_account; 
-                            $node['account'] = 178 ;
-                            $node['acc_no'] = 3010203 ;
-                            $node['acc_title'] = 'Discount Given' ;
-                            $node['VNo'] = $this->get_max_disc_no();
-                            $node['item'] = $item_id;
-                            $node['debit'] = $invoice->discount;
-                            $node['customer'] = $invoice->clientid;
-                            $node['paid'] = $paid;
-                            $node['date'] = $invoice->date;
-                            $node['tax'] = 0;
-                            $node['credit'] = 0;
-                            $node['description'] = 'Discount Give To Customer For Invoice No INV-' .$invoice->number;
-                            $node['rel_id'] = $invoice_id;
-                            $node['rel_type'] = 'discount';
-                            $node['datecreated'] = date('Y-m-d H:i:s');
-                            $node['addedfrom'] = get_staff_user_id();
-                            $data_insert[] = $node;
-                        }
- 
-
-                            
-        
                             $node = [];
                             $node['itemable_id'] = $value['id'];
                             $node['split'] = $deposit_to;
@@ -8977,8 +8886,6 @@ class Accounting_model extends App_Model
                             $node['addedfrom'] = get_staff_user_id();
                             $data_insert[] = $node;
 
-
-
                             
                             $nodes = [];
                             $nodes['account'] = 137 ;
@@ -8997,8 +8904,6 @@ class Accounting_model extends App_Model
                             $nodes['datecreated'] = date('Y-m-d H:i:s');
                             $nodes['addedfrom'] = get_staff_user_id();
 		                    $this->db->insert(db_prefix().'acc_account_history', $nodes);
-
-
                             
                             $nodes = [];
                             $nodes['account'] = 176 ;
@@ -9022,6 +8927,65 @@ class Accounting_model extends App_Model
                 
                 }
             }
+
+
+                $cust_debit = $grand_item_total;
+                if($invoice->discount_total > 0){
+                    $cust_debit = $item_total - $invoice->discount_total;
+                }
+                $node = [];
+                $node['itemable_id'] = $value['id'];
+                // // suf
+                $node['split'] = $payment_account;
+                $head_id = $this->get_HeadId( $invoice->clientid , 'customer' );
+                $node['account'] = $head_id ;
+                $node['acc_no'] = $this->get_HeadCodeById($head_id) ;
+                $node['acc_title'] = $this->get_HeadName($node['acc_no']);
+                $node['VNo'] = 'INV-'. $invoice->number;
+                $node['item'] = $item_id;
+                $node['debit'] = $cust_debit;
+                $node['customer'] = $invoice->clientid;
+                $node['paid'] = $paid;
+                $node['date'] = $invoice->date;
+                $node['tax'] = 0;
+                $node['credit'] = 0;
+                $node['description'] = 'Customer Debit For Invoice No INV-' .$invoice->number;
+                $node['rel_id'] = $invoice_id;
+                $node['rel_type'] = 'invoice';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+                $data_insert[] = $node;
+
+
+                
+
+            
+            if($invoice->discount_total > 0){
+                            
+                $node = [];
+                $node['itemable_id'] = $value['id'];
+                // // suf
+                $node['split'] = $payment_account; 
+                $node['account'] = 178 ;
+                $node['acc_no'] = 3010203 ;
+                $node['acc_title'] = 'Discount Given' ;
+                $node['VNo'] = $this->get_max_disc_no();
+                $node['item'] = $item_id;
+                $node['debit'] = $invoice->discount_total;
+                $node['customer'] = $invoice->clientid;
+                $node['paid'] = $paid;
+                $node['date'] = $invoice->date;
+                $node['tax'] = 0;
+                $node['credit'] = 0;
+                $node['description'] = 'Discount Give To Customer For Invoice No INV-' .$invoice->number;
+                $node['rel_id'] = $invoice_id;
+                $node['rel_type'] = 'discount';
+                $node['datecreated'] = date('Y-m-d H:i:s');
+                $node['addedfrom'] = get_staff_user_id();
+                $data_insert[] = $node;
+            }
+
+
             if($data_insert != []){
                 $affectedRows = $this->db->insert_batch(db_prefix().'acc_account_history', $data_insert);
             }

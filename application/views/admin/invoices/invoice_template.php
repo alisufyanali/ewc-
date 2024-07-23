@@ -739,11 +739,15 @@
             <table class="table text-right">
                 <tbody>
                     <tr id="subtotal">
-                        <td><span class="bold"><?php echo _l('invoice_subtotal'); ?> :</span>
+                        <td><span class="bold">Tag Price Total :
+                    
+                        <input type="hidden" name="subtotal">
+                    </span>
                         </td>
                         <td class="subtotal">
                         </td>
                     </tr>
+                    
                     <tr id="discount_area">
                         <td>
                             <div class="row">
@@ -798,7 +802,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="discount-total"></td>
+                        <td class="discount-total"> <span id="total-discount"></span></td>
                     </tr>
                     <tr>
                         <td>
@@ -871,7 +875,9 @@
                     </tr>
 
                     <tr>
-                        <td><span class="bold"><?php echo _l('invoice_total'); ?> :</span>
+                        <td><span class="bold"><?php echo _l('invoice_total'); ?> 
+                        <input type="hidden" name="total">
+                        :</span>
                         </td>
                         <td class="total">
                         </td>
