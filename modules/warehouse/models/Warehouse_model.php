@@ -16303,10 +16303,8 @@ class Warehouse_model extends App_Model {
 
 
 	public function get_account_by_vendor($id) {
-
 		$this->db->where('vendor_id', $id);
 		return $this->db->get(db_prefix() . 'acc_accounts')->row();
-
 	}
 
 
