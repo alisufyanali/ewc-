@@ -8713,6 +8713,7 @@ class Accounting_model extends App_Model
 
                     
                 $grand_item_total = 0 ;
+                $single_discount_total = 0 ;
                 foreach ($invoice->items as $value) {
                     $item = $this->get_item_by_sku_code($value['sku_code']);
                     $item_id = 0;
@@ -8789,6 +8790,27 @@ class Accounting_model extends App_Model
                         $nodes['datecreated'] = date('Y-m-d H:i:s');
                         $nodes['addedfrom'] = get_staff_user_id();
                         $this->db->insert(db_prefix().'acc_account_history', $nodes);
+
+                           
+                        $single_discount_total += $value['discount'] ;
+                        $nodes = [];
+                        $nodes['account'] = 178 ;
+                        $nodes['acc_no'] =  3010203 ;
+                        $nodes['acc_title'] = 'Discount Given';
+                        $nodes['VNo'] = $this->get_max_disc_no() ;
+                        $nodes['debit'] =   $value['discount'] ;
+                        $nodes['customer'] = $invoice->clientid;
+                        $nodes['paid'] = $paid;
+                        $nodes['date'] = $invoice->date;
+                        $nodes['tax'] = 0;
+                        $nodes['credit'] = 0 ;
+                        $nodes['description'] = ' Discount Give To Customer For Item '.$invoice->sku_code. ' In INV-' .$invoice->number;
+                        $nodes['rel_id'] = $invoice_id;
+                        $nodes['rel_type'] = 'discount';
+                        $nodes['datecreated'] = date('Y-m-d H:i:s');
+                        $nodes['addedfrom'] = get_staff_user_id();
+                        $this->db->insert(db_prefix().'acc_account_history', $nodes);
+
                     }
                 }
                 
@@ -8796,7 +8818,7 @@ class Accounting_model extends App_Model
 
                 $cust_debit = $grand_item_total;
                 if($invoice->discount_total > 0){
-                    $cust_debit = $grand_item_total - $invoice->discount_total;
+                    $cust_debit = $grand_item_total - ($invoice->discount_total + $single_discount_total ) ;
                 }
                 $node = [];
                 $node['itemable_id'] = $value['id'];
@@ -22436,40 +22458,42 @@ class Accounting_model extends App_Model
 
 
 
+ 
+        // Function to get the next VNO based on the prefix
+        private function get_next_vno($prefix) {
+            // Select the maximum VNO from the table
+            $this->db->select('max(VNO) as max_VNO');
+            $this->db->from(db_prefix() . 'acc_account_history');
+            $query = $this->db->get();
 
+            // Print the last query for debugging
+            echo 'Last Query: ' . $this->db->last_query();
+            
+            $max = $query->row();
 
-
-
-    // Function to get the next VNO based on the prefix
-    private function get_next_vno($prefix) {
-        // Select the maximum VNO from the table
-        $this->db->select('max(VNO) as max_VNO');
-        $this->db->from(db_prefix().'acc_account_history');
-        $max = $this->db->get()->row();
-
-        // If there is a result, process it
-        if ($max && $max->max_VNO !== null) {
-            // Extract the numeric part, increment it, and format it with leading zeros
-            $last_number = intval(substr($max->max_VNO, strlen($prefix) + 1));
-            $new_number = $prefix . '-' . sprintf('%05d', $last_number + 1);
-        } else {
-            // If no existing VNO found, return the initial number
+            // Initialize new_number with the default value
             $new_number = $prefix . '-01';
+
+            // If there is a result, process it
+            if ($max && $max->max_VNO !== null) {
+                // Extract the numeric part, increment it, and format it with leading zeros
+                $max_VNO = $max->max_VNO;
+                $last_number = substr($max_VNO, strlen($prefix) + 1);  // Extract numeric part
+                $last_number = intval($last_number);  // Convert to integer
+                $new_number = $prefix . '-' . sprintf('%02d', $last_number + 1);
+            }
+
+            return $new_number;
         }
 
-        return $new_number;
-    }
+        // Function to get the next COSG number
+        public function get_max_cosg_no() {
+            return $this->get_next_vno('COSG');
+        }
 
-    // Function to get the next COSG number
-    public function get_max_cosg_no() {
-        return $this->get_next_vno('COSG');
-    }
-
-    // Function to get the next DISC number
-    public function get_max_disc_no() {
-        return $this->get_next_vno('DISC');
-    }
-
-
+        // Function to get the next DISC number
+        public function get_max_disc_no() {
+            return $this->get_next_vno('DISC');
+        }
 
 }

@@ -402,11 +402,26 @@ class Invoices extends AdminController
 
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->invoice_items_model->get_grouped();
+            $items = $this->invoice_items_model->get_grouped();
+            
+
+            $filteredItems = [];
+
+            foreach ($items[9] as $key => $aRow) {
+                $qty = $this->calculateQuantity($aRow); 
+                if ($qty != 0) {
+                    $filteredItems[$key] = $aRow;
+                }
+            }
+
+            // Update the original array with filtered items
+            $items[9] = $filteredItems;
+            $data['items'] = $items;
         } else {
             $data['items']     = [];
             $data['ajaxItems'] = true;
         }
+
         $data['items_groups'] = $this->invoice_items_model->get_groups();
 
         $this->load->model('currencies_model');
@@ -419,7 +434,13 @@ class Invoices extends AdminController
         $data['bodyclass'] = 'invoice';
         $this->load->view('admin/invoices/invoice', $data);
     }
-    
+    // Function to calculate quantity based on the given conditions
+    public function calculateQuantity($item) {
+        return number_format(
+            (getTotalPurchaseQuantity($item['id']) - getTotalReturnQuantity($item['id'])) -
+            (getTotalInvoiceQuantity(str_replace(' ', '', $item['sku_code'])) - getTotalRefundQuantity(str_replace(' ', '', $item['sku_code'])))
+        );
+    }
     
     
     public function waranty($id = '')
