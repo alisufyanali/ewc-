@@ -8749,7 +8749,7 @@ class Accounting_model extends App_Model
                         $nodes['credit'] = $item_pur_total;
                         $nodes['description'] = 'Inventory '.$invoice->sku_code.' credit For Invoice  INV-' .$invoice->number;
                         $nodes['rel_id'] = $invoice_id;
-                        $nodes['rel_type'] = 'invoice';
+                        $nodes['rel_type'] = 'inventory';
                         $nodes['datecreated'] = date('Y-m-d H:i:s');
                         $nodes['addedfrom'] = get_staff_user_id();
                         $this->db->insert(db_prefix().'acc_account_history', $nodes);
@@ -22165,24 +22165,40 @@ class Accounting_model extends App_Model
         $received_entrie = $this->db->get(db_prefix() . 'acc_received_entries')->row();
 
         if($received_entrie){
+            $data_details =[];
             $this->db->where('rel_id', $id);
-            $this->db->where('rel_type', 'received_exit');
+            $this->db->where('rel_type', 'received_entry');
             $details = $this->db->get(db_prefix().'acc_account_history')->result_array();
 
-            $data_details =[];
             foreach ($details as $key => $value) {
                 $data_details[] = [
                     "account" => $value['account'],
                     "acc_no" => $value['acc_no'],
                     "HeadName" => $this->get_HeadName($value['acc_no']),
                     "debit" => floatval($value['debit']), 
+                    "credit" => floatval($value['credit']), 
                     "description" => $value['description']];
                     
             }
-            if(count($data_details) < 10){
-
-            }
             $received_entrie->details = $data_details;
+
+
+            $cust_data_details =[];
+            $this->db->where('rel_id', $id);
+            $this->db->where('rel_type', 'received_exit');
+            $details = $this->db->get(db_prefix().'acc_account_history')->result_array();
+
+            foreach ($details as $key => $value) {
+                $cust_data_details[] = [
+                    "account" => $value['account'],
+                    "acc_no" => $value['acc_no'],
+                    "HeadName" => $this->get_HeadName($value['acc_no']),
+                    "debit" => floatval($value['debit']), 
+                    "credit" => floatval($value['credit']), 
+                    "description" => $value['description']];
+                    
+            }
+            $received_entrie->cust_details = $cust_data_details;
         }
 
         return $received_entrie;

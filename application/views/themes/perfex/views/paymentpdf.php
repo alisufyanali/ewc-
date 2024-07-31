@@ -20,6 +20,10 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
         <th style="width:60%; text-align:right"><b> Mode of Payment :</b> </th>
         <th style="width:40%; text-align: right; ">'.$payment->mode_of_payment.'</th>
     </tr> 
+    <tr>
+        <th style="width:60%; text-align:right"><b> Reference No :</b> </th>
+        <th style="width:40%; text-align: right; ">'.$receipt->reference_no.'</th>
+    </tr>
     <tr> 
         <th style="width:60%; text-align:right"><b> Date :</b> </th>
         <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($payment->payment_date)).'</th>
@@ -144,7 +148,7 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
     <thead>
     <tr>
         <th width="30%"><b>Amount </b> </th>
-        <th width="70%">: '.$amount.'</th>
+        <th width="70%">: '.number_format($amount,2).'</th>
     </tr>
     <tr>
         <th width="30%"><b>Amount In Words</b></th>
@@ -229,6 +233,10 @@ if(isset($payment->pdf_for) && ($payment->pdf_for == 'both'  || $payment->pdf_fo
         <th style="width:60%; text-align:right"><b> Mode of Payment :</b> </th>
         <th style="width:40%; text-align: right; ">'.$payment->mode_of_payment.'</th>
     </tr> 
+    <tr>
+        <th style="width:60%; text-align:right"><b> Reference No :</b> </th>
+        <th style="width:40%; text-align: right; ">'.$receipt->reference_no.'</th>
+    </tr>
     <tr> 
         <th style="width:60%; text-align:right"><b> Date :</b> </th>
         <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($payment->payment_date)).'</th>

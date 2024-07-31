@@ -30,9 +30,29 @@
                             </span>
                         </h3>
                         <h4 class="invoice-html-status mtop7">
-                            <?php echo format_invoice_status($invoice->status, '', true); ?>
+                            <?php
+                            
+                            $received_amount = get_invoice_received_amount($invoice->id); 
+                            $paid_amount     = get_invoice_paid_amount($invoice->id);
+                            $total_amount    = $invoice->total;
+        
+                            $total = $total_amount - $received_amount ; 
+        
+                            if($total == 0){
+                                echo '<span class="label label-success ">Paid </span>';
+                            }elseif($received_amount == null   ){
+                                echo '<span class="label label-danger ">UnPaid </span>';
+                            }elseif($total < 0 || ($invoice->total >= $received_amount)) {
+                                echo '<span class="label label-primary ">Partical </span>';
+                            }else{
+                                echo '';
+                            }
+        
+                            ?>
                         </h4>
                     </div>
+                            <br>
+                            <br>
                     <div class="visible-xs">
                         <div class="clearfix"></div>
                     </div>
@@ -40,7 +60,8 @@
                   <?php if (($invoice->status != Invoices_model::STATUS_PAID && $invoice->status != Invoices_model::STATUS_CANCELLED
                      && $invoice->total > 0) && found_invoice_mode($payment_modes, $invoice->id, false)) {
                      echo ' pay-now-top';
-                  } ?>">
+                  }
+                  ?>">
                         <?php echo _l('invoice_html_online_payment_button_text'); ?>
                     </a>
                     <?php echo form_open($this->uri->uri_string()); ?>
@@ -51,7 +72,7 @@
                     <button type="submit" name="invoicepdf" value="invoicepdf"
                         class="btn btn-default pull-right action-button mtop5">
                         <i class='fa fa-file-pdf-o'></i>
-                        <?php echo _l('clients_invoice_html_btn_download'); ?>
+                    Print
                     </button>
                     <?php echo form_close(); ?>
                     <?php if (is_client_logged_in() && has_contact_permission('invoices')) { ?>
@@ -286,9 +307,9 @@
                                 <td>
                                     <span class="pull-left"><?php echo $received->VNo; ?></span>
                                     <?php echo form_open($this->uri->uri_string()); ?>
-                                    <button type="submit" value="<?php echo $received->id; ?>"
+                                    <a href="<?php echo admin_url('accounting/receipt_pdf/'. $received->rel_id  ); ?>?for=client" target="_blank"
                                         class="btn btn-icon btn-default pull-right" name="receviedpdf"><i
-                                            class="fa fa-file-pdf-o"></i></button>
+                                            class="fa fa-file-pdf-o"></i></a>
                                     <?php echo form_close(); ?>
                                 </td>
                                 <td><?php echo get_receivedvoucher_paymentexit($received->VNo); ?> </td>

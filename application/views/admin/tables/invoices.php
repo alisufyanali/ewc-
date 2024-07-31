@@ -135,7 +135,6 @@ $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
     $row = [];
-
     $numberOutput = '';
 
     // If is from client area table
@@ -160,7 +159,6 @@ foreach ($rResult as $aRow) {
         $numberOutput .= ' | <a href="' . admin_url('invoices/invoice/' . $aRow['id']) . '">' . _l('edit') . '</a>';
     }
     $numberOutput .= ' | <a class="text-danger" href="' . admin_url('invoices/delete/' . $aRow['id']) . '">' . _l('delete') . '</a>';
-
     $numberOutput .= '</div>';
 
     $row[] = $numberOutput;
@@ -185,7 +183,7 @@ foreach ($rResult as $aRow) {
 
     $received_amount = get_invoice_received_amount($aRow['id']); 
     $paid_amount     = get_invoice_paid_amount($aRow['id']);
-    $total_amount    = get_invoice_total_amount($aRow['id']);
+    $total_amount    = $aRow['total'];
 
     $total = $total_amount - $received_amount ; 
 
@@ -193,11 +191,11 @@ foreach ($rResult as $aRow) {
     $row[] = $total ;
 
     if($total == 0){
-        $row[] = '<span class="label label-success ">Paid</span>';
+        $row[] = '<span class="label label-success ">Paid </span>';
     }elseif($received_amount == null   ){
-        $row[] = '<span class="label label-danger ">UnPaid</span>';
+        $row[] = '<span class="label label-danger ">UnPaid </span>';
     }elseif($total < 0 || ($aRow['total'] >= $received_amount)) {
-        $row[] = '<span class="label label-primary ">Partical</span>';
+        $row[] = '<span class="label label-primary ">Partical </span>';
     }else{
         $row[] = '';
     }

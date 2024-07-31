@@ -333,7 +333,7 @@ function accounting_module_init_menu_items() {
 		if (has_permission('accounting_journal_entry', '', 'view')) {
 			$CI->app_menu->add_sidebar_children_item('accounting', [
 				'slug' => 'accounting_journal_entry',
-				'name' => _l('journal_entry'),
+				'name' => 'Journal Voucher',
 				'icon' => 'fa fa-book',
 				'href' => admin_url('accounting/journal_entry'),
 				'position' => 3,
@@ -341,7 +341,7 @@ function accounting_module_init_menu_items() {
 			 
 			$CI->app_menu->add_sidebar_children_item('accounting', [
 				'slug' => 'accounting_payment_entry',
-				'name' => 'Payment Entry',
+				'name' => 'Payment Voucher',
 				'icon' => 'fa fa-money',
 				'href' => admin_url('accounting/payment_entry'),
 				'position' => 3,
@@ -349,7 +349,7 @@ function accounting_module_init_menu_items() {
 			
 			$CI->app_menu->add_sidebar_children_item('accounting', [
 				'slug' => 'accounting_received_entry',
-				'name' => 'Received Entry',
+				'name' => 'Received Voucher',
 				'icon' => 'fa fa-handshake-o',
 				'href' => admin_url('accounting/received_entry'),
 				'position' => 3,

@@ -10,8 +10,25 @@ $info_left_column  = '';
 $info_right_column .= '<span style="font-weight:bold;font-size:27px;">' . _l('invoice_pdf_heading') . '</span><br />';
 $info_right_column .= '<b style="color:#4e4e4e;"># ' . $invoice_number . '</b>';
 
+
 if (get_option('show_status_on_pdf_ei') == 1) {
-    $info_right_column .= '<br /><span style="color:rgb(' . invoice_status_color_pdf($status) . ');text-transform:uppercase;">' . format_invoice_status($status, '', false) . '</span>';
+    $received_amount = get_invoice_received_amount($invoice->id); 
+    $paid_amount     = get_invoice_paid_amount($invoice->id);
+    $total_amount    = $invoice->total;
+
+    $total = $total_amount - $received_amount ; 
+
+    if($total == 0){
+        $status = '<span style="color:green;  ">Paid </span>';
+    }elseif($received_amount == null   ){
+        $status = '<span  style="color:red;  ">UnPaid </span>';
+    }elseif($total < 0 || ($invoice->total >= $received_amount)) {
+        $status = '<span  style="color:blue;  ">Partical </span>';
+    }else{
+        $status = '';
+    }
+        
+    $info_right_column .= '<br>'.$status ;
 }
 
 if ($status != Invoices_model::STATUS_PAID && $status != Invoices_model::STATUS_CANCELLED && get_option('show_pay_link_to_invoice_pdf') == 1
@@ -109,7 +126,7 @@ $tblhtml = $items->table();
 
 $pdf->writeHTML($tblhtml, true, false, false, false, '');
 
-$pdf->Ln(8);
+$pdf->Ln(2);
 
 $tbltotal = '';
 $tbltotal .= '<table cellpadding="6" style="font-size:' . ($font_size + 4) . 'px">';
@@ -146,19 +163,22 @@ if ((int) $invoice->adjustment != 0) {
 </tr>';
 }
 
-$tbltotal .= '
+
+if ((int) $invoice->freightcharges != 0) {
+    $tbltotal .= '
 <tr style="background-color:#f0f0f0;">
     <td align="right" width="85%"><strong>Frieght Charges</strong></td>
     <td align="right" width="15%">' . app_format_money($invoice->freightcharges, $invoice->currency_name) . '</td>
 </tr>';
+}
 
-
-$tbltotal .= '
+if ((int) $invoice->othercharges != 0) {
+    $tbltotal .= '
 <tr style="background-color:#f0f0f0;">
     <td align="right" width="85%"><strong>Other Charges</strong></td>
     <td align="right" width="15%">' . app_format_money($invoice->othercharges, $invoice->currency_name) . '</td>
 </tr>';
-
+}
 
 $tbltotal .= '
 <tr style="background-color:#f0f0f0;">

@@ -30,7 +30,7 @@ class Invoice extends ClientsController
             if ($companyname != '') {
                 $invoice_number .= '-' . mb_strtoupper(slug_it($companyname), 'UTF-8');
             }
-            $pdf->Output(mb_strtoupper(slug_it($invoice_number), 'UTF-8') . '.pdf', 'D');
+            $pdf->Output(mb_strtoupper(slug_it($invoice_number), 'UTF-8') . '.pdf', 'I');
             die();
         }
 

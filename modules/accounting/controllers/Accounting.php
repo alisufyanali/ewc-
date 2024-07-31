@@ -9613,13 +9613,13 @@ var_dump($data['group'] ); die;
     public function receipt_pdf($id){
         $data['title']         = _l('receipt_pdf');
         $receipt = $this->accounting_model->get_received_entry($id);
-        
+
+        $receipt->HeadName = $this->accounting_model->get_HeadName($receipt->modes_accounts);
+        $receipt->pdf_for  = $this->input->get('for');
+
         // echo '<pre>';
         // print_r($receipt);
         // exit;
-        $receipt->HeadName = $this->accounting_model->get_HeadName($receipt->modes_accounts);
-        $receipt->pdf_for = $this->input->get('for');
-        
         $receiptpdf            = receipt_pdf($receipt);
         $receiptpdf->Output(mb_strtoupper(slug_it(_l('receipt') . '-' . $receipt->VNo), 'UTF-8') . '.pdf', 'I');
         die;

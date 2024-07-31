@@ -21,6 +21,11 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
         <th style="width:60%; text-align:right"><b> Mode of Payment :</b> </th>
         <th style="width:40%; text-align: right; ">'.$receipt->mode_of_payment.'</th>
     </tr> 
+    
+    <tr>
+        <th style="width:60%; text-align:right"><b> reference No :</b> </th>
+        <th style="width:40%; text-align: right; ">'.$receipt->reference_no.'</th>
+    </tr> 
     <tr> 
         <th style="width:60%; text-align:right"><b> Date :</b> </th>
         <th style="width:40%; text-align: right; ">'.date( 'd-M-Y' ,strtotime($receipt->payment_date)).'</th>
@@ -75,13 +80,16 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     $total_debit = 0;
     foreach ($receipt->details as $key => $detail ) {
         # code...
+        if($detail["debit"] > 0 ){
+            continue;
+        }
         $key++;  
-        $total_debit += $detail["debit"] ;
+        $total_credit += $detail["credit"] ;
         $tblhtml .= '<tr>'; 
         $tblhtml .= '<td style="font-size:14px; ">'. $key .'</td>'; 
         $tblhtml .= '<td style="font-size:14px; "> '.$detail["acc_no"].' - '.$detail["HeadName"].' </td>'; 
         $tblhtml .= '<td style="font-size:14px; ">'.$detail["description"].' </td>'; 
-        $tblhtml .= '<td style="text-align:right; font-size:14px; " >'.number_format($detail["debit"] ,2 ).'  </td>'; 
+        $tblhtml .= '<td style="text-align:right; font-size:14px; " >'.number_format($detail["credit"] ,2 ).'  </td>'; 
         $tblhtml .= '</tr>'; 
         $tblhtml .= '</tbody>'; 
     }
@@ -89,7 +97,7 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     $tblhtml .= '<tfoot>'; 
     $tblhtml .= '<tr  style="color:#fff; " bgcolor="#000">'; 
     $tblhtml .= '<td  style="text-align:right; " colspan="3" > Total</td>'; 
-    $tblhtml .= '<td  style="text-align:right" >'.number_format($total_debit, 2).'</td>'; 
+    $tblhtml .= '<td  style="text-align:right" >'.number_format($total_credit, 2).'</td>'; 
     $tblhtml .= '</tr>'; 
     $tblhtml .= '</tfoot>'; 
 
@@ -145,7 +153,7 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     <thead>
     <tr>
         <th width="30%"><b>Amount </b> </th>
-        <th width="70%">: '.$amount.'</th>
+        <th width="70%">: '.number_format($amount,2).'</th>
     </tr>
     <tr>
         <th width="30%"><b>Amount In Words</b></th>
@@ -196,16 +204,6 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
 
 
 
-
-
-
-
-
-
-
-
-
-
 if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both' ) ){
 
     $pdf->AddPage(); // Add a new page
@@ -229,6 +227,11 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     <tr>
         <th style="width:60%; text-align:right"><b> Mode of Payment :</b> </th>
         <th style="width:40%; text-align: right; ">'.$receipt->mode_of_payment.'</th>
+    </tr> 
+    
+    <tr>
+        <th style="width:60%; text-align:right"><b> reference No :</b> </th>
+        <th style="width:40%; text-align: right; ">'.$receipt->reference_no.'</th>
     </tr> 
     <tr> 
         <th style="width:60%; text-align:right"><b> Date :</b> </th>
@@ -268,7 +271,7 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     $pdf->writeHTML($headerhtml, true, false, false, false, ''); 
 
     // Header
-    $tblhtml = '<h5>Receipt Details (DR)</h5>
+    $tblhtml = '<h5>Receipt Details</h5>
     <table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="10" border="0">
     <thead>
     <tr height="30" style="color:#fff; " bgcolor="#000">
@@ -282,8 +285,11 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     '; 
 
     $total_debit = 0;
-    foreach ($receipt->details as $key => $detail ) {
+    foreach ($receipt->cust_details as $key => $detail ) {
         # code...
+        if($detail["credit"] > 0 ){
+            continue;
+        }
         $key++;  
         $total_debit += $detail["debit"] ;
         $tblhtml .= '<tr>'; 
@@ -324,7 +330,7 @@ if(isset($receipt->pdf_for) && ($receipt->pdf_for == 'both'  || $receipt->pdf_fo
     <thead>
     <tr>
         <th width="30%"><b>Amount </b> </th>
-        <th width="70%">: '.$amount.'</th>
+        <th width="70%">: '.number_format($amount ,2 ).'</th>
     </tr>
     <tr>
         <th width="30%"><b>Amount In Words</b></th>
