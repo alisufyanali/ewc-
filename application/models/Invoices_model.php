@@ -412,7 +412,7 @@ class Invoices_model extends App_Model
             
             // print_r($response);
             // die();
-            $data['fbrinvoiceno'] = $response->InvoiceNumber;
+            // $data['fbrinvoiceno'] = $response->InvoiceNumber;
             
             $meritype = 'GST Invoice';
         }
